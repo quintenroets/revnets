@@ -62,6 +62,7 @@ tornado
 tqdm
 typing-extensions
 urllib3
+wandb
 Werkzeug
 wrapt
 
