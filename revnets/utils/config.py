@@ -43,6 +43,7 @@ class Config:
     debug_epochs: int = 3
     devices: int = None
     batch_size: int = 128
+    log: bool = False
     log_on_debug: bool = False
     _num_devices: int = None
 

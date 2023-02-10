@@ -12,7 +12,7 @@ class Trainer(pl.Trainer):
         logger=None,
         **kwargs,
     ):
-        if logger is None:
+        if logger is None and config.log:
             logger = config.logger
         if strategy is None and "num_nodes" not in kwargs:
             strategy = DDPStrategy()
