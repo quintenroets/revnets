@@ -15,7 +15,7 @@ class Trainer(pl.Trainer):
         if logger is None and config.log:
             logger = config.logger
         if strategy is None and "num_nodes" not in kwargs:
-            strategy = DDPStrategy()
+            strategy = DDPStrategy(find_unused_parameters=False)
 
         super().__init__(
             accelerator=accelerator,
