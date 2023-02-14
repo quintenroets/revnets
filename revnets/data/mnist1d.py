@@ -1,6 +1,7 @@
 import pickle
 from dataclasses import dataclass
 
+import numpy as np
 import pytorch_lightning as pl
 import requests
 import torch
@@ -27,7 +28,8 @@ class Dataset(pl.LightningDataModule):
         super().__init__()
         self.batch_size = self.calculate_effective_batch_size()
 
-    def calculate_effective_batch_size(self):
+    @classmethod
+    def calculate_effective_batch_size(cls):
         """
         We want reproducible experiments.
 
@@ -47,12 +49,29 @@ class Dataset(pl.LightningDataModule):
 
     def setup(self, stage: str) -> None:
         data = self.get_data()
-        train_tensors = (torch.from_numpy(data[key]) for key in ("x", "y"))
-        train_dataset = TensorDataset(*train_tensors)
-        self.train_dataset, self.val_dataset = split_train_val(train_dataset)
 
-        test_tensors = (torch.from_numpy(data[key]) for key in ("x_test", "y_test"))
-        self.test_dataset = TensorDataset(*test_tensors)
+        def load(name: str):
+            return torch.from_numpy(data[name])
+
+        x = data["x"]
+        y = data["y"]
+        x_test = data["x_test"]
+        y_test = data["y_test"]
+
+        def prepare_x(x_array: np.ndarray):
+            x_torch = torch.Tensor(x_array)
+            x_torch = torch.nn.functional.normalize(x_torch)
+            return x_torch
+
+        x = prepare_x(x)
+        x_test = prepare_x(x_test)
+
+        y = torch.LongTensor(y)
+        y_test = torch.LongTensor(y_test)
+
+        train_dataset = TensorDataset(x, y)
+        self.train_dataset, self.val_dataset = split_train_val(train_dataset)
+        self.test_dataset = TensorDataset(x_test, y_test)
 
     def train_dataloader(self):
         return self.get_dataloader(Split.train, self.batch_size, shuffle=True)
