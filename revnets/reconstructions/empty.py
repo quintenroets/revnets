@@ -1,5 +1,2 @@
-import torch.nn
-
-
-def reconstruct(original: torch.nn.Module, reconstructed: torch.nn.Module):
+def reconstruct(*_, **__):
     pass
