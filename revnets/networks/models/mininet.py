@@ -1,11 +1,11 @@
+import torch.nn
 import torch.optim as optim
 from torch import nn
 
 from ...utils import config
-from . import trainable
 
 
-class Model(trainable.Model):
+class Model(torch.nn.Module):
     def __init__(self, hidden_size=20):
         super().__init__()
         self.layer1 = nn.Linear(40, hidden_size)
@@ -19,3 +19,8 @@ class Model(trainable.Model):
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=config.lr)
+
+    @classmethod
+    @property
+    def name(cls):
+        return cls.__module__.replace(".", "_")

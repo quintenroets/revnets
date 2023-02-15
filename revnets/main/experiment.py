@@ -31,7 +31,7 @@ class Experiment:
             show_name(technique)
             reconstruction = network.get_architecture()
             technique.reconstruct(original, reconstruction, network)
-            evaluations.evaluate(original, reconstruction)
+            evaluations.evaluate(original, reconstruction, network)
 
     @classmethod
     @rank_zero_only

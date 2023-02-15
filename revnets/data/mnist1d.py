@@ -7,7 +7,7 @@ import requests
 import torch
 from torch.utils.data import ConcatDataset, Subset, TensorDataset
 
-from ..utils import Path, config
+from ..utils import Path, batch_size, config
 from .split import Split
 
 
@@ -118,6 +118,9 @@ class Dataset(pl.LightningDataModule):
         check_existence(path)
         with path.open("rb") as fp:
             return pickle.load(fp)
+
+    def calibrate(self, model):
+        self.eval_batch_size = batch_size.get_max_batch_size(model, self)
 
 
 def split_train_val(

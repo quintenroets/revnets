@@ -2,7 +2,7 @@ import torch
 from rich.pretty import pprint
 
 
-def evaluate(original: torch.nn.Module, reconstruction: torch.nn.Module):
+def evaluate(original: torch.nn.Module, reconstruction: torch.nn.Module, *_, **__):
     MSE = get_mse(original, reconstruction)
     message = f"MSE: {MSE}"
     pprint(message)

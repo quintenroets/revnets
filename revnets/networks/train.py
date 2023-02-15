@@ -1,8 +1,9 @@
 import torch
 
 from ..data.mnist1d import Dataset
-from ..utils import Path, batch_size
+from ..utils import Path
 from ..utils.trainer import Trainer
+from .models import trainable
 from .models.trainable import Model
 
 
@@ -39,10 +40,11 @@ class Network:
     @classmethod
     def train(cls, model: Model):
         data = cls.dataset()
-        data.eval_batch_size = batch_size.get_max_batch_size(model, data)
+        train_model = trainable.Model(model)
+        data.calibrate(train_model)
         trainer = Trainer()
-        trainer.fit(model, data)
-        trainer.test(model, data)
+        trainer.fit(train_model, data)
+        trainer.test(train_model, data)
 
     @classmethod
     def dataset(cls) -> Dataset:

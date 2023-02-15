@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytorch_lightning as pl
 import torchmetrics
 from torch import nn
@@ -6,8 +8,9 @@ from .metrics import Metrics, Phase
 
 
 class Model(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, model):
         super().__init__()
+        self.model = model
         self.do_log: bool = True
 
     def training_step(self, batch, batch_idx):
@@ -22,7 +25,7 @@ class Model(pl.LightningModule):
 
     def obtain_metrics(self, batch, phase: Phase) -> Metrics:
         inputs, labels = batch
-        outputs = self(inputs)
+        outputs = self.model(inputs)
         metrics = self.calculate_metrics(outputs, labels)
         self.log_metrics(metrics, phase)
         return metrics
@@ -40,6 +43,9 @@ class Model(pl.LightningModule):
             predictions, labels, task="multiclass", num_classes=10
         )
         return accuracy.item()
+
+    def configure_optimizers(self) -> Any:
+        return self.model.configure_optimizers()
 
     def log_metrics(self, metrics: Metrics, phase: Phase):
         if phase != Phase.SILENT:
@@ -61,8 +67,3 @@ class Model(pl.LightningModule):
             return super().log(
                 *args, sync_dist=sync_dist, on_epoch=on_epoch, on_step=on_step, **kwargs
             )
-
-    @classmethod
-    @property
-    def name(cls):
-        return cls.__module__.replace(".", "_")

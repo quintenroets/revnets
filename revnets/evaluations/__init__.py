@@ -1,10 +1,10 @@
 import torch
 
-from . import weights
+from . import outputs, weights
 
-evaluators = (weights,)
+evaluators = (weights, outputs)
 
 
-def evaluate(original: torch.nn.Module, reconstruction: torch.nn.Module):
+def evaluate(*args, **kwargs):
     for evaluator in evaluators:
-        evaluator.evaluate(original, reconstruction)
+        evaluator.evaluate(*args, **kwargs)
