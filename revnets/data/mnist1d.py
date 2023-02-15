@@ -47,7 +47,7 @@ class Dataset(pl.LightningDataModule):
         config._num_devices = used_devices
         return batch_size_per_gpu
 
-    def setup(self, stage: str) -> None:
+    def setup(self, stage: str = None) -> None:
         data = self.get_data()
 
         def load(name: str):
