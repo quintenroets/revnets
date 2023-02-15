@@ -26,6 +26,7 @@ class Enum(enum.Enum):
 
 class NetworkName(Enum):
     mininet = "mininet"
+    mininet_untrained = "mininet_untrained"
     mediumnet = "mediumnet"
 
 

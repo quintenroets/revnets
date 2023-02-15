@@ -1,1 +1,1 @@
-from . import mediumnet, mininet
+from . import mediumnet, mininet, mininet_untrained
