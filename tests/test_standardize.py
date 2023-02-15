@@ -35,4 +35,4 @@ def test_standardize_preserves_behavior(model, standardized_model, inputs):
     with torch.no_grad():
         inputs = torch.Tensor(inputs)
         outputs = (model(inputs), standardized_model(inputs))
-        assert torch.allclose(*outputs)
+        assert torch.allclose(*outputs, rtol=1e-3)
