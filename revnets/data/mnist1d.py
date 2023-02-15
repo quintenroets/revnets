@@ -77,7 +77,7 @@ class Dataset(pl.LightningDataModule):
         return self.get_dataloader(Split.train, self.batch_size, shuffle=True)
 
     def val_dataloader(self):
-        return self.get_dataloader(Split.valid, self.eval_batch_size, shuffle=True)
+        return self.get_dataloader(Split.valid, self.eval_batch_size)
 
     def test_dataloader(self):
         return self.get_dataloader(Split.test, self.eval_batch_size)
