@@ -1,5 +1,5 @@
-from . import cheat, empty, retrain
+from . import cheat, empty, retrain, retrain_on_outputs
 
 
 def get_algorithms():
-    return empty, cheat, retrain
+    return empty, cheat, retrain, retrain_on_outputs
