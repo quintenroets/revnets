@@ -1,11 +1,8 @@
 import torch
-from rich.pretty import pprint
 
 
 def evaluate(original: torch.nn.Module, reconstruction: torch.nn.Module, *_, **__):
-    MSE = get_mse(original, reconstruction)
-    message = f"MSE: {MSE}"
-    pprint(message)
+    return get_mse(original, reconstruction)
 
 
 def get_mse(original: torch.nn.Module, reconstruction: torch.nn.Module):
@@ -16,7 +13,7 @@ def get_mse(original: torch.nn.Module, reconstruction: torch.nn.Module):
     MSE_sum = sum(
         torch.nn.functional.mse_loss(
             original_weights, reconstructed_weights, reduction="sum"
-        )
+        ).item()
         for original_weights, reconstructed_weights in zip(
             original.state_dict().values(), reconstruction.state_dict().values()
         )

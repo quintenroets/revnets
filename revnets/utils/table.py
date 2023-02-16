@@ -16,5 +16,5 @@ class Table(table.Table):
                 message = console.export_text(styles=True)
                 return message
 
-    def print(self):
-        cli.console.print(self.text, highlight=False)
+    def show(self):
+        cli.console.print(self, highlight=False)

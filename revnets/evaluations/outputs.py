@@ -2,7 +2,6 @@ import pytorch_lightning as pl
 import torch
 import torchmetrics
 from cacher.caches.speedup_deep_learning import cache
-from rich.pretty import pprint
 
 from ..data.mnist1d import Dataset
 from ..utils.trainer import Trainer
@@ -38,6 +37,4 @@ def compare_outputs(model1, model2, dataset):
 
 def evaluate(original: torch.nn.Module, reconstruction: torch.nn.Module, network):
     dataset: Dataset = network.dataset()
-    difference = compare_outputs(original, reconstruction, dataset)
-    message = f"Output difference: {difference}"
-    pprint(message)
+    return compare_outputs(original, reconstruction, dataset)

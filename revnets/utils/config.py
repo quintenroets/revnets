@@ -32,7 +32,7 @@ class NetworkName(Enum):
 
 @dataclass
 class Config:
-    network: str
+    network: str | tuple[str]
     config_path: Path
     epochs: int = None
     num_workers: int = 4
@@ -49,7 +49,9 @@ class Config:
     _num_devices: int = None
 
     def __post_init__(self):
-        self.network_name = NetworkName.from_str(self.network)
+        if isinstance(self.network, str):
+            self.network = (self.network,)
+        self.network_names = [NetworkName.from_str(network) for network in self.network]
 
         if self.debug:
             self.epochs = self.debug_epochs
@@ -84,17 +86,21 @@ class Config:
             config = None
         return config
 
+    @property
+    def network_print_name(self):
+        return "_".join(network_name.value for network_name in self.network_names)
+
     def __repr__(self):
         return (
-            f"network {self.network_name.value} with manual seed {self.manual_seed}\n"
+            f"network {self.network_print_name} with manual seed {self.manual_seed}\n"
         )
 
     def name(self):
-        return f"{self.network_name.value}_seed{self.manual_seed}"
+        return f"{self.network_print_name}_seed{self.manual_seed}"
 
     @property
     def base_name(self):
-        return f"{self.network_name.value}_seed{self.manual_seed}"
+        return f"{self.network_print_name}_seed{self.manual_seed}"
 
     @property
     def log_folder(self):
@@ -107,7 +113,7 @@ class Config:
     @rank_zero_only
     def show(self):
         cli.console.rule(f"[bold #000000]{self}")
-        self.config_table.print()
+        self.config_table.show()
         self.config_path.copy_to(self.log_folder / "config.yaml")
 
     @property
