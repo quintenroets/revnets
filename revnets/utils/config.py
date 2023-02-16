@@ -28,6 +28,7 @@ class NetworkName(Enum):
     mininet = "mininet"
     mininet_untrained = "mininet_untrained"
     mediumnet = "mediumnet"
+    mediumnet_untrained = "mediumnet_untrained"
 
 
 @dataclass
@@ -79,11 +80,10 @@ class Config:
     @classmethod
     def load(cls):
         args = get_args()
-        if args.config_name:
-            config_path = (Path.config / args.config_name).with_suffix(".yaml")
-            config = Config(config_path=config_path, **config_path.yaml)
-        else:
-            config = None
+        if not args.config_name:
+            args.config_name = "baseline"
+        config_path = (Path.config / args.config_name).with_suffix(".yaml")
+        config = Config(config_path=config_path, **config_path.yaml)
         return config
 
     @property

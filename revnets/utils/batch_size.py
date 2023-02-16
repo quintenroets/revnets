@@ -60,6 +60,8 @@ cache = decorator.cache(Reducer)
 @cache
 def get_max_batch_size(model: Model, data, method="validate"):
     tune_model = TuneModel(model, data)
+    data.setup("train")
+
     trainer = pl.Trainer(
         accelerator="auto",
         auto_scale_batch_size=True,
