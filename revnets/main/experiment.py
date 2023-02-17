@@ -31,8 +31,7 @@ class Experiment:
 
         results = {}
         for technique in reconstructions.get_algorithms():
-            reconstruction = network.get_architecture()
-            technique.reconstruct(original, reconstruction, network)
+            reconstruction = technique.Reconstructor(original, network).reconstruct()
             evaluation_metrics = evaluations.evaluate(original, reconstruction, network)
             name = get_technique_name(technique)
             results[name] = evaluation_metrics

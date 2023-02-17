@@ -1,5 +1,7 @@
-import torch.nn
+from . import empty
 
 
-def reconstruct(original: torch.nn.Module, reconstructed: torch.nn.Module, *_, **__):
-    reconstructed.load_state_dict(original.state_dict())
+class Reconstructor(empty.Reconstructor):
+    def train(self):
+        state_dict = self.original.state_dict()
+        self.reconstruction.load_state_dict(state_dict)

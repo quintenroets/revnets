@@ -1,12 +1,17 @@
 from dataclasses import dataclass, fields
+from functools import cached_property
 
 import torch.nn
+from cacher.caches.deep_learning import Reducer
+from cacher.hashing import compute_hash
 from torch import nn
 
 from ..data.mnist1d import Dataset
 from ..networks.models import trainable
 from ..networks.models.metrics import Phase
+from ..utils import Path
 from ..utils.trainer import Trainer
+from . import empty
 
 
 @dataclass
@@ -53,10 +58,31 @@ class ReconstructModel(trainable.Model):
         )
 
 
-def reconstruct(original: torch.nn.Module, reconstructed: torch.nn.Module, network):
-    data: Dataset = network.dataset()
-    model = ReconstructModel(original, reconstructed)
-    data.calibrate(model)
-    trainer = Trainer()
-    trainer.fit(model, data)
-    trainer.test(model, data)
+class Reconstructor(empty.Reconstructor):
+    @cached_property
+    def trained_weights_path(self):
+        data: Dataset = self.network.dataset()
+        hash_value = compute_hash(Reducer, self.original, self.reconstruction, data)
+        path = Path.weights / "reconstructions" / hash_value
+        path.create_parent()
+        return path
+
+    def train(self):
+        if not self.trained_weights_path.exists():
+            self.start_training()
+            self.save_weights()
+
+        state_dict = torch.load(self.trained_weights_path)
+        self.reconstruction.load_state_dict(state_dict)
+
+    def start_training(self):
+        data: Dataset = self.network.dataset()
+        model = ReconstructModel(self.original, self.reconstruction)
+        data.calibrate(model)
+        trainer = Trainer()
+        trainer.fit(model, data)
+        trainer.test(model, data)
+
+    def save_weights(self):
+        state_dict = self.reconstruction.state_dict()
+        torch.save(state_dict, str(self.trained_weights_path))

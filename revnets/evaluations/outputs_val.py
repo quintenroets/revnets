@@ -4,6 +4,7 @@ import torchmetrics
 from cacher.caches.speedup_deep_learning import cache
 
 from ..data.mnist1d import Dataset
+from ..networks.models.metrics import Phase
 from ..utils.trainer import Trainer
 
 
@@ -26,15 +27,27 @@ class CompareModel(pl.LightningModule):
 
 
 @cache
-def compare_outputs(model1, model2, dataset):
+def compare_outputs(model1, model2, dataset: Dataset, phase: Phase):
     dataset.setup("valid")
     model = CompareModel(model1, model2)
     dataset.calibrate(model)
-    dataloader = dataset.val_dataloader()
-    Trainer().test(model, dataloaders=dataloader)
+    match phase:
+        case Phase.TRAIN:
+            dataloader = dataset.train_dataloader(shuffle=False)
+        case Phase.VAL:
+            dataloader = dataset.val_dataloader()
+        case Phase.TEST:
+            dataloader = dataset.test_dataloader()
+
+    Trainer().test(model, dataloaders=dataloader)  # noqa
     return model.mse
 
 
-def evaluate(original: torch.nn.Module, reconstruction: torch.nn.Module, network):
+def evaluate(
+    original: torch.nn.Module,
+    reconstruction: torch.nn.Module,
+    network,
+    phase: Phase = Phase.VAL,
+):
     dataset: Dataset = network.dataset()
-    return compare_outputs(original, reconstruction, dataset)
+    return compare_outputs(original, reconstruction, dataset, phase)

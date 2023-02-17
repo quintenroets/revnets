@@ -1,5 +1,6 @@
-import torch.nn
+from . import empty
 
 
-def reconstruct(original: torch.nn.Module, reconstructed: torch.nn.Module, network):
-    network.load_trained_weights(reconstructed)
+class Reconstructor(empty.Reconstructor):
+    def train(self):
+        self.network.load_trained_weights(self.reconstruction)

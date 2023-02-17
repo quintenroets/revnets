@@ -73,14 +73,14 @@ class Dataset(pl.LightningDataModule):
         self.train_dataset, self.val_dataset = split_train_val(train_dataset)
         self.test_dataset = TensorDataset(x_test, y_test)
 
-    def train_dataloader(self):
-        return self.get_dataloader(Split.train, self.batch_size, shuffle=True)
+    def train_dataloader(self, shuffle=True):
+        return self.get_dataloader(Split.train, self.batch_size, shuffle=shuffle)
 
-    def val_dataloader(self):
-        return self.get_dataloader(Split.valid, self.eval_batch_size)
+    def val_dataloader(self, shuffle=False):
+        return self.get_dataloader(Split.valid, self.eval_batch_size, shuffle=shuffle)
 
-    def test_dataloader(self):
-        return self.get_dataloader(Split.test, self.eval_batch_size)
+    def test_dataloader(self, shuffle=False):
+        return self.get_dataloader(Split.test, self.eval_batch_size, shuffle=shuffle)
 
     def get_dataloader(self, split: Split, batch_size, shuffle=False):
         if config.debug:

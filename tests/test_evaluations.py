@@ -6,10 +6,10 @@ def test_cheat_evaluations():
     for network_module in test_networks:
         network = network_module.Network()
         original = network.get_trained_network()
-        reconstruction = network.get_architecture()
-        reconstructions.cheat.reconstruct(original, reconstruction, network)
+        reconstructor = reconstructions.cheat.Reconstructor(original, network)
+        reconstruction = reconstructor.reconstruct()
         evaluation_metrics = evaluations.evaluate(original, reconstruction, network)
 
         # cheat should give perfect metrics
         for value in evaluation_metrics.dict().values():
-            assert value == 0
+            assert value in (0, None)

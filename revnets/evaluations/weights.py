@@ -5,20 +5,33 @@ def evaluate(original: torch.nn.Module, reconstruction: torch.nn.Module, *_, **_
     return get_mse(original, reconstruction)
 
 
-def get_mse(original: torch.nn.Module, reconstruction: torch.nn.Module):
-    standardize(original)
-    standardize(reconstruction)
-
-    MSE_size = sum(weights.numel() for weights in original.state_dict().values())
-    MSE_sum = sum(
-        torch.nn.functional.mse_loss(
-            original_weights, reconstructed_weights, reduction="sum"
-        ).item()
+def same_architecture(original: torch.nn.Module, reconstruction: torch.nn.Module):
+    return all(
+        original_weights.shape == reconstructed_weights.shape
         for original_weights, reconstructed_weights in zip(
             original.state_dict().values(), reconstruction.state_dict().values()
         )
     )
-    return MSE_sum / MSE_size
+
+
+def get_mse(original: torch.nn.Module, reconstruction: torch.nn.Module):
+    if not same_architecture(original, reconstruction):
+        mse = None
+    else:
+        standardize(original)
+        standardize(reconstruction)
+
+        MSE_size = sum(weights.numel() for weights in original.state_dict().values())
+        MSE_sum = sum(
+            torch.nn.functional.mse_loss(
+                original_weights, reconstructed_weights, reduction="sum"
+            ).item()
+            for original_weights, reconstructed_weights in zip(
+                original.state_dict().values(), reconstruction.state_dict().values()
+            )
+        )
+        mse = MSE_sum / MSE_size
+    return mse
 
 
 def permute_input_neurons(layer, sort_indices):
