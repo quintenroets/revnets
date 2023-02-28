@@ -1,5 +1,6 @@
-from . import attack, outputs_test, outputs_train, outputs_val, weights
+from . import attack, outputs_test, outputs_train, outputs_val
 from .evaluation import Evaluation
+from .weights import weights
 
 
 def evaluate(original, reconstruction, network, *_, **__):

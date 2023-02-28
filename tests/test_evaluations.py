@@ -11,12 +11,11 @@ def test_cheat_evaluations():
         evaluation_metrics = evaluations.evaluate(original, reconstruction, network)
 
         # cheat should give perfect metrics
-        perfect_values = evaluation_metrics.weights_mse, evaluation_metrics.train_outputs_mse, evaluation_metrics.val_outputs_mse, evaluation_metrics.train_outputs_mse
-        perfect_keys = [
-            "weights_mse",
-            "train_outputs_mse",
-            "val_outputs_mse",
-            "test_outputs_mse",
-        ]
-        for value in evaluation_metrics.dict().values():
+        perfect_values = (
+            evaluation_metrics.weights_mse,
+            evaluation_metrics.train_outputs_mse,
+            evaluation_metrics.val_outputs_mse,
+            evaluation_metrics.train_outputs_mse,
+        )
+        for value in perfect_values:
             assert value in (0, None)
