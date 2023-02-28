@@ -13,7 +13,7 @@ class Evaluation:
 
     @classmethod
     def metric_names(cls):
-        return [field.name.replace("_", "") for field in fields(cls)]
+        return [field.name.replace("_", " ") for field in fields(cls)]
 
     def dict(self):
         return asdict(self)
