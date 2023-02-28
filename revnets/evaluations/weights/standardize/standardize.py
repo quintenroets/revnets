@@ -9,12 +9,8 @@ def standardize(model: torch.nn.Module):
     """
     model_layers = get_layers(model)
     for layers in zip(model_layers, model_layers[1:]):
-        standardize_layers(*layers)
-
-
-def standardize_layers(*layers):
-    order.standardize_layers(*layers)
-    scale.standardize_layers(*layers)
+        order.standardize_layers(*layers)
+        scale.standardize_layers(*layers)
 
 
 def get_layers(model: torch.nn.Module):

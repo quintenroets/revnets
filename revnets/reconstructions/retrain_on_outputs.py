@@ -62,7 +62,13 @@ class Reconstructor(empty.Reconstructor):
     @cached_property
     def trained_weights_path(self):
         data: Dataset = self.network.dataset()
-        hash_value = compute_hash(Reducer, self.original, self.reconstruction, data)
+        hash_value = compute_hash(
+            Reducer,
+            self.original.__class__.__module__,
+            self.reconstruction.__class__.__module__,
+            self.reconstruction.state_dict(),
+            data,
+        )
         path = Path.weights / "reconstructions" / hash_value
         path.create_parent()
         return path

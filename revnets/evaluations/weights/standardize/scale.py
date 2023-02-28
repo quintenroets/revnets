@@ -1,3 +1,6 @@
+import torch
+
+
 def standardize_layers(layer1, layer2):
     """Standardize by multiplying incoming weights and biases by scale and
     outgoing weights with the inverse scale.
@@ -9,7 +12,10 @@ def standardize_layers(layer1, layer2):
 
 def get_output_scales(layer):
     weight = next(iter(layer.parameters()))
-    return weight.norm(dim=1)
+    scales = weight.norm(dim=1)
+    scales[scales == 0] = 1
+    scales = torch.abs(scales)
+    return scales
 
 
 def rescale_incoming_weights(layer, scales):
