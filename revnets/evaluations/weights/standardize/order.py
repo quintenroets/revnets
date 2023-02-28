@@ -8,8 +8,8 @@ def standardize_layers(layer1, layer2):
 
 
 def get_output_sort_order(layer):
-    weight = next(iter(layer.parameters()))
-    total_output_weights = weight.sum(dim=1)
+    weights = get_layer_weights(layer)
+    total_output_weights = weights.sum(dim=1)
     # use p1-norm because p2-norm is already standardized
     _, output_sort_order = torch.sort(total_output_weights)
     return output_sort_order
@@ -32,3 +32,9 @@ def permute_output_neurons(layer, sort_indices):
             param.data = (
                 param.data[sort_indices] if dims == 1 else param.data[sort_indices, :]
             )
+
+
+def get_layer_weights(layer):
+    connection_weights, bias_weights = layer.parameters()
+    weights = (connection_weights, bias_weights.reshape(-1, 1))
+    return torch.hstack(weights)

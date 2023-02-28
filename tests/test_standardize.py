@@ -72,7 +72,7 @@ def test_weight_standardization(model, model2):
 
     model_layers = standardize.get_layers(model)
     for layer1, layer2 in zip(model_layers, model_layers[1:]):
-        scales = standardize.scale.get_output_scales(layer1) * 2
+        scales = standardize.scale.get_scales(layer1, layer2)
         wrong_scales = torch.ones_like(scales) * 2
         standardize.scale.rescale_incoming_weights(layer1, 1 / wrong_scales)
         standardize.scale.rescale_outgoing_weights(layer2, wrong_scales)
