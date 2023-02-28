@@ -8,4 +8,4 @@ from . import (
 
 
 def get_algorithms():
-    return empty, cheat, retrain, retrain_on_outputs, retrain_on_outputs_with_bigger_net
+    return retrain, retrain_on_outputs, retrain_on_outputs_with_bigger_net

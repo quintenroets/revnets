@@ -1,1 +1,14 @@
 cacher @ git+https://github.com/quintenroets/cacher
+adversarial-robustness-toolbox
+matplotlib
+pytorch-lightning
+quinten-cli
+superpathlib
+tensorboard
+torch
+torchvision
+torchtoolbox
+torchmetrics
+transformers
+torchtext
+wandb

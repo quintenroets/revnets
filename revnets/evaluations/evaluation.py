@@ -7,10 +7,13 @@ class Evaluation:
     train_outputs_mse: float
     val_outputs_mse: float
     test_outputs_mse: float
+    test_acc: float
+    adversarial_test_acc: float
+    adversarial_transfer_test_acc: float
 
     @classmethod
     def metric_names(cls):
-        return [field.name for field in fields(cls)]
+        return [field.name.replace("_", "") for field in fields(cls)]
 
     def dict(self):
         return asdict(self)

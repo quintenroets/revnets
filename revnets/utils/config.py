@@ -48,6 +48,8 @@ class Config:
     log: bool = False
     log_on_debug: bool = False
     _num_devices: int = None
+    adversarial_epsilon: float = 0.1
+    visualize_attack: bool = False
 
     def __post_init__(self):
         if isinstance(self.network, str):

@@ -4,7 +4,7 @@ import cli
 
 from .. import evaluations, networks, reconstructions
 from ..networks.base import Network
-from ..utils import Path, config, rank_zero_only
+from ..utils import Path, config
 from ..utils.table import Table
 
 
@@ -12,14 +12,14 @@ def get_technique_name(technique):
     techniques_path = Path(reconstructions.__file__).parent
     technique_path = Path(technique.__file__)
     sub_name = technique_path.relative_to(techniques_path).with_suffix("")
-    return str(sub_name).capitalize()
+    return str(sub_name).capitalize().replace("_", " ")
 
 
 @dataclass
 class Experiment:
     @classmethod
     def run(cls):
-        # cls.show()
+        config.show()
         for name in config.network_names:
             network: Network = networks.__dict__[name.value].Network()
             cli.console.rule(name.value)
@@ -51,8 +51,3 @@ class Experiment:
             table.add_row(name, *values)
 
         return table
-
-    @classmethod
-    @rank_zero_only
-    def show(cls):
-        config.show()
