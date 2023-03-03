@@ -3,23 +3,32 @@ from dataclasses import asdict, dataclass, fields
 
 @dataclass
 class Evaluation:
-    weights_mse: float
-    train_outputs_mse: float
-    val_outputs_mse: float
-    test_outputs_mse: float
-    test_acc: float
-    adversarial_test_acc: float
-    adversarial_transfer_test_acc: float
+    weights_MSE: str = None
+    weights_MAE: str = None
+    weights_MAE_layers: str = None
+    train_outputs_MSE: str = None
+    val_outputs_MSE: str = None
+    test_outputs_MSE: str = None
+    test_acc: str = None
+    adversarial_test_acc: str = None
+    adversarial_transfer_test_acc: str = None
+
+    def metric_names(self):
+        return [
+            self.format_name(field.name)
+            for field in fields(self)
+            if self.dict()[field.name] is not None
+        ]
 
     @classmethod
-    def metric_names(cls):
-        return [field.name.replace("_", " ") for field in fields(cls)]
+    def format_name(cls, name):
+        name = name.replace("_", " ")
+        return name[0].upper() + name[1:]
 
     def dict(self):
         return asdict(self)
 
-    def get_value_list(self):
-        precision = 3
-        values = self.dict().values()
-        values = ["/" if v is None else f"{v:.{precision}f}" for v in values]
-        return values
+    def values(self):
+        for value in self.dict().values():
+            if value is not None:
+                yield value

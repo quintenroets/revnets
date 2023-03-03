@@ -7,8 +7,8 @@ from art.attacks.evasion import FastGradientMethod
 from art.estimators.classification import PyTorchClassifier
 from torch import nn
 
-from ..networks.models.metrics import Metrics
-from ..utils import config
+from ...networks.models.metrics import Metrics
+from ...utils import config
 
 
 class LossMetric(torchmetrics.Metric):

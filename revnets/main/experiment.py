@@ -41,13 +41,14 @@ class Experiment:
 
     @classmethod
     def make_table(cls, results):
-        table = Table()
-        table.add_column("Technique", style="cyan", no_wrap=True)
-        metrics = evaluations.Evaluation.metric_names()
+        table = Table(show_lines=True)
+        table.add_column("Technique", style="cyan", max_width=20, overflow="fold")
+
+        metrics = next(iter(results.values())).metric_names()
         for name in metrics:
-            table.add_column(name, style="magenta", no_wrap=True)
+            table.add_column(name, style="magenta", max_width=13)
         for name, metrics in results.items():
-            values = metrics.get_value_list()
+            values = metrics.values()
             table.add_row(name, *values)
 
         return table

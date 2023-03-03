@@ -83,8 +83,8 @@ def test_weight_standardization(model, model2):
 def are_isomorphism(model, model2):
     """Check that models are different but equal up to isomorphism."""
 
-    mse = weights.calculate_mse(model, model2)
-    standardized_mse = weights.get_mse(model, model2)
+    mse = weights.mse.Evaluator(model, model2, None).calculate_distance()
+    standardized_mse = weights.mse.Evaluator(model, model2, None).evaluate()
     return mse != 0 and standardized_mse == 0
 
 
