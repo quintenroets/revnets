@@ -58,7 +58,10 @@ class ReconstructModel(trainable.Model):
         )
 
 
+@dataclass
 class Reconstructor(empty.Reconstructor):
+    always_train: bool = False
+
     @cached_property
     def trained_weights_path(self):
         data: Dataset = self.network.dataset()
@@ -74,7 +77,7 @@ class Reconstructor(empty.Reconstructor):
         return path
 
     def reconstruct_weights(self):
-        if not self.trained_weights_path.exists():
+        if self.always_train or not self.trained_weights_path.exists():
             self.start_training()
             self.save_weights()
 

@@ -7,7 +7,8 @@ import requests
 import torch
 from torch.utils.data import ConcatDataset, Subset, TensorDataset
 
-from ..utils import Path, batch_size, config
+from .. import utils
+from ..utils import Path, config
 from .split import Split
 
 
@@ -26,10 +27,10 @@ class Dataset(pl.LightningDataModule):
 
     def __post_init__(self):
         super().__init__()
-        self.batch_size = self.calculate_effective_batch_size()
+        self.batch_size = self.calculate_effective_batch_size(config.batch_size)
 
     @classmethod
-    def calculate_effective_batch_size(cls):
+    def calculate_effective_batch_size(cls, batch_size):
         """
         We want reproducible experiments.
 
@@ -39,7 +40,7 @@ class Dataset(pl.LightningDataModule):
            the batch size per gpu accordingly
         """
         used_devices = 1
-        batch_size_per_gpu = config.batch_size
+        batch_size_per_gpu = batch_size
         while 2 * used_devices <= config.num_devices and batch_size_per_gpu % 2 == 0:
             batch_size_per_gpu //= 2
             used_devices *= 2
@@ -120,7 +121,7 @@ class Dataset(pl.LightningDataModule):
             return pickle.load(fp)
 
     def calibrate(self, model):
-        self.eval_batch_size = batch_size.get_max_batch_size(model, self)
+        self.eval_batch_size = utils.batch_size.get_max_batch_size(model, self)
 
 
 def split_train_val(

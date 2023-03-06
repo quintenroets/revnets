@@ -10,6 +10,7 @@ class Trainer(pl.Trainer):
         accelerator="auto",
         strategy=None,
         logger=None,
+        max_epochs=None,
         **kwargs,
     ):
         if logger is None and config.log:
@@ -21,7 +22,7 @@ class Trainer(pl.Trainer):
             accelerator=accelerator,
             strategy=strategy,
             logger=logger,
-            max_epochs=config.epochs,
+            max_epochs=max_epochs or config.epochs,
             num_sanity_val_steps=config.num_sanity_val_steps,
             limit_train_batches=config.limit_batches,
             limit_val_batches=config.limit_batches,
