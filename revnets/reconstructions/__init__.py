@@ -1,11 +1,5 @@
-from . import (
-    cheat,
-    empty,
-    retrain,
-    retrain_on_outputs,
-    retrain_on_outputs_with_bigger_net,
-)
+from . import cheat, empty, outputs_supervision, retrain
 
 
 def get_algorithms():
-    return retrain, retrain_on_outputs, retrain_on_outputs_with_bigger_net
+    return retrain, *outputs_supervision.get_algorithms()

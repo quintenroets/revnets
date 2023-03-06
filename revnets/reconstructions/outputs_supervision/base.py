@@ -6,12 +6,12 @@ from cacher.caches.deep_learning import Reducer
 from cacher.hashing import compute_hash
 from torch import nn
 
-from ..data.mnist1d import Dataset
-from ..networks.models import trainable
-from ..networks.models.metrics import Phase
-from ..utils import Path
-from ..utils.trainer import Trainer
-from . import empty
+from ...data.mnist1d import Dataset
+from ...networks.models import trainable
+from ...networks.models.metrics import Phase
+from ...utils import Path
+from ...utils.trainer import Trainer
+from .. import empty
 
 
 @dataclass
@@ -69,11 +69,11 @@ class Reconstructor(empty.Reconstructor):
             self.reconstruction.state_dict(),
             data,
         )
-        path = Path.weights / "reconstructions" / hash_value
+        path = Path.weights / "reconstructions" / self.name / hash_value
         path.create_parent()
         return path
 
-    def train(self):
+    def reconstruct_weights(self):
         if not self.trained_weights_path.exists():
             self.start_training()
             self.save_weights()

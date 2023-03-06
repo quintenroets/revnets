@@ -4,15 +4,8 @@ import cli
 
 from .. import evaluations, networks, reconstructions
 from ..networks.base import Network
-from ..utils import Path, config
+from ..utils import config
 from ..utils.table import Table
-
-
-def get_technique_name(technique):
-    techniques_path = Path(reconstructions.__file__).parent
-    technique_path = Path(technique.__file__)
-    sub_name = technique_path.relative_to(techniques_path).with_suffix("")
-    return str(sub_name).capitalize().replace("_", " ")
 
 
 @dataclass
@@ -31,10 +24,10 @@ class Experiment:
 
         results = {}
         for technique in reconstructions.get_algorithms():
-            reconstruction = technique.Reconstructor(original, network).reconstruct()
-            evaluation_metrics = evaluations.evaluate(original, reconstruction, network)
-            name = get_technique_name(technique)
-            results[name] = evaluation_metrics
+            reconstructor = technique.Reconstructor(original, network)
+            reconstruction = reconstructor.reconstruct()
+            evaluation = evaluations.evaluate(original, reconstruction, network)
+            results[reconstructor.name] = evaluation
 
         table = cls.make_table(results)
         table.show()

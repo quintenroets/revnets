@@ -1,6 +1,6 @@
-from . import empty
+from . import base
 
 
-class Reconstructor(empty.Reconstructor):
-    def train(self):
+class Reconstructor(base.Reconstructor):
+    def reconstruct_weights(self):
         self.network.load_trained_weights(self.reconstruction)

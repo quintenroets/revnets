@@ -1,7 +1,7 @@
-from . import empty
+from . import base
 
 
-class Reconstructor(empty.Reconstructor):
-    def train(self):
+class Reconstructor(base.Reconstructor):
+    def reconstruct_weights(self):
         state_dict = self.original.state_dict()
         self.reconstruction.load_state_dict(state_dict)
