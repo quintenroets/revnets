@@ -55,7 +55,7 @@ class ReconstructModel(trainable.Model):
 
     def calculate_metrics(self, outputs, targets):
         return Metrics(
-            loss=nn.functional.mse_loss(outputs, targets),
+            loss=nn.functional.l1_loss(outputs, targets),
         )
 
 
