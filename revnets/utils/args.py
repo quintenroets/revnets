@@ -11,4 +11,5 @@ def get_args():
         "--devices", nargs="+", help="Indices of devices to use", default=None
     )
     parser_args = ([],) if "pytest" in sys.modules else ()
-    return parser.parse_args(*parser_args)
+    args, _ = parser.parse_known_args(*parser_args)
+    return args
