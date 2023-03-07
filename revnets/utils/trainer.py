@@ -1,4 +1,5 @@
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import RichModelSummary, RichProgressBar
 from pytorch_lightning.strategies.ddp import DDPStrategy
 
 from .config import config
@@ -18,8 +19,11 @@ class Trainer(pl.Trainer):
         if strategy is None and "num_nodes" not in kwargs:
             strategy = DDPStrategy(find_unused_parameters=False)
 
+        callbacks = [RichModelSummary(), RichProgressBar()]
+
         super().__init__(
             accelerator=accelerator,
+            callbacks=callbacks,
             strategy=strategy,
             logger=logger,
             max_epochs=max_epochs or config.epochs,
