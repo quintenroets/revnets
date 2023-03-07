@@ -11,7 +11,6 @@ from ...data.split import Split
 from ...utils import config
 from ...utils.trainer import Trainer
 from . import base
-from .base import ReconstructModel
 
 
 @dataclass
@@ -53,29 +52,34 @@ class Reconstructor(base.Reconstructor):
     validation_ratio: float = 0.2
     num_extensions: int = 1
     always_train: bool = True
+    model: base.ReconstructModel = None
 
     @property
     def val_samples_per_stage(self):
         return int(self.samples_per_stage * self.validation_ratio)
 
+    @property
+    def train_samples_per_stage(self):
+        return self.samples_per_stage - self.val_samples_per_stage
+
     def __post_init__(self):
         self.trainer = Trainer()
         self.data = Dataset()
-        self.model = ReconstructModel(self.original, self.reconstruction)
 
     def start_training(self):
-        model = ReconstructModel(self.original, self.reconstruction)
+        self.model = self.get_train_model()
         for extension_iteration in range(self.num_extensions):
             cli.console.rule(str(extension_iteration))
             self.extend_dataset()
+
             trainer = Trainer()
-            trainer.fit(model, self.data)
+            trainer.fit(self.model, self.data)
 
     def extend_dataset(self):
         first_extension = len(self.data.train_datasets) == 0
-        new_dataset = self.get_new_dataset(self.samples_per_stage)
+        new_dataset = self.get_new_dataset(self.train_samples_per_stage)
         self.data.add_dataset(new_dataset, Split.train)
-        new_dataset = self.get_new_dataset(self.samples_per_stage)
+        new_dataset = self.get_new_dataset(self.val_samples_per_stage)
         self.data.add_dataset(new_dataset, Split.valid)
         if first_extension:
             self.data.calibrate(self.model)

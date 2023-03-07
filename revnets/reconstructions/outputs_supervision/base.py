@@ -28,11 +28,12 @@ class Metrics:
 
 
 class ReconstructModel(trainable.Model):
-    def __init__(self, original, reconstructed):
-        super().__init__(reconstructed)
+    def __init__(self, original, reconstruction, weights_path):
+        super().__init__(reconstruction)
         self.original = original
-        self.reconstructed = reconstructed
+        self.reconstruction = reconstruction
         self.do_log: bool = True
+        self.weights_path: Path = weights_path
 
     def training_step(self, batch, batch_idx):
         metrics = self.obtain_metrics(batch, Phase.TRAIN)
@@ -47,7 +48,7 @@ class ReconstructModel(trainable.Model):
     def obtain_metrics(self, batch, phase: Phase) -> Metrics:
         inputs, labels = batch
         targets = self.original(inputs)
-        outputs = self.reconstructed(inputs)
+        outputs = self.reconstruction(inputs)
         metrics = self.calculate_metrics(outputs, targets)
         self.log_metrics(metrics, phase)
         return metrics
@@ -85,12 +86,17 @@ class Reconstructor(empty.Reconstructor):
         self.reconstruction.load_state_dict(state_dict)
 
     def start_training(self):
+        model = self.get_train_model()
         data: Dataset = self.network.dataset()
-        model = ReconstructModel(self.original, self.reconstruction)
         data.calibrate(model)
         trainer = Trainer()
         trainer.fit(model, data)
         trainer.test(model, data)
+
+    def get_train_model(self):
+        return ReconstructModel(
+            self.original, self.reconstruction, self.trained_weights_path
+        )
 
     def save_weights(self):
         state_dict = self.reconstruction.state_dict()
