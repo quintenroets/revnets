@@ -1,12 +1,12 @@
 import torch
 
 from ...networks.models import mininet
+from ...utils import config
 from . import base
 
 
 class Reconstructor(base.Reconstructor):
     @classmethod
     def initialize_reconstruction(cls):
-        seed = 97
-        torch.manual_seed(seed)
+        torch.manual_seed(config.manual_seed * 2)
         return mininet.Model(hidden_size=256)

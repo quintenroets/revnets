@@ -1,6 +1,7 @@
 import torch.random
 
 from ..data import mnist1d
+from ..utils import config
 from . import train
 from .models import mininet
 
@@ -12,15 +13,12 @@ class Network(train.Network):
 
     @classmethod
     def get_trained_network(cls):
-        seed = 27
-        torch.manual_seed(seed)
-        model = cls.get_model_module().Model()
-        return model
+        torch.manual_seed(config.manual_seed)
+        return cls.get_model_module().Model()
 
     @classmethod
     def get_architecture(cls):
-        seed = 97
-        torch.manual_seed(seed)
+        torch.manual_seed(2 * config.manual_seed)
         return cls.get_model_module().Model()
 
     @classmethod
