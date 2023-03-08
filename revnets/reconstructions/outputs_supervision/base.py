@@ -6,9 +6,8 @@ from cacher.caches.deep_learning import Reducer
 from cacher.hashing import compute_hash
 from torch import nn
 
-from ...data.mnist1d import Dataset
+from ...data import Dataset, output_supervision
 from ...networks.models import trainable
-from ...networks.models.metrics import Phase
 from ...utils import Path
 from ...utils.trainer import Trainer
 from .. import empty
@@ -16,52 +15,34 @@ from .. import empty
 
 @dataclass
 class Metrics:
-    loss: torch.Tensor
+    l1_loss: torch.Tensor
+    l2_loss: torch.Tensor
 
     def dict(self):
         return self.__dict__
 
+    @property
+    def loss(self):
+        return self.l1_loss
+
     @classmethod
     @property
-    def names(cls):
+    def names(cls):  # noqa
         return [field.name for field in fields(cls)]
 
 
 class ReconstructModel(trainable.Model):
-    def __init__(self, original, reconstruction, weights_path):
-        super().__init__(reconstruction)
-        self.original = original
-        self.reconstruction = reconstruction
-        self.do_log: bool = True
-        self.weights_path: Path = weights_path
-
-    def training_step(self, batch, batch_idx):
-        metrics = self.obtain_metrics(batch, Phase.TRAIN)
-        return metrics.loss
-
-    def validation_step(self, batch, batch_idx):
-        self.obtain_metrics(batch, Phase.VAL)
-
-    def test_step(self, batch, batch_idx):
-        self.obtain_metrics(batch, Phase.TEST)
-
-    def obtain_metrics(self, batch, phase: Phase) -> Metrics:
-        inputs, labels = batch
-        targets = self.original(inputs)
-        outputs = self.reconstruction(inputs)
-        metrics = self.calculate_metrics(outputs, targets)
-        self.log_metrics(metrics, phase)
-        return metrics
-
     def calculate_metrics(self, outputs, targets):
         return Metrics(
-            loss=nn.functional.l1_loss(outputs, targets),
+            l1_loss=nn.functional.l1_loss(outputs, targets),
+            l2_loss=nn.functional.mse_loss(outputs, targets),
         )
 
 
 @dataclass
 class Reconstructor(empty.Reconstructor):
     always_train: bool = False
+    model: ReconstructModel = None
 
     @cached_property
     def trained_weights_path(self):
@@ -86,18 +67,28 @@ class Reconstructor(empty.Reconstructor):
         self.reconstruction.load_state_dict(state_dict)
 
     def start_training(self):
-        model = self.get_train_model()
-        data: Dataset = self.network.dataset()
-        data.calibrate(model)
+        self.model = ReconstructModel(self.reconstruction)
+        data = self.get_dataset()
+        data.calibrate(self.model)
         trainer = Trainer()
-        trainer.fit(model, data)
-        trainer.test(model, data)
+        trainer.fit(self.model, data)
+        trainer.test(self.model, data)
 
     def get_train_model(self):
-        return ReconstructModel(
-            self.original, self.reconstruction, self.trained_weights_path
-        )
+        return ReconstructModel(self.reconstruction)
 
     def save_weights(self):
         state_dict = self.reconstruction.state_dict()
         torch.save(state_dict, str(self.trained_weights_path))
+
+    def get_dataset(self):
+        data: Dataset = self.network.dataset()
+        dataset_module = self.get_dataset_module()
+        data: Dataset = dataset_module.Dataset(data, self.original)
+        data.setup("train")
+        data.calibrate(self.model)
+        return data
+
+    @classmethod
+    def get_dataset_module(cls):
+        return output_supervision

@@ -10,13 +10,13 @@ from cacher.caches import base
 from .config import config
 
 if typing.TYPE_CHECKING:
-    from revnets.networks.models.trainable import Model  # noqa: autoimport
+    from ..data import Dataset  # noqa: autoimport
 
 
 class TuneModel(pl.LightningModule):
     def __init__(self, model, data):
         super().__init__()
-        self.model: Model = model
+        self.model: pl.LightningModule = model
         self.data = data
         self.batch_size = 1
         self.old_batch_size = self.data.batch_size
@@ -49,16 +49,15 @@ class Reducer(base.Reducer):
         return config.network, config.devices
 
     @classmethod
-    def reduce_datamodule(cls, _: pl.LightningDataModule):
-        # always using same data so ignore for cache path calculation for now
-        return None
+    def reduce_datamodule(cls, data_module: pl.LightningDataModule):
+        return data_module.__module__
 
 
 cache = decorator.cache(Reducer)
 
 
 @cache
-def get_max_batch_size(model: Model, data, method="validate"):
+def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validate"):
     tune_model = TuneModel(model, data)
     data.setup("train")
 

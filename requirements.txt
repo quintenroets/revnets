@@ -1,6 +1,7 @@
 cacher @ git+https://github.com/quintenroets/cacher
 adversarial-robustness-toolbox
 matplotlib
+numpy
 pytorch-lightning
 quinten-cli
 superpathlib
