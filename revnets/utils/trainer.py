@@ -7,12 +7,7 @@ from .config import config
 
 class Trainer(pl.Trainer):
     def __init__(
-        self,
-        accelerator="auto",
-        strategy=None,
-        logger=None,
-        max_epochs=None,
-        **kwargs,
+        self, accelerator="auto", strategy=None, logger=None, max_epochs=None, **kwargs
     ):
         if logger is None and config.log:
             logger = config.logger
