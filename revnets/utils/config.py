@@ -38,7 +38,7 @@ class Config:
     epochs: int = None
     num_workers: int = 4
     lr: float = 0.1
-    manual_seed: int = 78
+    manual_seed: int = 77
     debug: bool = False
     debug_batch_limit: int = 1
     debug_batch_size: int = 16
