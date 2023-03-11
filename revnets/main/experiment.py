@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 import cli
 
 from .. import evaluations, networks, reconstructions
@@ -8,7 +6,6 @@ from ..utils import config
 from ..utils.table import Table
 
 
-@dataclass
 class Experiment:
     @classmethod
     def run(cls):

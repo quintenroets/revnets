@@ -63,8 +63,7 @@ class Reconstructor(empty.Reconstructor):
             self.start_training()
             self.save_weights()
 
-        state_dict = torch.load(self.trained_weights_path)
-        self.reconstruction.load_state_dict(state_dict)
+        self.load_weights()
 
     def start_training(self):
         self.model = ReconstructModel(self.reconstruction)
@@ -77,6 +76,10 @@ class Reconstructor(empty.Reconstructor):
     def get_train_model(self):
         return ReconstructModel(self.reconstruction)
 
+    def load_weights(self):
+        state_dict = torch.load(self.trained_weights_path)
+        self.reconstruction.load_state_dict(state_dict)
+
     def save_weights(self):
         state_dict = self.reconstruction.state_dict()
         torch.save(state_dict, str(self.trained_weights_path))
@@ -85,7 +88,6 @@ class Reconstructor(empty.Reconstructor):
         data: Dataset = self.network.dataset()
         dataset_module = self.get_dataset_module()
         data: Dataset = dataset_module.Dataset(data, self.original)
-        data.setup("train")
         data.calibrate(self.model)
         return data
 

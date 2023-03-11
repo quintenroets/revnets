@@ -51,6 +51,8 @@ class Config:
     _num_devices: int = None
     adversarial_epsilon: float = 0.1
     visualize_attack: bool = False
+    run_analysis: bool = False
+    precision: int = 64
 
     def __post_init__(self):
         if isinstance(self.network, str):

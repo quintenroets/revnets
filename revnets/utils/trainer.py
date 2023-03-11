@@ -7,7 +7,13 @@ from .config import config
 
 class Trainer(pl.Trainer):
     def __init__(
-        self, accelerator="auto", strategy=None, logger=None, max_epochs=None, **kwargs
+        self,
+        accelerator="auto",
+        strategy=None,
+        logger=None,
+        max_epochs=None,
+        precision=None,
+        **kwargs,
     ):
         if logger is None and config.log:
             logger = config.logger
@@ -27,6 +33,7 @@ class Trainer(pl.Trainer):
             limit_val_batches=config.limit_batches,
             limit_test_batches=config.limit_batches,
             default_root_dir=str(config.log_folder),
+            precision=precision or config.precision,
             sync_batchnorm=True,
             **kwargs,
         )

@@ -59,7 +59,7 @@ cache = decorator.cache(Reducer)
 @cache
 def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validate"):
     tune_model = TuneModel(model, data)
-    data.setup("train")
+    data.prepare()
 
     trainer = pl.Trainer(
         accelerator="auto",
@@ -67,6 +67,7 @@ def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validat
         devices=1,
         max_epochs=1,
         logger=False,
+        precision=config.precision,
     )
     scale_batch_size_kwargs = {"init_val": config.batch_size}
     print(f"Calculating max {method} batch size")

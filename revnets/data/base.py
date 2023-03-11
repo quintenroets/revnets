@@ -6,11 +6,13 @@ from torch.utils.data import ConcatDataset, Subset
 from .. import utils
 from ..utils import config
 from .split import Split
+from .utils import split_train_val
 
 
 class Dataset(pl.LightningDataModule):
     def __init__(self):
         super().__init__()
+        self.train_val_dataset: data.Dataset | None = None
         self.train_dataset: data.Dataset | None = None
         self.val_dataset: data.Dataset | None = None
         self.test_dataset: data.Dataset | None = None
@@ -35,6 +37,16 @@ class Dataset(pl.LightningDataModule):
 
         config._num_devices = used_devices
         return batch_size_per_gpu
+
+    def prepare(self):
+        self.prepare_data()
+        self.setup("train")
+
+    def prepare_data(self) -> None:
+        pass
+
+    def setup(self, stage: str = None) -> None:
+        self.train_dataset, self.val_dataset = split_train_val(self.train_val_dataset)
 
     def train_dataloader(self, shuffle=True):
         return self.get_dataloader(Split.train, self.batch_size, shuffle=shuffle)
@@ -73,6 +85,8 @@ class Dataset(pl.LightningDataModule):
                 dataset = self.val_dataset
             case Split.test:
                 dataset = self.test_dataset
+            case Split.train_val:
+                dataset = self.train_val_dataset
         return dataset  # noqa
 
     def calibrate(self, model):

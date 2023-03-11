@@ -7,7 +7,6 @@ from torch.utils.data import TensorDataset
 
 from ..utils import Path
 from . import base
-from .utils import split_train_val
 
 
 class Dataset(base.Dataset):
@@ -15,7 +14,7 @@ class Dataset(base.Dataset):
         super().__init__()
         self.path = Path.data / "mnist_1D.pkl"
 
-    def setup(self, stage: str = None) -> None:
+    def prepare_data(self):
         data = self.get_data()
 
         x = data["x"]
@@ -34,16 +33,15 @@ class Dataset(base.Dataset):
         y = torch.LongTensor(y)
         y_test = torch.LongTensor(y_test)
 
-        train_dataset = TensorDataset(x, y)
-        self.train_dataset, self.val_dataset = split_train_val(train_dataset)
+        self.train_val_dataset = TensorDataset(x, y)
         self.test_dataset = TensorDataset(x_test, y_test)
 
     def get_data(self):
-        self.prepare_data()
+        self.check_download()
         with self.path.open("rb") as fp:
             return pickle.load(fp)
 
-    def prepare_data(self):
+    def check_download(self):
         if not self.path.exists():
             url = "https://github.com/greydanus/mnist1d/raw/master/mnist1d_data.pkl"
             self.path.byte_content = requests.get(url, allow_redirects=True).content
