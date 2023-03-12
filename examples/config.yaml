@@ -1,0 +1,9 @@
+network:
+- mininet
+batch_size: 32
+reconstruction_batch_size: 256
+devices: 1
+epochs: 100
+lr: 1.0e-2
+adversarial_epsilon: 0.03
+always_train: true

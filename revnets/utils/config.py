@@ -53,6 +53,7 @@ class Config:
     visualize_attack: bool = False
     run_analysis: bool = False
     precision: int = 64
+    always_train: bool = None
 
     def __post_init__(self):
         if isinstance(self.network, str):
@@ -62,7 +63,6 @@ class Config:
         if self.debug:
             self.epochs = self.debug_epochs
             self.batch_size = self.debug_batch_size
-            self.always_do_train = True
 
         self.hyper_parameters = HyperParams(self.epochs, self.lr)
 
@@ -86,7 +86,7 @@ class Config:
     def load(cls):
         args = get_args()
         if not args.config_name:
-            args.config_name = "baseline"
+            args.config_name = "config"
         config_path = (Path.config / args.config_name).with_suffix(".yaml")
         config = Config(config_path=config_path, **config_path.yaml)
         return config
