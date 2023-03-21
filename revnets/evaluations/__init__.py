@@ -26,4 +26,4 @@ def evaluate(original, reconstruction, network):
 
 def format_percentage(value):
     percentage = value * 100
-    return f"{percentage:.{1}f} %"
+    return f"{percentage:.{1}f}%"

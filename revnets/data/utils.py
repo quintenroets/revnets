@@ -4,7 +4,9 @@ from torch.utils.data import Dataset
 from ..utils import config
 
 
-def split_train_val(dataset: Dataset, val_fraction=0.1) -> tuple[Dataset, ...]:
+def split_train_val(dataset: Dataset, val_fraction=None) -> tuple[Dataset, ...]:
+    if val_fraction is None:
+        val_fraction = 0.1
     # ignore len(dataset) warning
     total_size = len(dataset)  # noqa
     val_size = int(val_fraction * total_size)

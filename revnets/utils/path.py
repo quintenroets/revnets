@@ -9,3 +9,4 @@ class Path(plib.Path):
     config = assets / "config"
     weights = assets / "weights"
     outputs = assets / "outputs"
+    results = assets / "results"

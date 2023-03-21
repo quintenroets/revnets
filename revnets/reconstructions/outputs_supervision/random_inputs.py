@@ -6,7 +6,7 @@ from . import base
 
 @dataclass
 class Reconstructor(base.Reconstructor):
-    always_train: bool = True
+    always_train: bool = False
 
     @classmethod
     def get_dataset_module(cls):

@@ -11,39 +11,32 @@ from .base import Split
 @dataclass
 class Dataset(output_supervision.Dataset):
     num_samples: int = 100000
-    validation_ratio: float = 0.2
 
     def __post_init__(self):
         super().__post_init__()
         self.batch_size = config.reconstruction_batch_size
 
-    def setup(self, stage: str = None) -> None:
-        self.calibrate_original()
-        self.train_dataset = self.generate_dataset(Split.train)
-        self.val_dataset = self.generate_dataset(Split.valid)
-        self.test_dataset = self.generate_dataset(Split.test)
-
-    @property
-    def num_val_samples(self):
-        return int(self.num_samples * self.validation_ratio)
-
-    @property
-    def num_train_samples(self):
-        return self.num_samples - self.num_val_samples
-
     @property
     def input_shape(self):
-        train_sample = self.original_dataset.train_dataset[0]
+        train_sample = self.original_dataset.train_val_dataset[0]
         return train_sample[0].shape
 
     def get_dataset_shape(self, split: Split):
-        num_samples = self.num_train_samples if split.is_train else self.num_val_samples
+        num_samples = (
+            self.num_samples
+            if split == Split.train_val
+            else int(self.num_samples * self.validation_ratio)
+        )
+        if split == Split.train_val:
+            assert (
+                num_samples > 0
+            ), f"Number of {split.value} samples must be greater than 0"
         return num_samples, *self.input_shape
 
     def generate_dataset(self, split: Split):
         dataset_shape = self.get_dataset_shape(split)
         # same mean and std as training data
-        inputs = torch.randn(dataset_shape)
+        inputs = torch.randn(dataset_shape, dtype=torch.float64)
         targets = self.get_targets(inputs)
         return TensorDataset(inputs, targets)
 

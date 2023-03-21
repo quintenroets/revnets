@@ -1,12 +1,15 @@
+from abc import ABC
+
 import torch
 
 from ..data.mnist1d import Dataset
 from ..utils import Path
 from ..utils.trainer import Trainer
+from . import base
 from .models import trainable
 
 
-class Network:
+class Network(base.Network, ABC):
     @classmethod
     def load_trained_weights(cls, model: torch.nn.Module, seed: int = None):
         cls.check_weights_path(model, seed)

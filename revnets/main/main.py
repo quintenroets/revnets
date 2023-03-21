@@ -1,8 +1,9 @@
-from .experiment import Experiment
+from .. import experiments
 
 
 def main():
-    Experiment().run()
+    experiment_module = experiments.data_requirements
+    experiment_module.Experiment().run()
 
 
 if __name__ == "__main__":

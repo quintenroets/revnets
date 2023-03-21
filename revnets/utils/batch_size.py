@@ -46,7 +46,9 @@ class Reducer(base.Reducer):
         """We do not want a new cache entry for every weight assignment Cache
         calculated result for each model dataset and task names.
         """
-        return config.network, config.devices
+        values = {v for v in model.state_dict().values()}
+        dimensions = {v.shape for v in values}
+        return dimensions, config.devices
 
     @classmethod
     def reduce_datamodule(cls, data_module: pl.LightningDataModule):
@@ -59,7 +61,7 @@ cache = decorator.cache(Reducer)
 @cache
 def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validate"):
     tune_model = TuneModel(model, data)
-    data.setup("train")
+    data.prepare()
 
     trainer = pl.Trainer(
         accelerator="auto",
@@ -67,6 +69,7 @@ def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validat
         devices=1,
         max_epochs=1,
         logger=False,
+        precision=config.precision,
     )
     scale_batch_size_kwargs = {"init_val": config.batch_size}
     print(f"Calculating max {method} batch size")

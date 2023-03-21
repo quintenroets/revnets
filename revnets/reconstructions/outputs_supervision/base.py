@@ -8,7 +8,7 @@ from torch import nn
 
 from ...data import Dataset, output_supervision
 from ...networks.models import trainable
-from ...utils import Path
+from ...utils import Path, config
 from ...utils.trainer import Trainer
 from .. import empty
 
@@ -43,6 +43,7 @@ class ReconstructModel(trainable.Model):
 class Reconstructor(empty.Reconstructor):
     always_train: bool = False
     model: ReconstructModel = None
+    dataset_kwargs: dict = None
 
     @cached_property
     def trained_weights_path(self):
@@ -59,23 +60,33 @@ class Reconstructor(empty.Reconstructor):
         return path
 
     def reconstruct_weights(self):
-        if self.always_train or not self.trained_weights_path.exists():
+        always_train = (
+            self.always_train if config.always_train is None else config.always_train
+        )
+        if always_train or not self.trained_weights_path.exists():
             self.start_training()
             self.save_weights()
 
-        state_dict = torch.load(self.trained_weights_path)
-        self.reconstruction.load_state_dict(state_dict)
+        self.load_weights()
 
     def start_training(self):
         self.model = ReconstructModel(self.reconstruction)
         data = self.get_dataset()
-        data.calibrate(self.model)
         trainer = Trainer()
-        trainer.fit(self.model, data)
-        trainer.test(self.model, data)
+        if data.validation_ratio > 0:
+            trainer.fit(self.model, data)
+            trainer.test(self.model, data)
+        else:
+            data.prepare()
+            train_dataloader = data.train_dataloader()
+            trainer.fit(self.model, train_dataloaders=train_dataloader)
 
     def get_train_model(self):
         return ReconstructModel(self.reconstruction)
+
+    def load_weights(self):
+        state_dict = torch.load(self.trained_weights_path)
+        self.reconstruction.load_state_dict(state_dict)
 
     def save_weights(self):
         state_dict = self.reconstruction.state_dict()
@@ -84,8 +95,9 @@ class Reconstructor(empty.Reconstructor):
     def get_dataset(self):
         data: Dataset = self.network.dataset()
         dataset_module = self.get_dataset_module()
-        data: Dataset = dataset_module.Dataset(data, self.original)
-        data.setup("train")
+        data: Dataset = dataset_module.Dataset(
+            data, self.original, **self.dataset_kwargs  # noqa
+        )
         data.calibrate(self.model)
         return data
 

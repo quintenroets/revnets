@@ -3,10 +3,11 @@ from dataclasses import dataclass
 import torch.nn
 
 from ..networks.mininet import Network
+from ..utils import NamedClass
 
 
 @dataclass
-class Reconstructor:
+class Reconstructor(NamedClass):
     original: torch.nn.Module
     network: Network
     reconstruction: torch.nn.Module = None
@@ -23,10 +24,5 @@ class Reconstructor:
         pass
 
     @classmethod
-    @property
-    def name(cls):  # noqa
-        base_name = "revnets.reconstructions."
-        name = cls.__module__.replace(base_name, "")
-        for token in "_/.":
-            name = name.replace(token, " ")
-        return name.capitalize()
+    def get_base_name(cls):
+        return Reconstructor.__module__

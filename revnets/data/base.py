@@ -6,16 +6,29 @@ from torch.utils.data import ConcatDataset, Subset
 from .. import utils
 from ..utils import config
 from .split import Split
+from .utils import split_train_val
 
 
 class Dataset(pl.LightningDataModule):
-    def __init__(self):
+    def __init__(
+        self,
+        repetition_factor: float | None = None,
+        validation_ratio: float | None = None,
+    ):
         super().__init__()
+        self.train_val_dataset: data.Dataset | None = None
         self.train_dataset: data.Dataset | None = None
         self.val_dataset: data.Dataset | None = None
         self.test_dataset: data.Dataset | None = None
         self.batch_size: int = self.calculate_effective_batch_size(config.batch_size)
         self.eval_batch_size: int | None = None
+        self.repetition_factor: float | None = repetition_factor
+        self.validation_ratio: float | None = validation_ratio
+        """
+        for data size experiments, we want to now how many samples we need
+        in order to have fair comparisons, we keep the number of effective samples
+        the same by scaling the number of repetitions in the training set
+        """
 
     @classmethod
     def calculate_effective_batch_size(cls, batch_size):
@@ -36,6 +49,18 @@ class Dataset(pl.LightningDataModule):
         config._num_devices = used_devices
         return batch_size_per_gpu
 
+    def prepare(self):
+        self.prepare_data()
+        self.setup("train")
+
+    def prepare_data(self) -> None:
+        pass
+
+    def setup(self, stage: str = None) -> None:
+        self.train_dataset, self.val_dataset = split_train_val(
+            self.train_val_dataset, val_fraction=self.validation_ratio
+        )
+
     def train_dataloader(self, shuffle=True):
         return self.get_dataloader(Split.train, self.batch_size, shuffle=shuffle)
 
@@ -55,6 +80,16 @@ class Dataset(pl.LightningDataModule):
             shuffle = False
         else:
             dataset = self.get_dataset(split)
+            if split.is_train and self.repetition_factor is not None:
+                repetition_factor_int = int(self.repetition_factor)
+                repetition_fraction = self.repetition_factor - repetition_factor_int
+                datasets = [dataset] * repetition_factor_int
+                if repetition_fraction:
+                    last_length = int(len(dataset) * repetition_fraction)  # noqa
+                    last_dataset = Subset(dataset, list(range(last_length)))
+                    datasets.append(last_dataset)
+
+                dataset = ConcatDataset(datasets)
 
         dataloader = torch.utils.data.DataLoader(
             dataset,
@@ -73,6 +108,8 @@ class Dataset(pl.LightningDataModule):
                 dataset = self.val_dataset
             case Split.test:
                 dataset = self.test_dataset
+            case Split.train_val:
+                dataset = self.train_val_dataset
         return dataset  # noqa
 
     def calibrate(self, model):

@@ -95,7 +95,6 @@ class AttackModel(pl.LightningModule):
         outputs = model(inputs)
         _, predictions = outputs.max(1)
         metric.accuracy.update(predictions, labels)
-
         metric.loss.update(outputs, labels)
 
     def configure_attack(self, inputs):

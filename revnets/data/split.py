@@ -5,6 +5,7 @@ class Split(Enum):
     train = "train"
     valid = "valid"
     test = "test"
+    train_val = "train_val"
 
     @property
     def is_train(self):

@@ -33,7 +33,7 @@ class Evaluator(base.Evaluator):
         model = CompareModel(self.original, self.reconstruction)
 
         dataset = self.get_dataset()
-        dataset.setup("valid")
+        dataset.prepare()
         dataset.calibrate(model)
 
         dataloader = self.get_dataloader(dataset)

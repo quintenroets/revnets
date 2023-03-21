@@ -14,10 +14,11 @@ class Evaluation:
     adversarial_transfer_test_acc: str = None
 
     def metric_names(self):
+        valid_keys = self.dict().keys()
         return [
             self.format_name(field.name)
             for field in fields(self)
-            if self.dict()[field.name] is not None
+            if field.name in valid_keys
         ]
 
     @classmethod
@@ -26,9 +27,7 @@ class Evaluation:
         return name[0].upper() + name[1:]
 
     def dict(self):
-        return asdict(self)
+        return {k: v for k, v in asdict(self).items() if v is not None}
 
     def values(self):
-        for value in self.dict().values():
-            if value is not None:
-                yield value
+        yield from self.dict().values()
