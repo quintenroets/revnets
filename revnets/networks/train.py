@@ -1,12 +1,15 @@
+from abc import ABC
+
 import torch
 
 from ..data.mnist1d import Dataset
 from ..utils import Path
 from ..utils.trainer import Trainer
+from . import base
 from .models import trainable
 
 
-class Network:
+class Network(base.Network, ABC):
     @classmethod
     def load_trained_weights(cls, model: torch.nn.Module, seed: int = None):
         cls.check_weights_path(model, seed)
@@ -48,13 +51,3 @@ class Network:
     @classmethod
     def dataset(cls) -> Dataset:
         raise NotImplementedError
-
-    @classmethod
-    @property
-    def name(cls):  # noqa
-        filename = Path(__file__).stem
-        base_name = Network.__module__.replace(filename, "")
-        name = cls.__module__.replace(base_name, "")
-        for token in "_/.":
-            name = name.replace(token, " ")
-        return name.capitalize()
