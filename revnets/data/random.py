@@ -28,6 +28,9 @@ class Dataset(output_supervision.Dataset):
             if split == Split.train_val
             else int(self.num_samples * self.validation_ratio)
         )
+        assert (
+            num_samples > 0
+        ), f"Number of {split.value} samples must be greater than 0"
         return num_samples, *self.input_shape
 
     def generate_dataset(self, split: Split):

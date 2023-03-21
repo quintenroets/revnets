@@ -48,3 +48,13 @@ class Network:
     @classmethod
     def dataset(cls) -> Dataset:
         raise NotImplementedError
+
+    @classmethod
+    @property
+    def name(cls):  # noqa
+        filename = Path(__file__).stem
+        base_name = Network.__module__.replace(filename, "")
+        name = cls.__module__.replace(base_name, "")
+        for token in "_/.":
+            name = name.replace(token, " ")
+        return name.capitalize()

@@ -46,7 +46,9 @@ class Reducer(base.Reducer):
         """We do not want a new cache entry for every weight assignment Cache
         calculated result for each model dataset and task names.
         """
-        return config.network, config.devices
+        values = {v for v in model.state_dict().values()}
+        dimensions = {v.shape for v in values}
+        return dimensions, config.devices
 
     @classmethod
     def reduce_datamodule(cls, data_module: pl.LightningDataModule):

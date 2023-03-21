@@ -24,16 +24,8 @@ class Enum(enum.Enum):
         return cls._value2member_map_[label]
 
 
-class NetworkName(Enum):
-    mininet = "mininet"
-    mininet_untrained = "mininet_untrained"
-    mediumnet = "mediumnet"
-    mediumnet_untrained = "mediumnet_untrained"
-
-
 @dataclass
 class Config:
-    network: str | tuple[str]
     config_path: Path
     epochs: int = None
     num_workers: int = 4
@@ -56,10 +48,6 @@ class Config:
     always_train: bool = None
 
     def __post_init__(self):
-        if isinstance(self.network, str):
-            self.network = (self.network,)
-        self.network_names = [NetworkName.from_str(network) for network in self.network]
-
         if self.debug:
             self.epochs = self.debug_epochs
             self.batch_size = self.debug_batch_size
@@ -88,24 +76,18 @@ class Config:
         if not args.config_name:
             args.config_name = "config"
         config_path = (Path.config / args.config_name).with_suffix(".yaml")
-        config = Config(config_path=config_path, **config_path.yaml)
-        return config
-
-    @property
-    def network_print_name(self):
-        return "_".join(network_name.value for network_name in self.network_names)
+        return Config(config_path=config_path, **config_path.yaml)
 
     def __repr__(self):
-        return (
-            f"network {self.network_print_name} with manual seed {self.manual_seed}\n"
-        )
+        return f"{self.name}\n"
 
+    @property
     def name(self):
-        return f"{self.network_print_name}_seed{self.manual_seed}"
+        return self.base_name
 
     @property
     def base_name(self):
-        return f"{self.network_print_name}_seed{self.manual_seed}"
+        return f"seed_{self.manual_seed}"
 
     @property
     def log_folder(self):
@@ -117,7 +99,7 @@ class Config:
 
     @rank_zero_only
     def show(self):
-        cli.console.rule(f"[bold #000000]{self}")
+        cli.console.rule("[bold #000000]Config")
         self.config_table.show()
         self.config_path.copy_to(self.log_folder / "config.yaml")
 
@@ -128,8 +110,8 @@ class Config:
         table = Table(show_lines=True)
         table.add_column("Configuration", style="cyan", no_wrap=True)
         table.add_column("Value", style="magenta")
-        config = self.config_path.yaml
-        for name, value in config.items():
+        config_content = self.config_path.yaml
+        for name, value in config_content.items():
             # only show debug config in debug mode
             if self.debug or "debug" not in name:
                 table.add_row(name, str(value))

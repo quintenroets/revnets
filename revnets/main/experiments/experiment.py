@@ -1,18 +1,18 @@
 import cli
 
-from .. import evaluations, networks, reconstructions
-from ..networks.base import Network
-from ..utils import config
-from ..utils.table import Table
+from ... import evaluations, networks, reconstructions
+from ...networks.base import Network
+from ...utils import config
+from ...utils.table import Table
 
 
 class Experiment:
     @classmethod
     def run(cls):
         config.show()
-        for name in config.network_names:
-            network: Network = networks.__dict__[name.value].Network()
-            cli.console.rule(name.value)
+        for network_module in networks.get_networks():
+            network = network_module.Network()
+            cli.console.rule(network.name)
             cls.run_network(network)
 
     @classmethod
