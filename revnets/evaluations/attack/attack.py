@@ -30,6 +30,8 @@ class Evaluator(base.Evaluator):
         dataset.calibrate(model)
         dataloader = dataset.test_dataloader()
         precision = 32  # adversarial attack library only works with precision 32
-        model.reconstruction.to(torch.float32)
+        dtype = torch.float32
+        for network in (model.reconstruction, model.original):
+            network.to(dtype)
         Trainer(precision=precision).test(model, dataloaders=dataloader)
         return Evaluation(model.test, model.adversarial, model.adversarial_transfer)
