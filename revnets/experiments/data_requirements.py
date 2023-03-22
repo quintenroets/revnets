@@ -15,12 +15,17 @@ class Experiment(experiment.Experiment):
     min_num_samples: int = 1000
     max_num_samples: int = 100000
     num_values: int = 20
+    execution_failed: bool = False
 
     def get_network_results(self):
-        return {
-            num_samples: self.get_sample_results(num_samples)
-            for num_samples in self.get_samples_range()
-        }
+        results = {}
+        for num_samples in self.get_samples_range():
+            try:
+                results[num_samples] = self.get_sample_results(num_samples)
+            except RuntimeError:
+                self.execution_failed = True
+                break
+        return results
 
     @retry(RuntimeError, tries=15, delay=10)
     def get_sample_results(self, num_samples):
@@ -46,3 +51,9 @@ class Experiment(experiment.Experiment):
         start = math.log10(self.min_num_samples)
         stop = math.log10(self.max_num_samples)
         return np.logspace(start, stop, self.num_values, dtype=int)
+
+    def results_path(self):
+        path = super().results_path
+        if self.execution_failed:
+            path = path.with_stem(path.stem + "_fail")
+        return path
