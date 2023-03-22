@@ -13,10 +13,14 @@ class Experiment(NamedClass):
 
     def run(self):
         config.show()
-        for network_module in networks.get_networks():
+        for network_module in self.get_networks():
             self.network = network_module.Network()
             cli.console.rule(self.network.name)
             self.run_network()
+
+    @classmethod
+    def get_networks(cls):
+        return networks.get_networks()
 
     def run_network(self):
         results = self.get_network_results()

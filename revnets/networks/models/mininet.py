@@ -1,13 +1,11 @@
 from torch import nn
 
-from ...utils import config
 from . import base
 
 
 class Model(base.Model):
-    def __init__(self, hidden_size=20, learning_rate=None):
-        super().__init__()
-        self.learning_rate = learning_rate or config.lr
+    def __init__(self, hidden_size=20, **kwargs):
+        super().__init__(**kwargs)
         self.layer1 = nn.Linear(40, hidden_size)
         self.layer2 = nn.Linear(hidden_size, 10)
 
