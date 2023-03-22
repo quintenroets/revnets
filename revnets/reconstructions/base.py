@@ -8,9 +8,11 @@ from ..utils import NamedClass
 
 @dataclass
 class Reconstructor(NamedClass):
-    original: torch.nn.Module
     network: Network
     reconstruction: torch.nn.Module = None
+
+    def __post_init__(self):
+        self.original = self.network.trained_network
 
     def reconstruct(self):
         self.reconstruction = self.initialize_reconstruction()

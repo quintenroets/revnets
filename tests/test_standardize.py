@@ -54,15 +54,16 @@ def test_permutation_standardization(model, model2):
     model_layers = standardize.get_layers(model)
     model2_layers = standardize.get_layers(model2)
     layer_iterator = model_layers, model_layers[1:], model2_layers, model2_layers[1:]
+    order = standardize.order
     for iteration in zip(*layer_iterator):
         model_layer1, model_layer2, model2_layer1, model2_layer2 = iteration  # noqa
-        sort_indices = standardize.order.get_output_sort_order(model_layer1)
-        standardize.order.permute_output_neurons(model_layer1, sort_indices)
-        standardize.order.permute_input_neurons(model_layer2, sort_indices)
+        sort_indices = order.get_output_sort_order(model_layer1)
+        order.permute_output_neurons(model_layer1, sort_indices)
+        order.permute_input_neurons(model_layer2, sort_indices)
 
         sort_indices_reverse = torch.flip(sort_indices, (0,))
-        standardize.order.permute_output_neurons(model2_layer1, sort_indices_reverse)
-        standardize.order.permute_input_neurons(model2_layer2, sort_indices_reverse)
+        order.permute_output_neurons(model2_layer1, sort_indices_reverse)
+        order.permute_input_neurons(model2_layer2, sort_indices_reverse)
 
     assert are_isomorphism(model, model2)
 
@@ -83,8 +84,10 @@ def test_weight_standardization(model, model2):
 def are_isomorphism(model, model2):
     """Check that models are different but equal up to isomorphism."""
 
-    mse = weights.mse.Evaluator(model, model2, None).calculate_distance()
-    standardized_mse = weights.mse.Evaluator(model, model2, None).evaluate()
+    evaluator = weights.mse.Evaluator(model2, None)
+    evaluator.original = model
+    mse = evaluator.calculate_distance()
+    standardized_mse = evaluator.evaluate()
     return mse != 0 and standardized_mse == 0
 
 

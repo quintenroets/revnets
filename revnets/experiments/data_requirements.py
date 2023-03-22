@@ -1,43 +1,48 @@
 import math
+from dataclasses import dataclass
 
+import cli
 import numpy as np
+from retry import retry
 
 from .. import evaluations
-from ..networks.base import Network
 from ..reconstructions.outputs_supervision import random_inputs
 from . import experiment
 
 
+@dataclass
 class Experiment(experiment.Experiment):
-    @classmethod
-    def get_results(cls, network: Network):
-        original = network.get_trained_network()
+    min_num_samples: int = 1000
+    max_num_samples: int = 100000
+    num_values: int = 20
 
-        results = {}
-        max_num_samples = 100000
-        for num_samples in cls.get_samples_range(stop=max_num_samples):
-            scale_ratio = cls.calculate_scale_ratio(num_samples, max_num_samples)
-            dataset_kwargs = dict(
-                num_samples=num_samples,
-                repetition_factor=scale_ratio,
-                validation_ratio=0,
-            )
-            reconstructor = random_inputs.Reconstructor(
-                original, network, dataset_kwargs=dataset_kwargs
-            )
-            reconstruction = reconstructor.reconstruct()
-            evaluation = evaluations.evaluate(original, reconstruction, network)
-            results[num_samples] = evaluation
-        return results
+    def get_network_results(self):
+        return {
+            num_samples: self.get_sample_results(num_samples)
+            for num_samples in self.get_samples_range()
+        }
 
-    @classmethod
-    def calculate_scale_ratio(cls, num_samples, max_num_samples):
+    @retry(RuntimeError, tries=15, delay=10)
+    def get_sample_results(self, num_samples):
+        cli.console.rule(str(num_samples))
+        scale_ratio = self.calculate_scale_ratio(num_samples)
+        dataset_kwargs = dict(
+            num_samples=num_samples,
+            repetition_factor=scale_ratio,
+            validation_ratio=0,
+        )
+        reconstructor = random_inputs.Reconstructor(
+            self.network, dataset_kwargs=dataset_kwargs
+        )
+        reconstruction = reconstructor.reconstruct()
+        return evaluations.evaluate(reconstruction, self.network)
+
+    def calculate_scale_ratio(self, num_samples):
         # repeat number of samples if less data such
         # that effective number of samples is constant
-        return max_num_samples / num_samples
+        return self.max_num_samples / num_samples
 
-    @classmethod
-    def get_samples_range(cls, start=1000, stop=100000, num_values=50):
-        start = math.log10(start)
-        stop = math.log10(stop)
-        return np.logspace(start, stop, num_values, dtype=int)
+    def get_samples_range(self):
+        start = math.log10(self.min_num_samples)
+        stop = math.log10(self.max_num_samples)
+        return np.logspace(start, stop, self.num_values, dtype=int)

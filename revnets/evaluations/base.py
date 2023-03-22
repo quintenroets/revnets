@@ -8,9 +8,12 @@ from ..networks.base import Network
 
 @dataclass
 class Evaluator:
-    original: torch.nn.Module
     reconstruction: torch.nn.Module
     network: Network | None
+
+    def __post_init__(self):
+        if self.network is not None:
+            self.original: torch.nn.Module = self.network.trained_network
 
     def get_evaluation(self) -> str:
         evaluation = self.evaluate()

@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from plib import Path
+from rich.pretty import pprint
 
 from ..evaluations.weights import mae, named_layers_mae
 from ..evaluations.weights.standardize import standardize
@@ -18,14 +19,12 @@ class Experiment:
     def analyze(cls):
         network = mininet.Network()
 
-        model = network.get_trained_network()
-        reconstructor = random_inputs.Reconstructor(model, network)
+        reconstructor = random_inputs.Reconstructor(network)
         reconstruction = reconstructor.reconstruct()
-        # pprint(reconstruction.state_dict())
 
         standardize.standardize(reconstruction)
-        evaluator = mae.Evaluator(model, reconstruction, network)
-        evaluator2 = named_layers_mae.Evaluator(model, reconstruction, network)
+        evaluator = mae.Evaluator(reconstruction, network)
+        evaluator2 = named_layers_mae.Evaluator(reconstruction, network)
 
         for ev in (evaluator, evaluator2):
             distance = ev.evaluate()

@@ -1,12 +1,13 @@
 from types import ModuleType
 
+from ..networks import Network
 from . import attack, outputs, weights
 from .evaluation import Evaluation
 
 
-def evaluate(original, reconstruction, network):
+def evaluate(reconstruction, network: Network):
     def apply(evaluation_module: ModuleType):
-        evaluator = evaluation_module.Evaluator(original, reconstruction, network)
+        evaluator = evaluation_module.Evaluator(reconstruction, network)
         return evaluator.get_evaluation()
 
     attack_evaluation = apply(attack)

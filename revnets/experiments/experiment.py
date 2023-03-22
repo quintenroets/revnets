@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 import cli
 
 from .. import evaluations, networks, reconstructions
@@ -5,31 +7,29 @@ from ..networks.base import Network
 from ..utils import NamedClass, Path, Table, config
 
 
+@dataclass
 class Experiment(NamedClass):
-    @classmethod
-    def run(cls):
+    network: Network = None
+
+    def run(self):
         config.show()
         for network_module in networks.get_networks():
-            network = network_module.Network()
-            cli.console.rule(network.name)
-            cls.run_network(network)
+            self.network = network_module.Network()
+            cli.console.rule(self.network.name)
+            self.run_network()
 
-    @classmethod
-    def run_network(cls, network: Network):
-        results = cls.get_results(network)
-        table = cls.make_table(results)
+    def run_network(self):
+        results = self.get_network_results()
+        table = self.make_table(results)
         table.show()
-        cls.save(results)
+        self.save(results)
 
-    @classmethod
-    def get_results(cls, network: Network):
-        original = network.get_trained_network()
-
+    def get_network_results(self):
         results = {}
         for technique in reconstructions.get_algorithms():
-            reconstructor = technique.Reconstructor(original, network)
+            reconstructor = technique.Reconstructor(self.network)
             reconstruction = reconstructor.reconstruct()
-            evaluation = evaluations.evaluate(original, reconstruction, network)
+            evaluation = evaluations.evaluate(reconstruction, self.network)
             results[reconstructor.name] = evaluation
         return results
 
@@ -52,14 +52,12 @@ class Experiment(NamedClass):
     def get_base_name(cls):
         return Experiment.__module__
 
-    @classmethod
-    def save(cls, results):
-        cls.results_path.yaml = cls.serialize_results(results)
+    def save(self, results):
+        self.results_path.yaml = self.serialize_results(results)
 
-    @classmethod
     @property
-    def results_path(cls):  # noqa
-        path = Path.results / cls.name / "results.yaml"
+    def results_path(self):  # noqa
+        path = Path.results / self.name / self.network.name / "results.yaml"
         path = path.with_nonexistent_name()
         return path
 

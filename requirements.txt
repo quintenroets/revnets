@@ -5,6 +5,7 @@ numpy
 pytorch-lightning
 quinten-cli
 superpathlib
+retry
 tensorboard
 torch
 torchvision

@@ -1,7 +1,13 @@
+from functools import cached_property
+
 from ..utils import NamedClass
 
 
 class Network(NamedClass):
+    @cached_property
+    def trained_network(self):
+        return self.get_trained_network()
+
     @classmethod
     def get_trained_network(cls):
         raise NotImplementedError
