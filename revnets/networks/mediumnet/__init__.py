@@ -6,4 +6,4 @@ def get_all_networks():
 
 
 def get_networks():
-    return ()
+    return mediumnet_20, mediumnet_40
