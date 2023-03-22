@@ -32,10 +32,8 @@ class Network(base.Network, ABC):
 
     @classmethod
     def get_weights_path(cls, model: torch.nn.Module, seed=None):
-        name = model.name
-        if seed is not None:
-            name += f"_seed{seed}"
-        path: Path = Path.weights / name
+        seed_name = f"seed_{seed or 'none'}"
+        path: Path = Path.weights / "trained_blackbox" / cls.name / model.name / seed_name
         path.create_parent()
         return path
 

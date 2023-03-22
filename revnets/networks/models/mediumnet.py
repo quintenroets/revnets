@@ -1,9 +1,9 @@
 from torch import nn
 
-from . import mininet
+from . import base
 
 
-class Model(mininet.Model):
+class Model(base.Model):
     def __init__(self, hidden_size1=20, hidden_size2=10):
         super().__init__()
         self.layer1 = nn.Linear(40, hidden_size1)

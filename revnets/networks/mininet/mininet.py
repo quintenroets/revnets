@@ -1,4 +1,4 @@
-from ..utils import config
+from ...utils import config
 from . import mininet_untrained
 
 

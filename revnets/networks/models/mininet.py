@@ -1,11 +1,10 @@
-import torch.nn
-import torch.optim as optim
 from torch import nn
 
 from ...utils import config
+from . import base
 
 
-class Model(torch.nn.Module):
+class Model(base.Model):
     def __init__(self, hidden_size=20, learning_rate=None):
         super().__init__()
         self.learning_rate = learning_rate or config.lr
@@ -17,11 +16,3 @@ class Model(torch.nn.Module):
         x = nn.functional.relu(x)
         logits = self.layer2(x)
         return logits
-
-    def configure_optimizers(self):
-        return optim.Adam(self.parameters(), lr=self.learning_rate)
-
-    @classmethod
-    @property
-    def name(cls):
-        return cls.__module__.replace(".", "_")

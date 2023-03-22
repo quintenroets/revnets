@@ -1,11 +1,10 @@
-from . import mediumnet, mediumnet_untrained, mininet, mininet_untrained
+from . import mediumnet, mininet
 from .base import Network
 
 
 def get_all_networks():
-    return (mininet,)
-    return mininet, mininet_untrained, mediumnet, mediumnet_untrained
+    return *mininet.get_all_networks(), *mediumnet.get_all_networks()
 
 
 def get_networks():
-    return (mininet,)
+    return *mininet.get_networks(), *mediumnet.get_networks()

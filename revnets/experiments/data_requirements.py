@@ -50,8 +50,9 @@ class Experiment(experiment.Experiment):
     def get_samples_range(self):
         start = math.log10(self.min_num_samples)
         stop = math.log10(self.max_num_samples)
-        return np.logspace(start, stop, self.num_values, dtype=int)
+        return np.logspace(start, stop, self.num_values, dtype=int)[2:]
 
+    @property
     def results_path(self):
         path = super().results_path
         if self.execution_failed:

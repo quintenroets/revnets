@@ -1,18 +1,17 @@
 from dataclasses import dataclass
 
-import torch.nn
-
-from ..networks.mininet import Network
+from ..networks.base import Network
+from ..networks.models.base import Model
 from ..utils import NamedClass
 
 
 @dataclass
 class Reconstructor(NamedClass):
     network: Network
-    reconstruction: torch.nn.Module = None
+    reconstruction: Model = None
 
     def __post_init__(self):
-        self.original = self.network.trained_network
+        self.original: Model = self.network.trained_network
 
     def reconstruct(self):
         self.reconstruction = self.initialize_reconstruction()

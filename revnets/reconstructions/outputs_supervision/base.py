@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from functools import cached_property
 
 import torch.nn
@@ -43,15 +43,15 @@ class ReconstructModel(trainable.Model):
 class Reconstructor(empty.Reconstructor):
     always_train: bool = False
     model: ReconstructModel = None
-    dataset_kwargs: dict = None
+    dataset_kwargs: dict = field(default_factory=dict)
 
     @cached_property
     def trained_weights_path(self):
         data: Dataset = self.network.dataset()
         hash_value = compute_hash(
             Reducer,
-            self.original.__class__.__module__,
-            self.reconstruction.__class__.__module__,
+            self.original.name,
+            self.reconstruction.name,
             self.reconstruction.state_dict(),
             data,
         )
