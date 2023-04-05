@@ -1,5 +1,6 @@
 cacher @ git+https://github.com/quintenroets/cacher
 adversarial-robustness-toolbox
+kneed
 matplotlib
 numpy
 pytorch-lightning

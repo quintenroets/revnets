@@ -21,7 +21,9 @@ class Experiment:
         y_values = [v[1] for v in merged_results]
         plt.plot(x_values, y_values)
         plt.xscale("log")
+        plt.xlabel("Number of data points")
         plt.yscale("log")
+        plt.ylabel("Reconstructed weights MAE")
         plt.show()
 
     @classmethod
@@ -51,5 +53,7 @@ class Experiment:
 
     @classmethod
     def load_results(cls):
-        results_folder = Path.results / "Data requirements" / "mininet"
-        return [path.yaml for path in results_folder.iterdir()]
+        results_folder = Path.results / "Data requirements" / "Mininet mininet"
+        return [
+            path.yaml for path in results_folder.iterdir() if "fail" not in path.stem
+        ]

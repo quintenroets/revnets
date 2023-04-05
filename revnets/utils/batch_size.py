@@ -46,7 +46,16 @@ class Reducer(base.Reducer):
         """We do not want a new cache entry for every weight assignment Cache
         calculated result for each model dataset and task names.
         """
-        values = {v for v in model.state_dict().values()}
+        values = set()
+        state_dict = model.state_dict()
+
+        for key in state_dict.keys():
+            try:
+                value = state_dict[key]
+                values.add(value)
+            except ReferenceError:
+                pass
+
         dimensions = {v.shape for v in values}
         return dimensions, config.devices
 

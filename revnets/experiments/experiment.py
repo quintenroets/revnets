@@ -20,12 +20,15 @@ class Experiment(NamedClass):
 
     @classmethod
     def get_networks(cls):
+        return (networks.mininet.mininet,)
+        return (networks.mediumnet.mediumnet_40,)
         return networks.get_networks()
 
     def run_network(self):
         results = self.get_network_results()
-        table = self.make_table(results)
-        table.show()
+        if results:
+            table = self.make_table(results)
+            table.show()
         self.save(results)
 
     def get_network_results(self):

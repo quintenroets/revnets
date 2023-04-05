@@ -13,6 +13,9 @@ class Model(pl.LightningModule):
         self.model = model
         self.do_log: bool = True
 
+    def forward(self, inputs):
+        return self.model(inputs)
+
     def training_step(self, batch, batch_idx):
         metrics = self.obtain_metrics(batch, Phase.TRAIN)
         return metrics.loss
@@ -25,7 +28,7 @@ class Model(pl.LightningModule):
 
     def obtain_metrics(self, batch, phase: Phase) -> Metrics:
         inputs, labels = batch
-        outputs = self.model(inputs)
+        outputs = self(inputs)
         metrics = self.calculate_metrics(outputs, labels)
         self.log_metrics(metrics, phase)
         return metrics

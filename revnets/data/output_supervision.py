@@ -17,6 +17,11 @@ class PredictModel(pl.LightningModule):
     def forward(self, batch):
         return self.model(batch[0])
 
+    def get_predictions(self, trainer, *args, **kwargs):
+        batch_outputs = trainer.predict(self, *args, **kwargs)
+        outputs = torch.Tensor() if batch_outputs is None else torch.cat(batch_outputs)
+        return outputs
+
 
 @dataclass
 class Dataset(base.Dataset):
@@ -53,8 +58,10 @@ class Dataset(base.Dataset):
         return torch.cat(input_batches)
 
     def get_output_targets(self, dataloader: DataLoader):
-        model = PredictModel(self.target_network)
+        return self.get_predictions(dataloader, self.target_network)
+
+    @classmethod
+    def get_predictions(cls, dataloader: DataLoader, model):
+        predict_model = PredictModel(model)
         trainer = Trainer()
-        batch_outputs = trainer.predict(model, dataloader)
-        outputs = torch.Tensor() if batch_outputs is None else torch.cat(batch_outputs)
-        return outputs
+        return predict_model.get_predictions(trainer, dataloader)

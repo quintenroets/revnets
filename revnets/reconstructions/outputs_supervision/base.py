@@ -1,6 +1,8 @@
+import time
 from dataclasses import dataclass, field, fields
 from functools import cached_property
 
+import numpy as np
 import torch.nn
 from cacher.caches.deep_learning import Reducer
 from cacher.hashing import compute_hash
@@ -44,6 +46,7 @@ class Reconstructor(empty.Reconstructor):
     always_train: bool = False
     model: ReconstructModel = None
     dataset_kwargs: dict = field(default_factory=dict)
+    randomize_training: bool = False
 
     @cached_property
     def trained_weights_path(self):
@@ -71,6 +74,7 @@ class Reconstructor(empty.Reconstructor):
 
     def start_training(self):
         self.model = ReconstructModel(self.reconstruction)
+        self.check_randomize()
         data = self.get_dataset()
         trainer = Trainer()
         if data.validation_ratio > 0:
@@ -80,6 +84,17 @@ class Reconstructor(empty.Reconstructor):
             data.prepare()
             train_dataloader = data.train_dataloader()
             trainer.fit(self.model, train_dataloaders=train_dataloader)
+
+    def check_randomize(self):
+        if self.randomize_training:
+            self.set_random_seed()
+
+    @classmethod
+    def set_random_seed(cls):
+        now = time.time()
+        seed = int(now * 10**7) % 2**32
+        torch.manual_seed(seed)
+        np.random.seed(seed)
 
     def get_train_model(self):
         return ReconstructModel(self.reconstruction)

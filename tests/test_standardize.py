@@ -4,7 +4,7 @@ from hypothesis import HealthCheck, given, settings, strategies
 
 from revnets.evaluations import weights
 from revnets.evaluations.weights.standardize import standardize
-from revnets.networks import mininet
+from revnets.networks.mininet import mininet
 
 suppressed = (HealthCheck.function_scoped_fixture,)
 

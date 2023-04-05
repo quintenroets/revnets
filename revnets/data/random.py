@@ -10,10 +10,14 @@ from .base import Split
 
 @dataclass
 class Dataset(output_supervision.Dataset):
-    num_samples: int = 100000
+    num_samples: int = config.sampling_data_size
 
     def __post_init__(self):
         super().__post_init__()
+        self.train_val_dataset: TensorDataset | None = None
+        self.train_dataset: TensorDataset | None = None
+        self.val_dataset: TensorDataset | None = None
+        self.test_dataset: TensorDataset | None = None
         self.batch_size = config.reconstruction_batch_size
 
     @property
@@ -33,15 +37,23 @@ class Dataset(output_supervision.Dataset):
             ), f"Number of {split.value} samples must be greater than 0"
         return num_samples, *self.input_shape
 
+    @classmethod
+    def generate_random_inputs(cls, shape):
+        dtype = torch.float64 if config.precision == 64 else torch.float32
+        # same mean and std as training data
+        return torch.randn(shape, dtype=dtype)
+
     def generate_dataset(self, split: Split):
         dataset_shape = self.get_dataset_shape(split)
-        # same mean and std as training data
-        inputs = torch.randn(dataset_shape, dtype=torch.float64)
-        targets = self.get_targets(inputs)
-        return TensorDataset(inputs, targets)
+        inputs = self.generate_random_inputs(dataset_shape)
+        return self.construct_dataset(inputs)
 
     def get_targets(self, inputs):
         inputs_dataset = TensorDataset(inputs)
         batch_size = self.original_dataset.eval_batch_size
         dataloader = torch.utils.data.DataLoader(inputs_dataset, batch_size=batch_size)
         return self.get_output_targets(dataloader)
+
+    def construct_dataset(self, inputs):
+        targets = self.get_targets(inputs)
+        return TensorDataset(inputs, targets)

@@ -46,6 +46,8 @@ class Config:
     run_analysis: bool = False
     precision: int = 64
     always_train: bool = None
+    sampling_data_size: int = 10000
+    quiet_prediction = True
 
     def __post_init__(self):
         if self.debug:
@@ -76,7 +78,8 @@ class Config:
         if not args.config_name:
             args.config_name = "config"
         config_path = (Path.config / args.config_name).with_suffix(".yaml")
-        return Config(config_path=config_path, **config_path.yaml)
+        config_values = Config(config_path=config_path, **config_path.yaml)
+        return config_values
 
     def __repr__(self):
         return f"{self.name}\n"

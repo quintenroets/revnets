@@ -1,7 +1,10 @@
+import contextlib
+
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import RichModelSummary, RichProgressBar
 from pytorch_lightning.strategies.ddp import DDPStrategy
 
+from . import pl_logger
 from .config import config
 
 
@@ -9,6 +12,7 @@ class Trainer(pl.Trainer):
     def __init__(
         self,
         accelerator="auto",
+        callbacks=None,
         strategy=None,
         logger=None,
         max_epochs=None,
@@ -17,10 +21,10 @@ class Trainer(pl.Trainer):
     ):
         if logger is None and config.log:
             logger = config.logger
-        if strategy is None and "num_nodes" not in kwargs:
+        if False and strategy is None and "num_nodes" not in kwargs:
             strategy = DDPStrategy(find_unused_parameters=False)
 
-        callbacks = [RichModelSummary(), RichProgressBar()]
+        callbacks = (callbacks or []) + [RichModelSummary(), RichProgressBar()]
 
         super().__init__(
             accelerator=accelerator,
@@ -35,11 +39,16 @@ class Trainer(pl.Trainer):
             default_root_dir=str(config.log_folder),
             precision=precision or config.precision,
             sync_batchnorm=True,
+            tpu_cores=None,
             **kwargs,
         )
 
-    def save_log_message(self):
-        config.test_results_path.text = self.log_message
+    def predict(self, *args, **kwargs):
+        context_manager = (
+            pl_logger.Quiet() if config.quiet_prediction else contextlib.nullcontext
+        )
+        with context_manager:
+            return super().predict(*args, **kwargs)
 
     @property
     def log_message(self):
