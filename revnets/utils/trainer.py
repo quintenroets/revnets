@@ -2,7 +2,6 @@ import contextlib
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import RichModelSummary, RichProgressBar
-from pytorch_lightning.strategies.ddp import DDPStrategy
 
 from . import pl_logger
 from .config import config
@@ -13,23 +12,22 @@ class Trainer(pl.Trainer):
         self,
         accelerator="auto",
         callbacks=None,
-        strategy=None,
         logger=None,
         max_epochs=None,
         precision=None,
+        barebones=False,
         **kwargs,
     ):
         if logger is None and config.log:
             logger = config.logger
-        if False and strategy is None and "num_nodes" not in kwargs:
-            strategy = DDPStrategy(find_unused_parameters=False)
 
-        callbacks = (callbacks or []) + [RichModelSummary(), RichProgressBar()]
+        extra_callbacks = [] if barebones else [RichModelSummary(), RichProgressBar()]
+        callbacks = (callbacks or []) + extra_callbacks
 
         super().__init__(
             accelerator=accelerator,
+            barebones=barebones,
             callbacks=callbacks,
-            strategy=strategy,
             logger=logger,
             max_epochs=max_epochs or config.epochs,
             num_sanity_val_steps=config.num_sanity_val_steps,
@@ -39,16 +37,20 @@ class Trainer(pl.Trainer):
             default_root_dir=str(config.log_folder),
             precision=precision or config.precision,
             sync_batchnorm=True,
-            tpu_cores=None,
             **kwargs,
         )
 
+    @property
+    def context_manager(self):
+        return pl_logger.Quiet() if config.quiet_prediction else contextlib.nullcontext
+
     def predict(self, *args, **kwargs):
-        context_manager = (
-            pl_logger.Quiet() if config.quiet_prediction else contextlib.nullcontext
-        )
-        with context_manager:
+        with self.context_manager:
             return super().predict(*args, **kwargs)
+
+    def fit(self, *args, **kwargs):
+        with self.context_manager:
+            return super().fit(*args, **kwargs)
 
     @property
     def log_message(self):

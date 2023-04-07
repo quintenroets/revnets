@@ -111,19 +111,13 @@ class Dataset(pl.LightningDataModule):
 
         if batch_size == -1:
             batch_size = len(dataset)
-            num_workers = 1
-            persistent_workers = False
-        else:
-            num_workers = config.num_workers
-            persistent_workers = False
-            # persistent_workers = True
 
         dataloader = torch.utils.data.DataLoader(
             dataset,
             batch_size=batch_size,
+            # num_workers=config.num_workers,
             shuffle=shuffle,
-            num_workers=num_workers,
-            persistent_workers=persistent_workers,
+            # persistent_workers=True,
         )
         return dataloader
 

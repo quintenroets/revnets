@@ -11,7 +11,7 @@ from . import iterative_sampling
 
 @dataclass
 class Reconstructor(iterative_sampling.Reconstructor):
-    n_rounds: int = 10
+    n_rounds: int = 5
 
     def __post_init__(self):
         super().__post_init__()
@@ -20,6 +20,7 @@ class Reconstructor(iterative_sampling.Reconstructor):
     def run_round(self):
         self.train_model()
         self.analyze_samplings()
+        self.add_difficult_samples()
 
     def analyze_samplings(self):
         train_inputs = self.data.get_all_inputs(output_supervision.Split.train)
@@ -27,7 +28,10 @@ class Reconstructor(iterative_sampling.Reconstructor):
         elbow = self.get_elbow(train_losses)
         elbow_y = train_losses[elbow]
 
+        difficult_existing_inputs = self.extract_difficult_inputs()
+        self.visualize_samples(difficult_existing_inputs)
         difficult_inputs = self.sample_difficult_inputs()
+        self.visualize_samples(difficult_inputs)
         random_inputs = self.data.generate_random_inputs(difficult_inputs.shape)
         random_scales = [0, 1, 1 / 10, 1 / 100]
 
@@ -51,9 +55,7 @@ class Reconstructor(iterative_sampling.Reconstructor):
             "recombined difficult samples + noise (scale 1/100)",
         ]
 
-        color_points = np.linspace(0, 1, 10)
-        colors = cm.tab10(color_points)  # noqa
-
+        colors = self.get_colors()
         for inputs, color, label in zip(analyzed_inputs, colors, labels):
             losses = self.get_sorted_losses(inputs) / inputs.std()
             plt.plot(losses, color=color, label=label)
@@ -90,3 +92,43 @@ class Reconstructor(iterative_sampling.Reconstructor):
     def get_predictions(self, dataset, model):
         dataloader = DataLoader(dataset, batch_size=self.data.eval_batch_size)
         return self.data.get_predictions(dataloader, model)
+
+    @classmethod
+    def visualize_samples(cls, samples):
+        colors = cls.get_colors()
+        fig, ax = plt.subplots(figsize=(10, 10))
+        for features in samples:
+            ax.plot(features, color=colors[0], alpha=0.3, linewidth=0.1)
+
+        plt.title("Parallel Coordinates Plot")
+        plt.xlabel("Feature")
+        plt.ylabel("Feature Value")
+        plt.show()
+
+    @classmethod
+    def get_colors(cls, n=10):
+        mappers = {
+            10: (cm.tab10,),
+            20: (cm.tab20,),
+            40: (cm.tab20, cm.tab20b),
+            60: (cm.tab20, cm.tab20b, cm.tab20c),
+        }
+        color_maps = None
+        for number in mappers:
+            if n <= number:
+                n = number
+                color_maps = mappers[number]
+                break
+
+        n_color = 10 if n <= 10 else 20
+        colors = [
+            color
+            for color_map in color_maps
+            for color in cls.get_points(color_map, n_color)
+        ]
+        return colors
+
+    @classmethod
+    def get_points(cls, color_map, n):
+        color_points = np.linspace(0, 1, n)
+        return color_map(color_points)

@@ -9,6 +9,7 @@ from cacher.hashing import compute_hash
 from torch import nn
 
 from ...data import Dataset, output_supervision
+from ...evaluations.weights.mae import Evaluator
 from ...networks.models import trainable
 from ...utils import Path, config
 from ...utils.trainer import Trainer
@@ -34,11 +35,20 @@ class Metrics:
 
 
 class ReconstructModel(trainable.Model):
+    def __init__(self, model, network):
+        super().__init__(model)
+        self.network = network
+
     def calculate_metrics(self, outputs, targets):
         return Metrics(
             l1_loss=nn.functional.l1_loss(outputs, targets),
             l2_loss=nn.functional.mse_loss(outputs, targets),
         )
+
+    def on_train_epoch_end(self) -> None:
+        evaluator = Evaluator(self.model, self.network)
+        mae = evaluator.evaluate()
+        self.log("weights MAE", mae, prog_bar=True)
 
 
 @dataclass
@@ -73,7 +83,7 @@ class Reconstructor(empty.Reconstructor):
         self.load_weights()
 
     def start_training(self):
-        self.model = ReconstructModel(self.reconstruction)
+        self.model = ReconstructModel(self.reconstruction, self.network)
         self.check_randomize()
         data = self.get_dataset()
         trainer = Trainer()

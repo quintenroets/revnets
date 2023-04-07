@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -21,25 +22,26 @@ class Reconstructor(random_inputs.Reconstructor):
     def __post_init__(self):
         super().__post_init__()
         # make total samples used equal to other experiments
+        num_validation_samples = int(self.num_samples * Dataset.validation_ratio)
+        self.dataset_kwargs = dict(
+            num_samples=num_validation_samples, validation_ratio=1
+        )
         self.num_samples //= self.n_rounds
 
     def start_training(self):
-        self.model = ReconstructModel(self.reconstruction)
+        self.model = ReconstructModel(self.reconstruction, self.network)
         self.check_randomize()
         self.data = self.get_dataset()
 
         for i in range(self.n_rounds):
             self.run_round()
 
-    @property
-    def input_dataset_shape(self):
-        return (self.num_samples, *self.data.input_shape)  # noqa
-
     def get_dataset(self):
         data = super().get_dataset()
-        self.data.prepare()
-        inputs = self.data.generate_random_inputs(self.input_dataset_shape)
-        self.data.train_dataset = self.data.construct_dataset(inputs)
+        data.prepare()
+        shape = (self.num_samples, *data.input_shape)  # noqa
+        inputs = data.generate_random_inputs(shape)
+        data.train_dataset = data.construct_dataset(inputs)
         return data
 
     def run_round(self):
@@ -48,11 +50,19 @@ class Reconstructor(random_inputs.Reconstructor):
 
     def train_model(self):
         # early_stop_callback = EarlyStopping(
-        #   monitor="train l1_loss", patience=50, mode="min"
+        # monitor="train l1_loss", patience=100, mode="min"
         # )
-        callbacks = []
-        trainer = Trainer(callbacks=callbacks)
-        trainer.fit(self.model, self.data)
+        # callbacks = [early_stop_callback]
+        path = Path("weightos")
+        if path.exists() and False:
+            weights = torch.load(path)
+            self.model.load_state_dict(weights)
+        else:
+            callbacks = []
+            trainer = Trainer(callbacks=callbacks)
+            trainer.fit(self.model, self.data)
+            weights = self.model.state_dict()
+            torch.save(weights, path)
 
     def add_difficult_samples(self):
         difficult_inputs = self.sample_difficult_inputs()

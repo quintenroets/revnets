@@ -28,7 +28,7 @@ class Enum(enum.Enum):
 class Config:
     config_path: Path
     epochs: int = None
-    num_workers: int = 4
+    num_workers: int = 8
     lr: float = 0.1
     manual_seed: int = 77
     debug: bool = False
@@ -143,7 +143,7 @@ class Config:
 
     @property
     def num_sanity_val_steps(self):
-        return 0 if self.debug else 2
+        return 0 if self.debug else None
 
 
 # @cache

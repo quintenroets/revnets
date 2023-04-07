@@ -63,5 +63,5 @@ class Dataset(base.Dataset):
     @classmethod
     def get_predictions(cls, dataloader: DataLoader, model):
         predict_model = PredictModel(model)
-        trainer = Trainer()
+        trainer = Trainer(barebones=True)
         return predict_model.get_predictions(trainer, dataloader)
