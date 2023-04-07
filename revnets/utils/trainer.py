@@ -20,8 +20,15 @@ class Trainer(pl.Trainer):
     ):
         if logger is None and config.log:
             logger = config.logger
+        try:
+            get_ipython()
+            is_notebook = True
+        except NameError:
+            is_notebook = False
 
-        extra_callbacks = [] if barebones else [RichModelSummary(), RichProgressBar()]
+        extra_callbacks = (
+            [] if barebones or is_notebook else [RichModelSummary(), RichProgressBar()]
+        )
         callbacks = (callbacks or []) + extra_callbacks
 
         super().__init__(

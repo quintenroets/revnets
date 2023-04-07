@@ -34,8 +34,11 @@ def permute_output_neurons(layer, sort_indices):
             )
 
 
-def get_layer_weights(layer):
+def get_layer_weights(layer, device=None):
     with torch.no_grad():
         connection_weights, bias_weights = layer.parameters()
         weights = (connection_weights, bias_weights.reshape(-1, 1))
-        return torch.hstack(weights)
+        weights = torch.hstack(weights)
+        if device is not None:
+            weights = weights.to(device)
+        return weights

@@ -6,9 +6,9 @@ class Evaluation:
     weights_MSE: str = None
     weights_MAE: str = None
     weights_MAE_layers: str = None
-    train_outputs_MSE: str = None
-    val_outputs_MSE: str = None
-    test_outputs_MSE: str = None
+    train_outputs_MAE: str = None
+    val_outputs_MAE: str = None
+    test_outputs_MAE: str = None
     test_acc: str = None
     adversarial_test_acc: str = None
     adversarial_transfer_test_acc: str = None

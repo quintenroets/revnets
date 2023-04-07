@@ -6,13 +6,14 @@ from .standardize import standardize
 
 class Evaluator(base.Evaluator):
     def evaluate(self):
-        if not self.same_architecture():
-            distance = None
-        else:
+        return self.calculate_distance() if self.standardize_networks() else None
+
+    def standardize_networks(self):
+        standardized = self.same_architecture()
+        if standardized:
             standardize.standardize(self.original)
             standardize.standardize(self.reconstruction)
-            distance = self.calculate_distance()
-        return distance
+        return standardized
 
     def same_architecture(self):
         return all(

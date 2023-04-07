@@ -1,6 +1,5 @@
 import time
 from dataclasses import dataclass, field, fields
-from functools import cached_property
 
 import numpy as np
 import torch.nn
@@ -45,7 +44,7 @@ class ReconstructModel(trainable.Model):
             l2_loss=nn.functional.mse_loss(outputs, targets),
         )
 
-    def on_train_epoch_end(self) -> None:
+    def on_train_epoch_endos(self) -> None:
         evaluator = Evaluator(self.model, self.network)
         mae = evaluator.evaluate()
         self.log("weights MAE", mae, prog_bar=True)
@@ -57,9 +56,9 @@ class Reconstructor(empty.Reconstructor):
     model: ReconstructModel = None
     dataset_kwargs: dict = field(default_factory=dict)
     randomize_training: bool = False
+    trained_weights_path: Path = None
 
-    @cached_property
-    def trained_weights_path(self):
+    def get_trained_weights_path(self):
         data: Dataset = self.network.dataset()
         hash_value = compute_hash(
             Reducer,
@@ -73,12 +72,18 @@ class Reconstructor(empty.Reconstructor):
         return path
 
     def reconstruct_weights(self):
+        # needs to be calculated before training
+        self.trained_weights_path = self.get_trained_weights_path()
         always_train = (
             self.always_train if config.always_train is None else config.always_train
         )
         if always_train or not self.trained_weights_path.exists():
+            self.load_weights()
+
+            print("hier")
             self.start_training()
-            self.save_weights()
+            print("zo")
+            # self.save_weights()
 
         self.load_weights()
 
@@ -96,7 +101,7 @@ class Reconstructor(empty.Reconstructor):
             trainer.fit(self.model, train_dataloaders=train_dataloader)
 
     def check_randomize(self):
-        if self.randomize_training:
+        if not self.randomize_training:
             self.set_random_seed()
 
     @classmethod
@@ -106,12 +111,10 @@ class Reconstructor(empty.Reconstructor):
         torch.manual_seed(seed)
         np.random.seed(seed)
 
-    def get_train_model(self):
-        return ReconstructModel(self.reconstruction)
-
     def load_weights(self):
         state_dict = torch.load(self.trained_weights_path)
         self.reconstruction.load_state_dict(state_dict)
+        self.reconstruction.layer2.reset_parameters()
 
     def save_weights(self):
         state_dict = self.reconstruction.state_dict()

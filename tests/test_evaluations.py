@@ -11,10 +11,10 @@ def test_cheat_evaluations():
 
         # cheat should give perfect metrics
         perfect_values = (
-            evaluation_metrics.weights_MSE,
-            evaluation_metrics.train_outputs_MSE,
-            evaluation_metrics.val_outputs_MSE,
-            evaluation_metrics.train_outputs_MSE,
+            evaluation_metrics.weights_MAE,
+            evaluation_metrics.train_outputs_MAE,
+            evaluation_metrics.val_outputs_MAE,
+            evaluation_metrics.train_outputs_MAE,
         )
         for value in perfect_values:
             assert value in ("/", None) or float(value) == 0
