@@ -47,7 +47,8 @@ class Config:
     precision: int = 64
     always_train: bool = None
     sampling_data_size: int = 10000
-    quiet_prediction = True
+    quiet_prediction: bool = True
+    randomize_training: bool = False
 
     def __post_init__(self):
         if self.debug:

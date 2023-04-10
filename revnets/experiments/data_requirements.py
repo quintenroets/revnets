@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 from .. import evaluations, networks
-from ..reconstructions.outputs_supervision import random_inputs
+from ..reconstructions import outputs_supervision
 from . import experiment
 
 
@@ -51,7 +51,9 @@ class Experiment(experiment.Experiment):
             repetition_factor=scale_ratio,
             validation_ratio=0,
         )
-        reconstructor = random_inputs.Reconstructor(
+        # reconstruction_module = outputs_supervision.random_inputs
+        reconstruction_module = outputs_supervision.iterative_sampling
+        reconstructor = reconstruction_module.Reconstructor(
             self.network, dataset_kwargs=dataset_kwargs, randomize_training=True
         )
         reconstruction = reconstructor.reconstruct()

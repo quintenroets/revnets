@@ -6,6 +6,7 @@ import pytorch_lightning as pl
 import torch.nn
 from cacher import decorator
 from cacher.caches import base
+from pytorch_lightning.tuner.tuning import Tuner
 
 from .config import config
 
@@ -74,22 +75,20 @@ def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validat
 
     trainer = pl.Trainer(
         accelerator="auto",
-        auto_scale_batch_size=True,
         devices=1,
         max_epochs=1,
         logger=False,
         precision=config.precision,
     )
-    scale_batch_size_kwargs = {"init_val": config.batch_size}
+    tuner = Tuner(trainer)
+
     print(f"Calculating max {method} batch size")
 
     model.do_log = False
     old_batch_size = data.batch_size
     try:
-        trainer.tune(
-            tune_model,
-            method=method,  # noqa
-            scale_batch_size_kwargs=scale_batch_size_kwargs,
+        tuner.scale_batch_size(
+            tune_model, method=method, init_val=config.batch_size  # noqa
         )
     except ValueError:
         message = "Batch size of 2 does not fit in GPU, impossible to start training"

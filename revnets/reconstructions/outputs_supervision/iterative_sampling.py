@@ -1,31 +1,32 @@
 from dataclasses import dataclass
-from pathlib import Path
 
+import cli
 import numpy as np
 import torch
 from kneed import KneeLocator
+from rich.text import Text
 from torch.utils.data import ConcatDataset
 
 from ...data import output_supervision
 from ...data.random import Dataset
-from ...utils.trainer import Trainer
 from . import random_inputs
 from .base import ReconstructModel
 
 
 @dataclass
 class Reconstructor(random_inputs.Reconstructor):
-    n_rounds: int = 10
+    n_rounds: int = 2
     noise_factor: float = 1 / 100
     data: Dataset = None
+    visualize: bool = False
 
     def __post_init__(self):
         super().__post_init__()
         # make total samples used equal to other experiments
         num_validation_samples = int(self.num_samples * Dataset.validation_ratio)
-        self.dataset_kwargs = dict(
-            num_samples=num_validation_samples, validation_ratio=1
-        )
+        dataset_kwargs = dict(num_samples=num_validation_samples, validation_ratio=1)
+        for k, v in dataset_kwargs.items():
+            self.dataset_kwargs.setdefault(k, v)
         self.num_samples //= self.n_rounds
 
     def start_training(self):
@@ -33,7 +34,12 @@ class Reconstructor(random_inputs.Reconstructor):
         self.check_randomize()
         self.data = self.get_dataset()
 
+        total_samples = len(self.data.train_dataset) * self.n_rounds
         for i in range(self.n_rounds):
+            n_samples = len(self.data.train_dataset)
+            title = f"Round {i+1}/{self.n_rounds}: {n_samples}/{total_samples} samples"
+            text = Text(title, style="black")
+            cli.console.rule(text)
             self.run_round()
 
     def get_dataset(self):
@@ -45,24 +51,10 @@ class Reconstructor(random_inputs.Reconstructor):
         return data
 
     def run_round(self):
-        self.train_model()
+        self.train_model(self.data)
         self.add_difficult_samples()
-
-    def train_model(self):
-        # early_stop_callback = EarlyStopping(
-        # monitor="train l1_loss", patience=100, mode="min"
-        # )
-        # callbacks = [early_stop_callback]
-        path = Path("weightos")
-        if path.exists() and False:
-            weights = torch.load(path)
-            self.model.load_state_dict(weights)
-        else:
-            callbacks = []
-            trainer = Trainer(callbacks=callbacks)
-            trainer.fit(self.model, self.data)
-            weights = self.model.state_dict()
-            torch.save(weights, path)
+        if self.visualize:
+            self.model.visualizer.evaluate()
 
     def add_difficult_samples(self):
         difficult_inputs = self.sample_difficult_inputs()

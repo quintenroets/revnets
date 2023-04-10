@@ -66,7 +66,9 @@ class Dataset(pl.LightningDataModule):
     def train_dataloader(self, shuffle=True, batch_size=None):
         if batch_size is None:
             batch_size = self.batch_size
-        return self.get_dataloader(Split.train, batch_size, shuffle=shuffle)
+        return self.get_dataloader(
+            Split.train, batch_size, shuffle=shuffle, use_repeat=True
+        )
 
     def val_dataloader(self, shuffle=False):
         return self.get_dataloader(Split.valid, self.eval_batch_size, shuffle=shuffle)
@@ -88,7 +90,7 @@ class Dataset(pl.LightningDataModule):
         batched_targets = tuple(batch[1] for batch in dataloader)
         return torch.vstack(batched_targets)
 
-    def get_dataloader(self, split: Split, batch_size, shuffle=False):
+    def get_dataloader(self, split: Split, batch_size, shuffle=False, use_repeat=False):
         if config.debug:
             # memorize 1 training batch during debugging
             dataset = self.get_dataset(Split.train)
@@ -98,7 +100,7 @@ class Dataset(pl.LightningDataModule):
             shuffle = False
         else:
             dataset = self.get_dataset(split)
-            if split.is_train and self.repetition_factor is not None:
+            if split.is_train and self.repetition_factor is not None and use_repeat:
                 repetition_factor_int = int(self.repetition_factor)
                 repetition_fraction = self.repetition_factor - repetition_factor_int
                 datasets = [dataset] * repetition_factor_int
