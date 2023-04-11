@@ -71,11 +71,11 @@ class Reconstructor(empty.Reconstructor):
             trainer.fit(self.model, train_dataloaders=train_dataloader)
 
     def check_randomize(self):
-        if not self.randomize_training:
-            self.set_random_seed()
+        if self.randomize_training:
+            self.randomize_used_seed()
 
     @classmethod
-    def set_random_seed(cls):
+    def randomize_used_seed(cls):
         now = time.time()
         seed = int(now * 10**7) % 2**32
         torch.manual_seed(seed)

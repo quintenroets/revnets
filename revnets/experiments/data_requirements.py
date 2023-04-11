@@ -51,8 +51,8 @@ class Experiment(experiment.Experiment):
             repetition_factor=scale_ratio,
             validation_ratio=0,
         )
-        # reconstruction_module = outputs_supervision.random_inputs
-        reconstruction_module = outputs_supervision.iterative_sampling
+        reconstruction_module = outputs_supervision.random_inputs
+        # reconstruction_module = outputs_supervision.iterative_sampling
         reconstructor = reconstruction_module.Reconstructor(
             self.network, dataset_kwargs=dataset_kwargs, randomize_training=True
         )

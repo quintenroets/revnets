@@ -9,6 +9,7 @@ from torch.utils.data import ConcatDataset
 
 from ...data import output_supervision
 from ...data.random import Dataset
+from ...utils import config
 from . import random_inputs
 from .base import ReconstructModel
 
@@ -27,6 +28,7 @@ class Reconstructor(random_inputs.Reconstructor):
         dataset_kwargs = dict(num_samples=num_validation_samples, validation_ratio=1)
         for k, v in dataset_kwargs.items():
             self.dataset_kwargs.setdefault(k, v)
+
         self.num_samples //= self.n_rounds
 
     def start_training(self):
@@ -52,6 +54,7 @@ class Reconstructor(random_inputs.Reconstructor):
 
     def run_round(self):
         self.train_model(self.data)
+        self.check_randomize()
         self.add_difficult_samples()
         if self.visualize:
             self.model.visualizer.evaluate()
@@ -108,3 +111,11 @@ class Reconstructor(random_inputs.Reconstructor):
             elbow_range, values, curve="convex", direction="decreasing"
         )
         return elbow_result.elbow
+
+    @property
+    def num_samples(self):
+        return self.dataset_kwargs.get("num_samples", config.sampling_data_size)
+
+    @num_samples.setter
+    def num_samples(self, value):
+        self.dataset_kwargs["num_samples"] = value
