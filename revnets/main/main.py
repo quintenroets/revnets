@@ -4,8 +4,11 @@ from ..utils import get_args
 
 def main():
     args = get_args()
-    experiment_name = args.experiment or "data_requirements_runner"
-    experiment_module = experiments.__dict__[experiment_name]
+    experiment_module = (
+        experiments.__dict__[args.experiment]
+        if args.experiment
+        else experiments.experiment
+    )
     experiment_module.Experiment().run()
 
 
