@@ -1,23 +1,14 @@
 from dataclasses import dataclass
 
-from .. import networks
 from ..evaluations import outputs, weights
-from ..reconstructions import outputs_supervision
 from . import experiment
 
 
 @dataclass
 class Experiment(experiment.Experiment):
-    @classmethod
-    def get_networks(cls):
-        return (networks.mininet.mininet,)
-        return (networks.mininet.mininet_bigger_reconstruction,)
-
     def run_network(self):
-        reconstructor = outputs_supervision.iterative_sampling.Reconstructor(
-            self.network
-        )
-        # reconstructor = outputs_supervision.random_inputs.Reconstructor(self.network)
+        technique = self.get_techniques()[0]
+        reconstructor = technique.Reconstructor(self.network)
         reconstruction = reconstructor.reconstruct()
 
         evaluators = (weights.mae, outputs.val, weights.visualizer)

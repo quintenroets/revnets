@@ -20,9 +20,7 @@ class Experiment(NamedClass):
 
     @classmethod
     def get_networks(cls):
-        return (networks.mininet.mininet,)
-        return (networks.mediumnet.mediumnet_40,)
-        return networks.get_networks()
+        return (networks.mediumnet.mediumnet_20,)
 
     def run_network(self):
         results = self.get_network_results()
@@ -31,9 +29,13 @@ class Experiment(NamedClass):
             table.show()
         self.save(results)
 
+    @classmethod
+    def get_techniques(cls):
+        return (reconstructions.outputs_supervision.iterative_sampling,)
+
     def get_network_results(self):
         results = {}
-        for technique in reconstructions.get_algorithms():
+        for technique in self.get_techniques():
             reconstructor = technique.Reconstructor(self.network)
             reconstruction = reconstructor.reconstruct()
             evaluation = evaluations.evaluate(reconstruction, self.network)
