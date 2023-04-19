@@ -49,6 +49,7 @@ class Config:
     sampling_data_size: int = 10000
     quiet_prediction: bool = True
     randomize_training: bool = False
+    n_rounds: int = None
 
     def __post_init__(self):
         if self.debug:
