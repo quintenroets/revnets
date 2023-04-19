@@ -5,8 +5,8 @@ matplotlib
 numpy
 pytorch-lightning
 quinten-cli
-superpathlib
 retry
+superpathlib
 tensorboard
 torch
 torchvision
