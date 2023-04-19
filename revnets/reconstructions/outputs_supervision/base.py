@@ -89,7 +89,6 @@ class Reconstructor(empty.Reconstructor):
     def load_weights(self):
         state_dict = torch.load(self.trained_weights_path)
         self.reconstruction.load_state_dict(state_dict)
-        # self.reconstruction.layer2.reset_parameters()
 
     def save_weights(self):
         state_dict = self.reconstruction.state_dict()
