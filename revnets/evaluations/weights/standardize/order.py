@@ -9,8 +9,8 @@ def standardize_layers(layer1, layer2):
 
 def get_output_sort_order(layer):
     weights = get_layer_weights(layer)
-    total_output_weights = weights.sum(dim=1)
-    # use p1-norm because p2-norm is already standardized
+    total_output_weights = weights.norm(dim=1, p=1)
+    # use l1-norm because l2-norm is already standardized
     _, output_sort_order = torch.sort(total_output_weights)
     return output_sort_order
 

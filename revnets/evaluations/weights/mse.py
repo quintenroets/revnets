@@ -1,18 +1,26 @@
+from dataclasses import dataclass
+
 import torch
 
 from .. import base
-from .standardize import standardize
+from . import standardize
 
 
+@dataclass
 class Evaluator(base.Evaluator):
+    use_align: bool = True
+
     def evaluate(self):
         return self.calculate_distance() if self.standardize_networks() else None
 
     def standardize_networks(self):
         standardized = self.same_architecture()
         if standardized:
-            standardize.standardize(self.original)
-            standardize.standardize(self.reconstruction)
+            if self.use_align:
+                standardize.align.align(self.original, self.reconstruction)
+            else:
+                for model in (self.original, self.reconstruction):
+                    standardize.standardize.standardize(model)
         return standardized
 
     def same_architecture(self):
