@@ -13,8 +13,11 @@ class Experiment(experiment.Experiment):
 
         evaluators = (weights.mae, outputs.val, weights.visualizer)
         # evaluators = (weights.mae, outputs.val)
+        # evaluators = (weights.mae, )
+        # evaluators = (weights.mae, weights.mae, weights.mae, weights.mae, weights.mae)
         for evaluator_module in evaluators:
             evaluator = evaluator_module.Evaluator(reconstruction, self.network)
             evaluation = evaluator.evaluate()
             if evaluation is not None:
+                print("---------")
                 print(evaluation)

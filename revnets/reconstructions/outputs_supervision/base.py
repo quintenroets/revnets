@@ -23,6 +23,10 @@ class Reconstructor(empty.Reconstructor):
     visualize_weights: bool = False
     visualization_interval: int = 10
 
+    def __post_init__(self):
+        super().__post_init__()
+        self.dataset_kwargs = {"num_samples": config.sampling_data_size}
+
     def get_trained_weights_path(self):
         data: Dataset = self.network.dataset()
         hash_value = compute_hash(
@@ -43,6 +47,7 @@ class Reconstructor(empty.Reconstructor):
             self.always_train if config.always_train is None else config.always_train
         )
         if always_train or not self.trained_weights_path.exists():
+            self.load_weights()
             self.start_training()
             self.save_weights()
 
@@ -90,11 +95,12 @@ class Reconstructor(empty.Reconstructor):
         state_dict = self.reconstruction.state_dict()
         torch.save(state_dict, str(self.trained_weights_path))
 
-    def get_dataset(self):
+    def get_dataset(self, **kwargs):
         data: Dataset = self.network.dataset()
         dataset_module = self.get_dataset_module()
+        dataset_kwargs = self.dataset_kwargs | kwargs
         data: Dataset = dataset_module.Dataset(
-            data, self.original, **self.dataset_kwargs  # noqa
+            data, self.original, **dataset_kwargs  # noqa
         )
         data.calibrate(self.model)
         return data

@@ -3,7 +3,6 @@ from . import (
     bigger_net,
     bigger_net_random_inputs,
     iterative_sampling,
-    iterative_sampling_analysis,
     random_inputs,
 )
 
@@ -13,7 +12,6 @@ def get_algorithms():
         base,
         bigger_net,
         bigger_net_random_inputs,
-        iterative_sampling,
-        iterative_sampling_analysis,
+        *iterative_sampling.get_algorithms(),
         random_inputs,
     )

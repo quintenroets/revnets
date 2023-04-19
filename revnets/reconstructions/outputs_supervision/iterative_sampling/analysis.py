@@ -3,13 +3,14 @@ from dataclasses import dataclass
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
 
-from ...data import output_supervision
-from ...utils.colors import get_colors
-from . import iterative_sampling
+from revnets.data import output_supervision
+from revnets.utils.colors import get_colors
+
+from . import difficult_train_inputs
 
 
 @dataclass
-class Reconstructor(iterative_sampling.Reconstructor):
+class Reconstructor(difficult_train_inputs.Reconstructor):
     n_rounds: int = 5
 
     def __post_init__(self):
@@ -17,7 +18,7 @@ class Reconstructor(iterative_sampling.Reconstructor):
         self.n_rounds = 1
 
     def run_round(self):
-        self.train_model()
+        self.train_model(self.data)
         self.analyze_samplings()
         self.add_difficult_samples()
 
@@ -54,7 +55,7 @@ class Reconstructor(iterative_sampling.Reconstructor):
             "recombined difficult samples + noise (scale 1/100)",
         ]
 
-        colors = self.get_colors()
+        colors = get_colors()
         for inputs, color, label in zip(analyzed_inputs, colors, labels):
             losses = self.get_sorted_losses(inputs) / inputs.std()
             plt.plot(losses, color=color, label=label)
