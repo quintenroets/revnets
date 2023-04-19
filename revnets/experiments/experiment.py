@@ -31,7 +31,8 @@ class Experiment(NamedClass):
 
     @classmethod
     def get_techniques(cls):
-        return (reconstructions.outputs_supervision.iterative_sampling,)
+        iterative_sampling = reconstructions.outputs_supervision.iterative_sampling
+        return (iterative_sampling.difficult_train_inputs,)
 
     def get_network_results(self):
         results = {}
