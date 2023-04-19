@@ -8,8 +8,8 @@ from . import layers_mae, standardize
 class Evaluator(layers_mae.Evaluator):
     def evaluate(self):
         self.standardize_networks()
-        # self.visualize_network_weights(self.original)
-        # self.visualize_network_weights(self.reconstruction)
+        self.visualize_network_weights(self.original)
+        self.visualize_network_weights(self.reconstruction)
         if self.same_architecture():
             self.visualize_network_differences()
 
