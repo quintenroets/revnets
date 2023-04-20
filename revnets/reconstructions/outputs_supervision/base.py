@@ -47,7 +47,6 @@ class Reconstructor(empty.Reconstructor):
             self.always_train if config.always_train is None else config.always_train
         )
         if always_train or not self.trained_weights_path.exists():
-            self.load_weights()
             self.start_training()
             self.save_weights()
 
