@@ -15,6 +15,7 @@ class Reconstructor(random_inputs.Reconstructor):
     n_rounds: int = config.n_rounds or 2
     data: Dataset = None
     visualize: bool = False
+    round: int = 0
 
     @property
     def num_samples(self):
@@ -43,6 +44,7 @@ class Reconstructor(random_inputs.Reconstructor):
 
         total_samples = len(self.data.train_dataset) * self.n_rounds
         for i in range(self.n_rounds):
+            self.round = i
             n_samples = len(self.data.train_dataset)
             title = f"Round {i+1}/{self.n_rounds}: {n_samples}/{total_samples} samples"
             text = Text(title, style="black")
@@ -52,17 +54,25 @@ class Reconstructor(random_inputs.Reconstructor):
     def get_dataset(self):
         data = super().get_dataset(num_samples=self.num_validation_samples)
         data.prepare()
-        shape = (self.num_samples, *data.input_shape)  # noqa
-        inputs = data.generate_random_inputs(shape)
+        inputs = self.prepare_train_data_inputs(data)
         data.train_dataset = data.construct_dataset(inputs)
         return data
+
+    def prepare_train_data_inputs(self, data):
+        shape = (self.num_samples, *data.input_shape)  # noqa
+        return data.generate_random_inputs(shape)
 
     def run_round(self):
         self.train_model(self.data)
         self.check_randomize()
-        self.add_difficult_samples()
+        if not self.last_round:
+            self.add_difficult_samples()
         if self.visualize:
             self.model.visualizer.evaluate()
+
+    @property
+    def last_round(self):
+        return self.round == self.n_rounds - 1
 
     def add_difficult_samples(self):
         raise NotImplementedError
