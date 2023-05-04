@@ -13,7 +13,7 @@ class Network(NamedClass):
         raise NotImplementedError
 
     @classmethod
-    def get_architecture(cls):
+    def get_architecture(cls, seed=None):
         raise NotImplementedError
 
     @classmethod
