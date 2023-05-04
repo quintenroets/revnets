@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 from kneed import KneeLocator
-from torch.utils.data import ConcatDataset
 
 from revnets.data import output_supervision
 
@@ -14,13 +13,7 @@ from . import base
 class Reconstructor(base.Reconstructor):
     noise_factor: float = 1 / 100
 
-    def add_difficult_samples(self):
-        difficult_inputs = self.sample_difficult_inputs()
-        extra_dataset = self.data.construct_dataset(difficult_inputs)
-        datasets = extra_dataset, self.data.train_dataset
-        self.data.train_dataset = ConcatDataset(datasets)
-
-    def sample_difficult_inputs(self):
+    def get_difficult_inputs(self):
         difficult_inputs = self.extract_difficult_inputs()
         recombined_inputs = self.recombine(difficult_inputs)
         noise = self.data.generate_random_inputs(recombined_inputs.shape)

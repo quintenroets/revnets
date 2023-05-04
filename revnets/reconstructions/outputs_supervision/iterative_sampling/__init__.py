@@ -1,4 +1,4 @@
-from . import analysis, base, difficult_inputs, difficult_train_inputs
+from . import analysis, base, difficult_inputs, difficult_train_inputs, balanced_outputs
 
 
 def get_algorithms():

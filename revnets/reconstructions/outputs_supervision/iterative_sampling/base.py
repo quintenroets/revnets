@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import cli
 from rich.text import Text
+from torch.utils.data import ConcatDataset
 
 from revnets.data.random import Dataset
 from revnets.utils import config
@@ -75,4 +76,10 @@ class Reconstructor(random_inputs.Reconstructor):
         return self.round == self.n_rounds - 1
 
     def add_difficult_samples(self):
+        difficult_inputs = self.get_difficult_inputs()
+        extra_dataset = self.data.construct_dataset(difficult_inputs)
+        datasets = extra_dataset, self.data.train_dataset
+        self.data.train_dataset = ConcatDataset(datasets)
+
+    def get_difficult_inputs(self):
         raise NotImplementedError
