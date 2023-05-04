@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from cacher.caches.deep_learning import Reducer
 from cacher.hashing import compute_hash
+from pytorch_lightning.callbacks import EarlyStopping
 
 from ...data import Dataset, output_supervision
 from ...utils import Path, config
@@ -64,9 +65,10 @@ class Reconstructor(empty.Reconstructor):
         self.train_model(data)
 
     def train_model(self, data):
-        trainer = Trainer()
+        callback = EarlyStopping("validation l1_loss", patience=30)
+        callbacks = [callback]
+        trainer = Trainer(callbacks=callbacks)
         if data.validation_ratio > 0:
-            trainer = Trainer()
             trainer.fit(self.model, data)
             trainer.test(self.model, data)
         else:
