@@ -35,7 +35,7 @@ class Config:
     debug_batch_limit: int = 1
     debug_batch_size: int = 16
     debug_epochs: int = 3
-    devices: int = None
+    devices: int = 1
     batch_size: int = 128
     reconstruction_batch_size: int = batch_size
     log: bool = False
@@ -50,6 +50,7 @@ class Config:
     quiet_prediction: bool = True
     randomize_training: bool = False
     n_rounds: int = None
+    n_networks: int = 2
 
     def __post_init__(self):
         if self.debug:
@@ -57,6 +58,7 @@ class Config:
             self.batch_size = self.debug_batch_size
 
         self.hyper_parameters = HyperParams(self.epochs, self.lr)
+        self._num_devices = self.devices
 
     @property
     def num_devices(self):
@@ -106,7 +108,6 @@ class Config:
     def show(self):
         cli.console.rule("[bold #000000]Config")
         self.config_table.show()
-        self.config_path.copy_to(self.log_folder / "config.yaml")
 
     @property
     def config_table(self):

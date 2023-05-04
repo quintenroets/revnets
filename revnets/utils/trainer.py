@@ -49,7 +49,9 @@ class Trainer(pl.Trainer):
 
     @property
     def context_manager(self):
-        return pl_logger.Quiet() if config.quiet_prediction else contextlib.nullcontext
+        return (
+            pl_logger.Quiet() if config.quiet_prediction else contextlib.nullcontext()
+        )
 
     def predict(self, *args, **kwargs):
         with self.context_manager:

@@ -9,6 +9,7 @@ from cacher.caches import base
 from pytorch_lightning.tuner.tuning import Tuner
 
 from .config import config
+from .trainer import Trainer
 
 if typing.TYPE_CHECKING:
     from ..data import Dataset  # noqa: autoimport
@@ -73,13 +74,7 @@ def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validat
     tune_model = TuneModel(model, data)
     data.prepare()
 
-    trainer = pl.Trainer(
-        accelerator="auto",
-        devices=1,
-        max_epochs=1,
-        logger=False,
-        precision=config.precision,
-    )
+    trainer = Trainer(max_epochs=1, devices=1)
     tuner = Tuner(trainer)
 
     print(f"Calculating max {method} batch size")
@@ -97,7 +92,7 @@ def get_max_batch_size(model: pl.LightningModule, data: Dataset, method="validat
     model.do_log = True
     data.batch_size = old_batch_size
 
-    safety_factor = (4 if config.devices > 1 else 2) if method == "validate" else 1
+    safety_factor = (4 if config.num_devices > 1 else 2) if method == "validate" else 1
     max_batch_size = tune_model.batch_size // safety_factor
     max_batch_size |= 1  # max sure batch size at least one
     return max_batch_size
