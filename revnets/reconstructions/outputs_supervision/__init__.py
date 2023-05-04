@@ -4,6 +4,7 @@ from . import (
     bigger_net_random_inputs,
     iterative_sampling,
     random_inputs,
+    smaller_weight_variance,
 )
 
 
@@ -14,4 +15,5 @@ def get_algorithms():
         bigger_net_random_inputs,
         *iterative_sampling.get_algorithms(),
         random_inputs,
+        smaller_weight_variance,
     )
