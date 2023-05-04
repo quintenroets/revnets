@@ -1,4 +1,5 @@
 from . import (
+    activations_analysis,
     analysis,
     data_requirements,
     experiment,
