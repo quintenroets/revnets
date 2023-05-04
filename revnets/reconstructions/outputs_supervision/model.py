@@ -20,6 +20,7 @@ class Metrics:
 
     @property
     def loss(self):
+        return self.l1_loss
         return self.l2_loss
 
     @classmethod
@@ -62,8 +63,12 @@ class ReconstructModel(trainable.Model):
 
     def log_weights_MAE(self) -> None:
         evaluator = Evaluator(self.model, self.network)
-        scales = {"": 0, "milli ": 3, "micro ": 6, "nano ": 9}
         mae = evaluator.evaluate()
+        if mae is not None:
+            self.log_weights_MAE_value(mae)
+
+    def log_weights_MAE_value(self, mae):
+        scales = {"": 0, "milli ": 3, "micro ": 6, "nano ": 9}
         scale_name = ""
         log_scale = 0
         for scale_name, log_scale in scales.items():
