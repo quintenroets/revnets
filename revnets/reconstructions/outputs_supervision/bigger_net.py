@@ -1,12 +1,13 @@
 import torch
 
-from ...networks.models import mininet
+from revnets.networks import models
+
 from ...utils import config
-from . import base
+from . import random_inputs
 
 
-class Reconstructor(base.Reconstructor):
+class Reconstructor(random_inputs.Reconstructor):
     @classmethod
     def initialize_reconstruction(cls):
         torch.manual_seed(config.manual_seed * 2)
-        return mininet.Model(hidden_size=256)
+        return models.mediumnet.Model(hidden_size1=200, hidden_size2=100)

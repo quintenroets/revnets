@@ -11,6 +11,6 @@ class Model(base.Model):
 
     def forward(self, x):
         x = self.layer1(x)
-        x = nn.functional.relu(x)
+        x = nn.functional.leaky_relu(x, negative_slope=0.1)
         logits = self.layer2(x)
         return logits

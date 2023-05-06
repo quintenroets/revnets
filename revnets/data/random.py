@@ -23,6 +23,7 @@ class Dataset(output_supervision.Dataset):
 
     @property
     def input_shape(self):
+        self.original_dataset.prepare()
         train_sample = self.original_dataset.train_val_dataset[0]
         return train_sample[0].shape
 
@@ -39,10 +40,29 @@ class Dataset(output_supervision.Dataset):
         return num_samples, *self.input_shape
 
     @classmethod
-    def generate_random_inputs(cls, shape):
-        dtype = torch.float64 if config.precision == 64 else torch.float32
+    def get_dtype(cls):
+        return torch.float64 if config.precision == 64 else torch.float32
+
+    def get_train_inputs(self):
+        self.original_dataset.prepare()
+        train_dataset_dataloader = self.original_dataset.get_dataloader(
+            Split.train_val, -1
+        )
+        train_dataset_batch = next(iter(train_dataset_dataloader))
+        return train_dataset_batch[0]
+
+    def get_train_mean(self):
+        return self.get_train_inputs().mean().item()
+
+    def get_train_std(self):
+        return self.get_train_inputs().std().item()
+
+    def generate_random_inputs(self, shape):
+        dtype = self.get_dtype()
+        mean = self.get_train_mean()
+        std = self.get_train_std()
         # same mean and std as training data
-        return torch.randn(shape, dtype=dtype)
+        return torch.randn(shape, dtype=dtype) * std + mean
 
     def generate_dataset(self, split: Split):
         dataset_shape = self.get_dataset_shape(split)

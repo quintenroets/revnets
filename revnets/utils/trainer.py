@@ -18,6 +18,8 @@ class Trainer(pl.Trainer):
         barebones=False,
         **kwargs,
     ):
+        if config.quiet_prediction:
+            pl_logger.Quiet().__enter__()  # remove logging messages
         if logger is None and config.log:
             logger = config.logger
         try:

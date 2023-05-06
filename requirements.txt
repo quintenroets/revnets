@@ -6,6 +6,7 @@ numpy
 pytorch-lightning
 quinten-cli
 retry
+scikit-learn
 superpathlib
 tensorboard
 torch

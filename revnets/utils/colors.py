@@ -15,6 +15,8 @@ def get_colors(n=10):
             n = number
             color_maps = mappers[number]
             break
+    if color_maps is None:
+        color_maps = list(mappers[60]) * (n // 60 + 1)
 
     n_color = 10 if n <= 10 else 20
     colors = [

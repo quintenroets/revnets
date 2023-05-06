@@ -1,2 +1,2 @@
-from . import mediumnet, mininet, trainable
+from . import mediumnet, mediumnet_images, mininet, trainable
 from .base import Model

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import torch
 
-from ..data.mnist1d import Dataset
+from ..data import Dataset
 from ..networks.base import Network
 
 

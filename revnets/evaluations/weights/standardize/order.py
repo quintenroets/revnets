@@ -34,7 +34,7 @@ def permute_output_neurons(layer, sort_indices):
             )
 
 
-def get_layer_weights(layer, device=None):
+def get_layer_weights(layer, device=None) -> torch.Tensor:
     with torch.no_grad():
         connection_weights, bias_weights = layer.parameters()
         weights = (connection_weights, bias_weights.reshape(-1, 1))

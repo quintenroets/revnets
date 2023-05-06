@@ -2,7 +2,7 @@ from abc import ABC
 
 import torch
 
-from ..data.mnist1d import Dataset
+from ..data.base import Dataset
 from ..utils import Path
 from ..utils.trainer import Trainer
 from . import base
@@ -33,7 +33,9 @@ class Network(base.Network, ABC):
     @classmethod
     def get_weights_path(cls, model: torch.nn.Module, seed=None):
         seed_name = f"seed_{seed or 'none'}"
-        path: Path = Path.weights / "trained_blackbox" / cls.name / model.name / seed_name
+        path: Path = (
+            Path.weights / "trained_blackbox" / cls.name / model.name / seed_name
+        )
         path.create_parent()
         return path
 

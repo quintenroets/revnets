@@ -10,4 +10,4 @@ class Reconstructor(base.Reconstructor):
 
     @classmethod
     def get_dataset_module(cls):
-        return data.random
+        return data.correlated_features

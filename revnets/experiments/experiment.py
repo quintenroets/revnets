@@ -3,13 +3,32 @@ from dataclasses import dataclass
 import cli
 
 from .. import evaluations, networks, reconstructions
-from ..networks.base import Network
-from ..utils import NamedClass, Path, Table, config
+from ..networks.train import Network
+from ..utils import NamedClass, Path, Table, always_return_tuple, config
 
 
 @dataclass
 class Experiment(NamedClass):
     network: Network = None
+
+    @classmethod
+    @always_return_tuple
+    def get_networks(cls):
+        network = networks.mediumnet_images.mediumnet_small
+        # network = networks.mininet.mininet
+        return network
+
+    @classmethod
+    @always_return_tuple
+    def get_techniques(cls):
+        # iterative_sampling = reconstructions.outputs_supervision.iterative_sampling
+        # technique = iterative_sampling.difficult_train_inputs
+        technique = reconstructions.outputs_supervision.correlated_features
+        return technique
+        # technique = reconstructions.outputs_supervision.random_inputs
+        # technique = iterative_sampling.balanced_outputs
+        # technique = iterative_sampling.difficult_train_inputs
+        # technique = iterative_sampling.difficult_inputs
 
     def run(self):
         config.show()
@@ -18,21 +37,12 @@ class Experiment(NamedClass):
             cli.console.rule(self.network.name)
             self.run_network()
 
-    @classmethod
-    def get_networks(cls):
-        return (networks.mediumnet.mediumnet_20,)
-
     def run_network(self):
         results = self.get_network_results()
         if results:
             table = self.make_table(results)
             table.show()
         self.save(results)
-
-    @classmethod
-    def get_techniques(cls):
-        iterative_sampling = reconstructions.outputs_supervision.iterative_sampling
-        return (iterative_sampling.difficult_train_inputs,)
 
     def get_network_results(self):
         results = {}

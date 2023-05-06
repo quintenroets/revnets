@@ -65,7 +65,7 @@ class Reconstructor(empty.Reconstructor):
         self.train_model(data)
 
     def train_model(self, data):
-        callback = EarlyStopping("validation l1_loss", patience=30)
+        callback = EarlyStopping("validation l1_loss", patience=30, verbose=True)
         callbacks = [callback]
         trainer = Trainer(callbacks=callbacks)
         if data.validation_ratio > 0:

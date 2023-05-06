@@ -1,8 +1,8 @@
 import pickle
 
-import numpy as np
 import requests
 import torch
+from sklearn.preprocessing import StandardScaler
 from torch.utils.data import TensorDataset
 
 from ..utils import Path
@@ -22,13 +22,12 @@ class Dataset(base.Dataset):
         x_test = data["x_test"]
         y_test = data["y_test"]
 
-        def prepare_x(x_array: np.ndarray):
-            x_torch = torch.Tensor(x_array)
-            x_torch = torch.nn.functional.normalize(x_torch)
-            return x_torch
+        scaler = StandardScaler()
+        x = scaler.fit_transform(x)
+        x_test = scaler.transform(x_test)
 
-        x = prepare_x(x)
-        x_test = prepare_x(x_test)
+        x = torch.Tensor(x)
+        x_test = torch.Tensor(x_test)
 
         y = torch.LongTensor(y)
         y_test = torch.LongTensor(y_test)

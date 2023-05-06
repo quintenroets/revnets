@@ -7,12 +7,12 @@ from torch.utils.data import ConcatDataset
 from revnets.data.random import Dataset
 from revnets.utils import config
 
-from .. import random_inputs
+from .. import correlated_features
 from ..base import ReconstructModel
 
 
 @dataclass
-class Reconstructor(random_inputs.Reconstructor):
+class Reconstructor(correlated_features.Reconstructor):
     n_rounds: int = config.n_rounds or 2
     data: Dataset = None
     visualize: bool = False

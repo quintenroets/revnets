@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from ..evaluations import outputs, weights
-from . import experiment
+from ...evaluations import outputs, weights
+from .. import experiment
 
 
 @dataclass
@@ -10,7 +10,9 @@ class Experiment(experiment.Experiment):
         technique = self.get_techniques()[0]
         reconstructor = technique.Reconstructor(self.network)
         reconstruction = reconstructor.reconstruct()
+        self.run_reconstruction(reconstruction)
 
+    def run_reconstruction(self, reconstruction):
         evaluators = (weights.mae, outputs.val, weights.visualizer)
         # evaluators = (weights.mae, outputs.val)
         # evaluators = (weights.mae, )

@@ -47,10 +47,11 @@ class Config:
     precision: int = 64
     always_train: bool = None
     sampling_data_size: int = 10000
-    quiet_prediction: bool = True
+    quiet_prediction: bool = False
     randomize_training: bool = False
     n_rounds: int = None
     n_networks: int = 2
+    weight_variance_downscale_factor: float = None
 
     def __post_init__(self):
         if self.debug:
@@ -83,6 +84,8 @@ class Config:
             args.config_name = "config"
         config_path = (Path.config / args.config_name).with_suffix(".yaml")
         config_values = Config(config_path=config_path, **config_path.yaml)
+        if args.experiment is not None and "analysis" in args.experiment:
+            config_values.always_train = False
         return config_values
 
     def __repr__(self):
