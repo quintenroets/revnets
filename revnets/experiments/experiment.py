@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 import cli
+import numpy as np
+import torch
 
 from .. import evaluations, networks, reconstructions
 from ..networks.train import Network
@@ -16,19 +18,24 @@ class Experiment(NamedClass):
     def get_networks(cls):
         network = networks.mediumnet_images.mediumnet_small
         # network = networks.mininet.mininet
+        network = networks.mininet.mininet_100
+        network = networks.mininet_images.mininet_small
+        # network = networks.mediumnet.mediumnet_20
+
+        # network = networks.mininet.mininet
+        # network = networks.mininet.mininet_40
         return network
 
     @classmethod
     @always_return_tuple
     def get_techniques(cls):
-        # iterative_sampling = reconstructions.outputs_supervision.iterative_sampling
-        # technique = iterative_sampling.difficult_train_inputs
-        technique = reconstructions.outputs_supervision.correlated_features
-        return technique
-        # technique = reconstructions.outputs_supervision.random_inputs
-        # technique = iterative_sampling.balanced_outputs
-        # technique = iterative_sampling.difficult_train_inputs
-        # technique = iterative_sampling.difficult_inputs
+        iterative_sampling = reconstructions.outputs_supervision.iterative_sampling
+        return (
+            iterative_sampling.difficult_train_inputs,
+            reconstructions.outputs_supervision.correlated_features,
+            reconstructions.outputs_supervision.arbitrary_correlated_features,
+            reconstructions.outputs_supervision.random_inputs,
+        )
 
     def run(self):
         config.show()
@@ -47,11 +54,17 @@ class Experiment(NamedClass):
     def get_network_results(self):
         results = {}
         for technique in self.get_techniques():
+            self.set_seed()
             reconstructor = technique.Reconstructor(self.network)
             reconstruction = reconstructor.reconstruct()
             evaluation = evaluations.evaluate(reconstruction, self.network)
             results[reconstructor.name] = evaluation
         return results
+
+    @classmethod
+    def set_seed(cls):
+        torch.manual_seed(config.manual_seed)
+        np.random.seed(config.manual_seed)
 
     @classmethod
     def make_table(cls, results):

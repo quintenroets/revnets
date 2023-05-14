@@ -29,7 +29,8 @@ class Reconstructor(correlated_features.Reconstructor):
     def __post_init__(self):
         super().__post_init__()
         # make total samples used equal to other experiments
-        self.num_validation_samples = int(self.num_samples * Dataset.validation_ratio)
+        validation_ratio = Dataset.validation_ratio or 0.2
+        self.num_validation_samples = int(config.sampling_data_size * validation_ratio)
         dataset_kwargs = dict(
             num_samples=self.num_validation_samples, validation_ratio=1
         )
@@ -40,7 +41,6 @@ class Reconstructor(correlated_features.Reconstructor):
 
     def start_training(self):
         self.model = ReconstructModel(self.reconstruction, self.network)
-        self.check_randomize()
         self.data = self.get_dataset()
 
         total_samples = len(self.data.train_dataset) * self.n_rounds
@@ -65,7 +65,6 @@ class Reconstructor(correlated_features.Reconstructor):
 
     def run_round(self):
         self.train_model(self.data)
-        self.check_randomize()
         if not self.last_round:
             self.add_difficult_samples()
         if self.visualize:

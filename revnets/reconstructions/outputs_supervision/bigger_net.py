@@ -9,5 +9,5 @@ from . import random_inputs
 class Reconstructor(random_inputs.Reconstructor):
     @classmethod
     def initialize_reconstruction(cls):
-        torch.manual_seed(config.manual_seed * 2)
+        torch.manual_seed(config.network_seed * 2)
         return models.mediumnet.Model(hidden_size1=200, hidden_size2=100)

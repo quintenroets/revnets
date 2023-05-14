@@ -28,7 +28,7 @@ class Evaluator:
         return self.format_evaluation(evaluation)
 
     @classmethod
-    def format_evaluation(cls, value, precision=3):
+    def format_evaluation(cls, value, precision=9):
         if value is None:
             result = "/"
         elif isinstance(value, float):

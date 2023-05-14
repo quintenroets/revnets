@@ -66,9 +66,7 @@ class Model(pl.LightningModule):
         name = f"{phase.value} {name}"
         return self.log(name, *args, **kwargs)
 
-    def log(self, *args, sync_dist=True, on_epoch=True, on_step=True, **kwargs):
-        if "MAE" in args[0]:
-            on_step = False
+    def log(self, *args, sync_dist=True, on_epoch=True, on_step=False, **kwargs):
         if self.do_log:
             return super().log(
                 *args, sync_dist=sync_dist, on_epoch=on_epoch, on_step=on_step, **kwargs

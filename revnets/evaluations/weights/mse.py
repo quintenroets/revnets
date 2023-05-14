@@ -4,11 +4,12 @@ import torch
 
 from .. import base
 from . import standardize
+from revnets.utils import config
 
 
 @dataclass
 class Evaluator(base.Evaluator):
-    use_align: bool = True
+    use_align: bool = config.use_align
 
     def evaluate(self):
         return self.calculate_distance() if self.standardize_networks() else None

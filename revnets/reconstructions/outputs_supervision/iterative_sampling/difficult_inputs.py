@@ -108,7 +108,6 @@ class Reconstructor(base.Reconstructor):
         for model in self.models:
             self.model = model
             self.train_model(self.data)
-            self.check_randomize()
 
         if not self.last_round:
             self.add_difficult_samples()

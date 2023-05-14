@@ -1,4 +1,5 @@
 import enum
+import time
 from dataclasses import asdict, dataclass
 from functools import cached_property
 
@@ -16,6 +17,7 @@ from .rank import rank_zero_only
 class HyperParams:
     epochs: int
     lr: float
+    bias_lr: float
 
 
 class Enum(enum.Enum):
@@ -27,39 +29,68 @@ class Enum(enum.Enum):
 @dataclass
 class Config:
     config_path: Path
-    epochs: int = None
     num_workers: int = 8
+
+    blackbox_batch_size: int = 32
+    blackbox_lr: float = 1.0e-2
+    blackbox_epochs: int = 100
+
+    batch_size: int = 256
     lr: float = 0.1
+    bias_lr: float = None
+    epochs: int = None
+
+    sampling_data_size: int = 10000
+    n_rounds: int = None
+    n_networks: int = 2
+    weight_variance_downscale_factor: float = None
+    gradient_clip_val: int = None
+
     manual_seed: int = 77
+    network_seed: int = 77
+    randomize_training: bool = False
+    randomize_target: bool = False
     debug: bool = False
     debug_batch_limit: int = 1
     debug_batch_size: int = 16
     debug_epochs: int = 3
-    devices: int = 1
-    batch_size: int = 128
-    reconstruction_batch_size: int = batch_size
     log: bool = False
     log_on_debug: bool = False
+    quiet_prediction: bool = False
+    run_analysis: bool = False
+
+    devices: int = 1
     _num_devices: int = None
+
     adversarial_epsilon: float = 0.1
     visualize_attack: bool = False
-    run_analysis: bool = False
+
     precision: int = 64
     always_train: bool = None
-    sampling_data_size: int = 10000
-    quiet_prediction: bool = False
-    randomize_training: bool = False
-    n_rounds: int = None
-    n_networks: int = 2
-    weight_variance_downscale_factor: float = None
+    use_align: bool = True
+    loss_criterion: str = "l1"
+    validation_ratio: float = 0
 
     def __post_init__(self):
+        self.sampling_data_size = int(self.sampling_data_size)
+        self.lr = float(self.lr)
+        self.blackbox_lr = float(self.blackbox_lr)
+        if self.bias_lr is not None:
+            self.bias_lr = float(self.bias_lr)
+        self.sampling_data_size = int(self.sampling_data_size)
+
         if self.debug:
             self.epochs = self.debug_epochs
             self.batch_size = self.debug_batch_size
 
-        self.hyper_parameters = HyperParams(self.epochs, self.lr)
+        self.hyper_parameters = HyperParams(self.epochs, self.lr, self.bias_lr)
         self._num_devices = self.devices
+
+        if self.randomize_training:
+            now = time.time()
+            self.manual_seed = int(now * 10**7) % 2**32
+            if self.randomize_target:
+                self.network_seed = self.manual_seed
 
     @property
     def num_devices(self):
@@ -86,7 +117,20 @@ class Config:
         config_values = Config(config_path=config_path, **config_path.yaml)
         if args.experiment is not None and "analysis" in args.experiment:
             config_values.always_train = False
+        if config_values.is_notebook:
+            config_values.quiet_prediction = True
+        if args.seed is not None:
+            config_values.manual_seed = int(args.seed)
         return config_values
+
+    @property
+    def is_notebook(self):
+        try:
+            get_ipython()
+            is_in_notebook = True
+        except NameError:
+            is_in_notebook = False
+        return is_in_notebook
 
     def __repr__(self):
         return f"{self.name}\n"

@@ -46,6 +46,7 @@ class Trainer(pl.Trainer):
             default_root_dir=str(config.log_folder),
             precision=precision or config.precision,
             sync_batchnorm=True,
+            # gradient_clip_val=config.gradient_clip_val,
             **kwargs,
         )
 

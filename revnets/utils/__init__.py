@@ -6,5 +6,6 @@ from .logger import get_logger
 from .named_class import NamedClass
 from .path import Path
 from .rank import rank_zero_only
+from .runner import run
 from .table import Table
 from .trainer import Trainer

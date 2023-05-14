@@ -1,7 +1,6 @@
-import time
+import pdb
 from dataclasses import dataclass, field
 
-import numpy as np
 import torch
 from cacher.caches.deep_learning import Reducer
 from cacher.hashing import compute_hash
@@ -11,7 +10,7 @@ from ...data import Dataset, output_supervision
 from ...utils import Path, config
 from ...utils.trainer import Trainer
 from .. import empty
-from .model import ReconstructModel
+from .advanced_model import ReconstructModel
 
 
 @dataclass
@@ -19,7 +18,6 @@ class Reconstructor(empty.Reconstructor):
     always_train: bool = False
     model: ReconstructModel = None
     dataset_kwargs: dict = field(default_factory=dict)
-    randomize_training: bool = config.randomize_training
     trained_weights_path: Path = None
     visualize_weights: bool = False
     visualization_interval: int = 10
@@ -60,14 +58,13 @@ class Reconstructor(empty.Reconstructor):
             visualize=self.visualize_weights,
             visualization_interval=self.visualization_interval,
         )
-        self.check_randomize()
         data = self.get_dataset()
         self.train_model(data)
 
     def train_model(self, data):
-        callback = EarlyStopping("validation l1_loss", patience=30, verbose=True)
+        callback = EarlyStopping("train l1_loss", patience=30, verbose=True)
         callbacks = [callback]
-        trainer = Trainer(callbacks=callbacks)
+        trainer = Trainer(callbacks=callbacks, max_epochs=config.epochs)
         if data.validation_ratio > 0:
             trainer.fit(self.model, data)
             trainer.test(self.model, data)
@@ -75,17 +72,6 @@ class Reconstructor(empty.Reconstructor):
             data.prepare()
             train_dataloader = data.train_dataloader()
             trainer.fit(self.model, train_dataloaders=train_dataloader)
-
-    def check_randomize(self):
-        if self.randomize_training:
-            self.randomize_used_seed()
-
-    @classmethod
-    def randomize_used_seed(cls):
-        now = time.time()
-        seed = int(now * 10**7) % 2**32
-        torch.manual_seed(seed)
-        np.random.seed(seed)
 
     def load_weights(self):
         state_dict = torch.load(self.trained_weights_path)

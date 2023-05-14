@@ -4,9 +4,10 @@ import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from ..utils import Trainer
+from ..utils import Trainer, config
 from . import base
 from .base import Split
+
 
 
 class PredictModel(pl.LightningModule):
@@ -26,9 +27,9 @@ class PredictModel(pl.LightningModule):
 @dataclass
 class Dataset(base.Dataset):
     original_dataset: base.Dataset
-    target_network: torch.nn.Module
+    target_network: torch.nn.Module | None
     repetition_factor: float = None
-    validation_ratio: float = 0.2
+    validation_ratio: float = config.validation_ratio
 
     def __post_init__(self):
         super().__init__(self.repetition_factor, self.validation_ratio)

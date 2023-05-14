@@ -7,7 +7,7 @@ from ...utils import NamedClass, config
 class Model(torch.nn.Module, NamedClass):
     def __init__(self, learning_rate=None):
         super().__init__()
-        self.learning_rate = learning_rate or config.lr
+        self.learning_rate = learning_rate or config.blackbox_lr
 
     @classmethod
     def get_base_name(cls):

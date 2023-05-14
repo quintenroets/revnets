@@ -1,4 +1,5 @@
 from . import (
+    arbitrary_correlated_features,
     base,
     bigger_net,
     bigger_net_random_inputs,
@@ -10,6 +11,7 @@ from . import (
 
 def get_algorithms():
     return (
+        arbitrary_correlated_features,
         base,
         bigger_net,
         bigger_net_random_inputs,

@@ -19,7 +19,7 @@ class Dataset(output_supervision.Dataset):
         self.train_dataset: TensorDataset | None = None
         self.val_dataset: TensorDataset | None = None
         self.test_dataset: TensorDataset | None = None
-        self.batch_size = config.reconstruction_batch_size
+        self.batch_size = config.batch_size
 
     @property
     def input_shape(self):
@@ -61,7 +61,7 @@ class Dataset(output_supervision.Dataset):
         dtype = self.get_dtype()
         mean = self.get_train_mean()
         std = self.get_train_std()
-        # same mean and std as training data
+        # same mean and std as training data (should be 0 and 1)
         return torch.randn(shape, dtype=dtype) * std + mean
 
     def generate_dataset(self, split: Split):

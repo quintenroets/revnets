@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from functools import cache
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,13 +8,62 @@ from torch.utils.data import TensorDataset
 
 from revnets.data import random
 from revnets.networks.models.mediumnet import Model
-from revnets.utils import config
+from revnets.utils import Path, config
 
 from . import weights
 
 
 @dataclass
+class Statistics:
+    mean: float
+    std: float
+    min: float
+
+    def __post_init__(self):
+        self.mean = round(self.mean, 1)
+        self.std = round(self.std, 1)
+        self.min = round(self.min, 1)
+
+    @classmethod
+    def from_values(cls, values: list | np.ndarray):
+        values = np.array(values)
+        values *= 1000
+        return cls(mean=values.mean(), min=values.min(), std=values.std())
+
+    def __repr__(self):
+        return f"{self.mean} + {self.std}    {self.min}"
+
+
+@dataclass
 class Experiment(weights.Experiment):
+    def run(self):
+        experiment_path = Path.results / "Experiment"
+        for network_path in experiment_path.iterdir():
+            network = network_path.stem
+            results = [path.yaml for path in network_path.iterdir() if path.is_file()]
+            combined_result = self.combine_keys(results)
+            combined_result = {
+                k: self.combine_keys(v) for k, v in combined_result.items()
+            }
+            combined_result = {
+                k.replace("Outputs supervision ", ""): v
+                for k, v in combined_result.items()
+            }
+            results = {k: self.extract_mae(v) for k, v in combined_result.items()}
+
+            print(network)
+            pprint(results)
+        exit()
+
+    def extract_mae(self, values):
+        values = values["weights_MAE"]
+        values = [float(v) for v in values]
+        return Statistics.from_values(values)
+
+    @classmethod
+    def combine_keys(cls, items):
+        return {k: [item[k] for item in items] for k in items[0].keys()}
+
     def run_reconstruction(self, reconstruction):
         super().run_reconstruction(reconstruction)
         # self.visualize_inputs()

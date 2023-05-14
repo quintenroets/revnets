@@ -1,11 +1,14 @@
 from .. import experiments
-from ..utils import get_args
+from ..utils import get_args, run
 
 
 def main():
     args = get_args()
-    experiment_module = get_experiment_module(args)
-    experiment_module.Experiment().run()
+    if args.runner:
+        run()
+    else:
+        experiment_module = get_experiment_module(args)
+        experiment_module.Experiment().run()
 
 
 def get_experiment_module(args):

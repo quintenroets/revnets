@@ -1,4 +1,4 @@
-from . import mininet, mininet_100, mininet_bigger_reconstruction, mininet_untrained
+from . import mininet, mininet_100, mininet_bigger_reconstruction, mininet_untrained, mininet_40
 
 
 def get_all_networks():

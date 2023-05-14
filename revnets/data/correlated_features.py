@@ -9,8 +9,9 @@ from . import random
 
 @dataclass
 class Dataset(random.Dataset):
-    def generate_random_inputs(self, shape):
+    def get_distribution_parameters(self):
         train_inputs = self.get_train_inputs().numpy()
+
         train_inputs = train_inputs.reshape(len(train_inputs), -1)
         train_means = train_inputs.mean(axis=0)
         train_inputs -= train_means
@@ -21,6 +22,10 @@ class Dataset(random.Dataset):
         covariance_matrix = self.regularize_covariance_matrix(covariance_matrix)
 
         means = torch.tensor(train_means, dtype=dtype)
+        return means, covariance_matrix
+
+    def generate_random_inputs(self, shape):
+        means, covariance_matrix = self.get_distribution_parameters()
         distribution = MultivariateNormal(means, covariance_matrix)
         sample_shape = (shape[0],)
         # same mean, variance, and covariance as the training data

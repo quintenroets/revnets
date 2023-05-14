@@ -2,6 +2,8 @@ from abc import ABC
 
 import torch
 
+from revnets.utils import config
+
 from ..data.base import Dataset
 from ..utils import Path
 from ..utils.trainer import Trainer
@@ -44,7 +46,7 @@ class Network(base.Network, ABC):
         data = cls.dataset()
         train_model = trainable.Model(model)
         data.calibrate(train_model)
-        trainer = Trainer()
+        trainer = Trainer(max_epochs=config.blackbox_epochs)
         trainer.fit(train_model, data)
         trainer.test(train_model, data)
 
