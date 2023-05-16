@@ -11,7 +11,7 @@ class Network(mininet.Network):
 
     @classmethod
     def initialize_model(cls):
-        return cls.get_model_module().Model(hidden_size=40)
+        return cls.get_model_module().Model(hidden_size=200)
 
     @classmethod
     def dataset(cls):
