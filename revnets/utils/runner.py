@@ -8,5 +8,5 @@ def run():
     seeds = range(10)
 
     for seed in seeds:
-        args = {"config-name": "mininet_images_small", "seed": seed}
+        args = {"config-name": "mediumnet20", "seed": seed}
         cli.run("revnets", args)

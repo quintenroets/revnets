@@ -20,9 +20,12 @@ class Statistics:
     min: float
 
     def __post_init__(self):
-        self.mean = round(self.mean, 1)
-        self.std = round(self.std, 1)
-        self.min = round(self.min, 1)
+        if self.mean > 0.1:
+            self.mean = round(self.mean, 1)
+        if self.std > 0.1:
+            self.std = round(self.std, 1)
+        if self.min > 0.1:
+            self.min = round(self.min, 1)
 
     @classmethod
     def from_values(cls, values: list | np.ndarray):
@@ -41,6 +44,10 @@ class Experiment(weights.Experiment):
         for network_path in experiment_path.iterdir():
             network = network_path.stem
             results = [path.yaml for path in network_path.iterdir() if path.is_file()]
+            if len(results) < 10:
+                print(network)
+                print(len(results))
+                continue
             combined_result = self.combine_keys(results)
             combined_result = {
                 k: self.combine_keys(v) for k, v in combined_result.items()
