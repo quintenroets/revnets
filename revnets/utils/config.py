@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 import time
 from dataclasses import asdict, dataclass
@@ -22,8 +24,14 @@ class HyperParams:
 
 class Enum(enum.Enum):
     @classmethod
-    def from_str(cls, label):
-        return cls._value2member_map_[label]
+    def from_str(cls, name):
+        return cls._value2member_map_[name]
+
+
+class Activation(Enum):
+    relu = "relu"
+    leaky_relu = "leaky_relu"
+    tanh = "tanh"
 
 
 @dataclass
@@ -70,6 +78,7 @@ class Config:
     use_align: bool = True
     loss_criterion: str = "l1"
     validation_ratio: float = 0
+    activation: str | Enum = "leaky_relu"
 
     def __post_init__(self):
         self.sampling_data_size = int(self.sampling_data_size)
@@ -91,6 +100,8 @@ class Config:
             self.manual_seed = int(now * 10**7) % 2**32
             if self.randomize_target:
                 self.network_seed = self.manual_seed
+
+        self.activation = Activation.from_str(self.activation)
 
     @property
     def num_devices(self):

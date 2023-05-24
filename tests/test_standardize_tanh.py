@@ -4,24 +4,25 @@ from hypothesis import HealthCheck, given, settings
 
 from revnets.evaluations.weights.standardize import standardize
 from revnets.test_utils import test_utils
+from revnets.utils.config import Activation
 
 suppressed = (HealthCheck.function_scoped_fixture,)
 
 
 @pytest.fixture()
 def model():
-    return test_utils.initialize_model()
+    return test_utils.initialize_model(activation=Activation.tanh)
 
 
 @pytest.fixture()
 def model2():
-    return test_utils.initialize_model()
+    return test_utils.initialize_model(activation=Activation.tanh)
 
 
 @pytest.fixture()
 def standardized_model():
-    standardized_model = test_utils.initialize_model()
-    standardize.standardize(standardized_model)
+    standardized_model = test_utils.initialize_model(activation=Activation.tanh)
+    standardize.standardize(standardized_model, tanh=True)
     return standardized_model
 
 
@@ -51,7 +52,7 @@ def test_permutation_standardization(model, model2):
         order.permute_output_neurons(model2_layer1, sort_indices_reverse)
         order.permute_input_neurons(model2_layer2, sort_indices_reverse)
 
-    assert test_utils.are_isomorphism(model, model2)
+    assert test_utils.are_isomorphism(model, model2, tanh=True)
 
 
 def test_weight_standardization(model, model2):
@@ -60,8 +61,8 @@ def test_weight_standardization(model, model2):
     model_layers = standardize.get_layers(model)
     for layer1, layer2 in zip(model_layers, model_layers[1:]):
         scales = standardize.scale.get_scales(layer1)
-        wrong_scales = torch.ones_like(scales) * 2
+        wrong_scales = torch.ones_like(scales) * -1
         standardize.scale.rescale_incoming_weights(layer1, 1 / wrong_scales)
         standardize.scale.rescale_outgoing_weights(layer2, wrong_scales)
 
-    assert test_utils.are_isomorphism(model, model2)
+    assert test_utils.are_isomorphism(model, model2, tanh=True)

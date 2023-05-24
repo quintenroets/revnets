@@ -51,10 +51,6 @@ class ReconstructModel(trainable.Model):
         metrics: Metrics = self.obtain_metrics(batch, trainable.Phase.TRAIN)
         self.clip_weights()
         return metrics.loss
-        self.manual_backward(metrics.loss)
-        for optimizer in self.optimizers():
-            optimizer.step()
-            optimizer.zero_grad()
 
     def clip_weights(self):
         for param in self.parameters():
@@ -65,7 +61,8 @@ class ReconstructModel(trainable.Model):
             self.log_weights_MAE()
 
     def log_weights_MAE(self) -> None:
-        # pprint(self.model.state_dict())
+        pprint(self.network)
+        exit()
         evaluator = Evaluator(self.model, self.network)
         state_dict = self.model.state_dict()
         mae = evaluator.evaluate()

@@ -5,9 +5,11 @@ import torch
 from . import order, standardize
 
 
-def align(model: torch.nn.Module, model_to_align: torch.nn.Module):
-    standardize.standardize_scale(model)
-    standardize.standardize_scale(model_to_align)
+def align(
+    model: torch.nn.Module, model_to_align: torch.nn.Module, tanh: bool = None
+):
+    standardize.standardize_scale(model, tanh=tanh)
+    standardize.standardize_scale(model_to_align, tanh=tanh)
 
     # align neurons of model_to_align to neurons of model
     # to achieve a minimal weight difference
@@ -19,9 +21,6 @@ def align(model: torch.nn.Module, model_to_align: torch.nn.Module):
     layer_pairs_to_align = zip(model_layers_to_align, model_layers_to_align[1:])
 
     for layer_pair, layer_pair_to_align in zip(layer_pairs, layer_pairs_to_align):
-        # for layers in (layer_pair, layer_pair_to_align):
-        # scale.standardize_layers(*layers)
-
         align_layers(layer_pair, layer_pair_to_align)
 
 

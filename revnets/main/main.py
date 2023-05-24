@@ -1,17 +1,20 @@
 from .. import experiments
-from ..utils import get_args, run
-from ..utils import config
+from ..utils import config, get_args
 
 
 def main():
     args = get_args()
-    if args.runner:
-        run()
-    else:
-        for seed in range(10):
+    if args.seed_range:
+        for seed in range(args.seed_range):
             config.manual_seed = seed
-            experiment_module = get_experiment_module(args)
-            experiment_module.Experiment().run()
+            run(args)
+    else:
+        run(args)
+
+
+def run(args):
+    experiment_module = get_experiment_module(args)
+    experiment_module.Experiment().run()
 
 
 def get_experiment_module(args):
