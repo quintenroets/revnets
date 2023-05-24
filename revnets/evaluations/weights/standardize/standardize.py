@@ -31,7 +31,7 @@ def standardize_scale(model: torch.nn.Module, tanh: bool = None):
         out_scale_total = sum(out_scale) / len(out_scale)
         avg_scale = out_scale_total ** (1 / len(model_layers))
         for layers in zip(model_layers, model_layers[1:]):
-            scale.standardize_layers(*layers, scale=avg_scale)
+            scale.standardize_layers(*layers, scale=avg_scale, tanh=tanh)
 
 
 def get_layers(model: torch.nn.Module):

@@ -61,8 +61,6 @@ class ReconstructModel(trainable.Model):
             self.log_weights_MAE()
 
     def log_weights_MAE(self) -> None:
-        pprint(self.network)
-        exit()
         evaluator = Evaluator(self.model, self.network)
         state_dict = self.model.state_dict()
         mae = evaluator.evaluate()

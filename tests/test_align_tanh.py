@@ -29,3 +29,16 @@ def test_align_preserves_behavior(model, standardized_model, inputs):
     with torch.no_grad():
         outputs = (model(inputs), standardized_model(inputs))
     assert torch.allclose(*outputs, rtol=1e-3)
+
+
+if __name__ == "__main__":
+    model = test_utils.initialize_model(activation=Activation.tanh)
+    std_model = test_utils.initialize_model(activation=Activation.tanh)
+    standardize.standardize(std_model, tanh=True)
+    align.align(model, std_model, tanh=True)
+    inputs = torch.randn(1, 784)
+    a = model(inputs)
+    b = std_model(inputs)
+    assert torch.allclose(a, b, rtol=1e-3)
+    pprint(a)
+    pprint(b)

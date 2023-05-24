@@ -17,6 +17,7 @@ class Evaluator(base.Evaluator):
     def __post_init__(self):
         if self.tanh is None:
             self.tanh = config.activation == Activation.tanh
+        super().__post_init__()
 
     def evaluate(self):
         return self.calculate_distance() if self.standardize_networks() else None

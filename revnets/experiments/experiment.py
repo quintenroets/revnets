@@ -17,8 +17,8 @@ class Experiment(NamedClass):
     @always_return_tuple
     def get_networks(cls):
         return (
-            networks.mininet.mininet
-            # networks.mininet.mininet_40,
+            # networks.mininet.mininet
+            networks.mininet.mininet_40,
             # networks.mininet.mininet_100,
             # networks.mediumnet.mediumnet_20,
             # networks.mediumnet.mediumnet_40,
