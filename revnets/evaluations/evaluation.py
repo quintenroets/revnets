@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass, fields
 class Evaluation:
     weights_MSE: str = None
     weights_MAE: str = None
+    weights_max_AE: str = None
     weights_MAE_layers: str = None
     train_outputs_MAE: str = None
     val_outputs_MAE: str = None

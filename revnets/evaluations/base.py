@@ -28,11 +28,11 @@ class Evaluator:
         return self.format_evaluation(evaluation)
 
     @classmethod
-    def format_evaluation(cls, value, precision=9):
+    def format_evaluation(cls, value, precision=3):
         if value is None:
             result = "/"
         elif isinstance(value, float):
-            result = f"{value:.{precision}f}"
+            result = f"{value:.{precision}e}"
         else:
             result = value
         return result
