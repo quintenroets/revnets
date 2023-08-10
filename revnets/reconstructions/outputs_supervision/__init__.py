@@ -4,6 +4,7 @@ from . import (
     bigger_net,
     bigger_net_random_inputs,
     correlated_features,
+    finegrained,
     iterative_sampling,
     random_inputs,
 )
@@ -16,6 +17,7 @@ def get_algorithms():
         bigger_net,
         bigger_net_random_inputs,
         correlated_features,
+        finegrained,
         *iterative_sampling.get_algorithms(),
         random_inputs,
     )

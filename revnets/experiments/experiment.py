@@ -17,8 +17,8 @@ class Experiment(NamedClass):
     @always_return_tuple
     def get_networks(cls):
         return (
-            # networks.mininet.mininet
-            networks.mininet.mininet_40,
+            networks.mininet.mininet
+            # networks.mininet.mininet_40,
             # networks.mininet.mininet_100,
             # networks.mediumnet.mediumnet_20,
             # networks.mediumnet.mediumnet_40,
@@ -31,11 +31,11 @@ class Experiment(NamedClass):
     @classmethod
     @always_return_tuple
     def get_techniques(cls):
-        iterative_sampling = reconstructions.outputs_supervision.iterative_sampling
         return (
+            reconstructions.outputs_supervision.finegrained,
             # reconstructions.outputs_supervision.random_inputs,
             # reconstructions.outputs_supervision.correlated_features,
-            reconstructions.outputs_supervision.arbitrary_correlated_features,
+            # reconstructions.outputs_supervision.arbitrary_correlated_features,
             # iterative_sampling.difficult_train_inputs,
             # iterative_sampling.difficult_inputs,
         )
