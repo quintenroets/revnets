@@ -63,6 +63,7 @@ class Model(pl.LightningModule):
             self.log_metric(phase, metric, value, prog_bar=True)
 
     def log_metric(self, phase: Phase, name: str, *args, **kwargs):
+        name = name.replace("_", " ")
         name = f"{phase.value} {name}"
         return self.log(name, *args, **kwargs)
 
