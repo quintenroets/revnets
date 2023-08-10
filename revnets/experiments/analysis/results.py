@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn.functional as F
+from rich.pretty import pprint
 from torch.utils.data import TensorDataset
 
 from revnets.data import random
