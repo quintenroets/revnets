@@ -9,7 +9,6 @@ from . import base
 from .base import Split
 
 
-
 class PredictModel(pl.LightningModule):
     def __init__(self, model):
         super().__init__()
