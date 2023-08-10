@@ -19,7 +19,8 @@ def evaluate(reconstruction, network: Network):
         weights_MAE_layers=apply(weights.layers_mae),
         test_outputs_MAE=apply(outputs.test).mae,
         # test_acc=format_percentage(attack_evaluation.test.accuracy),
-        # adversarial_test_acc=format_percentage(attack_evaluation.adversarial.accuracy),
+        # adversarial_test_acc=
+        # format_percentage(attack_evaluation.adversarial.accuracy),
         # adversarial_transfer_test_acc=format_percentage(
         # attack_evaluation.adversarial_transfer.accuracy
         # ),
