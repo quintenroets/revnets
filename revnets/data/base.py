@@ -20,7 +20,9 @@ class Dataset(pl.LightningDataModule):
         self.train_dataset: data.Dataset | None = None
         self.val_dataset: data.Dataset | None = None
         self.test_dataset: data.Dataset | None = None
-        self.batch_size: int = self.calculate_effective_batch_size(config.blackbox_batch_size)
+        self.batch_size: int = self.calculate_effective_batch_size(
+            config.blackbox_batch_size
+        )
         self.eval_batch_size: int | None = None
         self.repetition_factor: float | None = repetition_factor
         self.validation_ratio: float | None = validation_ratio
