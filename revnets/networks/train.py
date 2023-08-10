@@ -1,6 +1,7 @@
 from abc import ABC
 
 import torch
+from cacher import cache
 
 from revnets.utils import config
 
@@ -53,3 +54,16 @@ class Network(base.Network, ABC):
     @classmethod
     def dataset(cls) -> Dataset:
         raise NotImplementedError
+
+    @classmethod
+    @property
+    @cache
+    def output_size(cls):  # noqa
+        dataset = cls.dataset()
+        dataset.prepare()
+        sample = dataset.train_val_dataset[0][0]
+        inputs = sample.unsqueeze(0)
+        model = cls.get_architecture()
+        outputs = model(inputs)[0]
+        size = outputs.shape[-1]
+        return size

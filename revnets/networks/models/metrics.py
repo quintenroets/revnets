@@ -6,7 +6,7 @@ import torch
 
 class Phase(Enum):
     TRAIN = "train"
-    VAL = "validation"
+    VAL = "val"
     TEST = "test"
     SILENT = "silent"
 
@@ -17,14 +17,17 @@ class MetricName(Enum):
 
 
 @dataclass
-class Metrics:
-    accuracy: float
-    loss: torch.Tensor
-
+class LogMetrics:
     def dict(self):
-        return self.__dict__
+        return {name: getattr(self, name) for name in self.names}
 
     @classmethod
     @property
     def names(cls):
         return [field.name for field in fields(cls)]
+
+
+@dataclass
+class Metrics(LogMetrics):
+    accuracy: float
+    loss: torch.Tensor

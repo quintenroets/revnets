@@ -1,4 +1,3 @@
-import pdb
 from dataclasses import dataclass, field
 
 import torch
@@ -10,7 +9,7 @@ from ...data import Dataset, output_supervision
 from ...utils import Path, config
 from ...utils.trainer import Trainer
 from .. import empty
-from .advanced_model import ReconstructModel
+from .reconstruction_model import ReconstructModel
 
 
 @dataclass
@@ -62,7 +61,8 @@ class Reconstructor(empty.Reconstructor):
         self.train_model(data)
 
     def train_model(self, data):
-        callback = EarlyStopping("train l1_loss", patience=30, verbose=True)
+        patience = config.early_stopping_patience
+        callback = EarlyStopping("train l1 loss", patience=patience, verbose=True)
         callbacks = [callback]
         trainer = Trainer(callbacks=callbacks, max_epochs=config.epochs)
         if data.validation_ratio > 0:

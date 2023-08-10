@@ -10,10 +10,17 @@ from . import learning_rate_scheduler
 
 
 class ReconstructModel(learning_rate_scheduler.ReconstructModel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.window_size = 10
+
     def on_train_epoch_end(self) -> None:
         super().on_train_epoch_end()
-        if self.current_epoch % 5 == 0:
-            self.check_dead_neurons()
+        if len(self.losses) > self.window_size:
+            window = self.losses[-self.window_size :]
+            local_optimum = window[0] == min(window)
+            if local_optimum:
+                self.check_dead_neurons()
 
     def check_dead_neurons(self) -> None:
         layers = get_layers(self.model)
@@ -28,8 +35,11 @@ class ReconstructModel(learning_rate_scheduler.ReconstructModel):
             if dead_indices.numel() > 0:
                 outputs = cls.get_output_activations(layer, n_check=n_check)
                 dead_indices = torch.where(outputs < 1e-6)[0]
+
         if dead_indices.numel() > 0:
-            message = f"Repairing dead neurons {dead_indices}"
+            message_indices = dead_indices.cpu().numpy()
+            message_indices = ", ".join(str(index) for index in message_indices)
+            message = f"Repairing dead neurons: {message_indices}"
             print(message)
             cls.revive_dead_neurons(layer, dead_indices)
 
