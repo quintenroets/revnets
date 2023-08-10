@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Dict, Union, cast
+from typing import cast
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import RichProgressBar
@@ -88,7 +88,7 @@ class ProgressBar(RichProgressBar):
 
     def get_metrics(
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
-    ) -> Dict[str, Union[int, str, float, Dict[str, float]]]:
+    ) -> dict[str, int | str | float | dict[str, float]]:
         metrics = super().get_metrics(trainer, pl_module)
         metrics.pop("v_num")
         return metrics

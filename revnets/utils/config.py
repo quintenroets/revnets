@@ -47,6 +47,7 @@ class Config:
     lr: float = 0.1
     bias_lr: float = None
     epochs: int = None
+    early_stopping_patience: int = 100
 
     sampling_data_size: int = 10000
     n_rounds: int = None
@@ -64,7 +65,7 @@ class Config:
     debug_epochs: int = 3
     log: bool = False
     log_on_debug: bool = False
-    quiet_prediction: bool = False
+    quiet_prediction: bool = True
     run_analysis: bool = False
 
     devices: int = 1
@@ -79,6 +80,8 @@ class Config:
     loss_criterion: str = "l1"
     validation_ratio: float = 0
     activation: str | Enum = "leaky_relu"
+
+    console_metrics_refresh_interval: float = 0.5
 
     def __post_init__(self):
         self.sampling_data_size = int(self.sampling_data_size)
@@ -129,7 +132,7 @@ class Config:
         if args.experiment is not None and "analysis" in args.experiment:
             config_values.always_train = False
         if config_values.is_notebook:
-            config_values.quiet_prediction = True
+            config_values.quiet_prediction = False
         if args.seed is not None:
             config_values.manual_seed = int(args.seed)
         return config_values

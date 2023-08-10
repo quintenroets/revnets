@@ -1,10 +1,11 @@
 import contextlib
 
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import RichModelSummary, RichProgressBar
+from pytorch_lightning.callbacks import RichModelSummary
 
 from . import pl_logger
 from .config import config
+from .progress_bar import ProgressBar
 
 
 class Trainer(pl.Trainer):
@@ -29,7 +30,7 @@ class Trainer(pl.Trainer):
             is_notebook = False
 
         extra_callbacks = (
-            [] if barebones or is_notebook else [RichModelSummary(), RichProgressBar()]
+            [] if barebones or is_notebook else [RichModelSummary(), ProgressBar()]
         )
         callbacks = (callbacks or []) + extra_callbacks
 
