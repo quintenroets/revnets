@@ -1,18 +1,7 @@
-from revnets import data
-
-from .. import models
-from ..mininet import mininet
+from . import mininet_small
 
 
-class Network(mininet.Network):
-    @classmethod
-    def get_model_module(cls):
-        return models.mininet_images
-
+class Network(mininet_small.Network):
     @classmethod
     def initialize_model(cls):
         return cls.get_model_module().Model(hidden_size=128)
-
-    @classmethod
-    def dataset(cls):
-        return data.mnist.Dataset()
