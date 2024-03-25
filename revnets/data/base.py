@@ -38,9 +38,9 @@ class Dataset(pl.LightningDataModule):
         We want reproducible experiments.
 
         => effective batch size needs to remain the same at all times
-           effective batch size = batch size per gpu * # GPUs
-        => we can only increase the number of GPUs when we can scale down
-           the batch size per gpu accordingly
+        effective batch size = batch size per gpu * # GPUs => we can
+        only increase the number of GPUs when we can scale down    the
+        batch size per gpu accordingly
         """
         used_devices = 1
         batch_size_per_gpu = batch_size

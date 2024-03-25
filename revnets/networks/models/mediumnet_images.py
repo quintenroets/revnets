@@ -7,7 +7,7 @@ class Model(mediumnet.Model):
             input_size=input_size,
             hidden_size1=hidden_size1,
             hidden_size2=hidden_size2,
-            **kwargs
+            **kwargs,
         )
 
     def forward(self, x):

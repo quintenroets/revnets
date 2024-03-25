@@ -6,7 +6,7 @@ from . import order, scale
 
 
 def standardize(model: torch.nn.Module, tanh: bool = None):
-    """network weights are only defined up to isomorphisms, so standardize the
+    """Network weights are only defined up to isomorphisms, so standardize the
     weights before comparing.
     """
     model_layers = get_layers(model)

@@ -5,9 +5,7 @@ import torch
 from . import order, standardize
 
 
-def align(
-    model: torch.nn.Module, model_to_align: torch.nn.Module, tanh: bool = None
-):
+def align(model: torch.nn.Module, model_to_align: torch.nn.Module, tanh: bool = None):
     standardize.standardize_scale(model, tanh=tanh)
     standardize.standardize_scale(model_to_align, tanh=tanh)
 
