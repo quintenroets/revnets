@@ -10,7 +10,7 @@ dependencies = [
     "adversarial-robustness-toolbox",
     "kneed",
     "matplotlib",
-    "powercli >=0.1.0, <1",
+    "powercli >=0.2.0, <1",
     "pytorch-lightning",
     "retry",
     "scikit-learn",
