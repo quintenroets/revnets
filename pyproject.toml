@@ -1,6 +1,6 @@
 [project]
 name = "revnets"
-version = "0.0.1"
+version = "0.1.0"
 authors = [{name = "Quinten Roets", email = "qdr2104@columbia.edu"}, {name="Judah Goldfeder", email="jag2396@columbia.edu"}]
 description = "Reverse engineering neural network weights"
 license = {text = "MIT"}
@@ -10,8 +10,8 @@ dependencies = [
     "adversarial-robustness-toolbox",
     "kneed",
     "matplotlib",
+    "powercli >=0.1.0, <1",
     "pytorch-lightning",
-    "quinten-cli",
     "retry",
     "scikit-learn",
     "superpathlib",
