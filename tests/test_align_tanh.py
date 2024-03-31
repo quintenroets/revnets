@@ -1,11 +1,10 @@
 import pytest
 import torch
 from hypothesis import HealthCheck, given, settings
-from rich.pretty import pprint
-
 from revnets.evaluations.weights.standardize import align, standardize
 from revnets.test_utils import test_utils
 from revnets.utils.config import Activation
+from rich.pretty import pprint
 
 suppressed = (HealthCheck.function_scoped_fixture,)
 
@@ -24,7 +23,7 @@ def standardized_model():
 
 @given(inputs=test_utils.network_inputs())
 @settings(suppress_health_check=suppressed, max_examples=2, deadline=20000)
-def test_align_preserves_behavior(model, standardized_model, inputs):
+def test_align_preserves_behavior(model, standardized_model, inputs) -> None:
     align.align(model, standardized_model, tanh=True)
     inputs = test_utils.prepare_inputs(inputs)
     with torch.no_grad():

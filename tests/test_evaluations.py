@@ -1,7 +1,7 @@
 from revnets import evaluations, networks, reconstructions
 
 
-def test_cheat_evaluations():
+def test_cheat_evaluations() -> None:
     test_networks = networks.get_all_networks()
     for network_module in test_networks:
         network = network_module.Network()

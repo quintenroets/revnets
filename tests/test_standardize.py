@@ -1,7 +1,6 @@
 import pytest
 import torch
 from hypothesis import HealthCheck, given, settings
-
 from revnets.evaluations.weights.standardize import standardize
 from revnets.test_utils import test_utils
 
@@ -27,14 +26,14 @@ def standardized_model():
 
 @given(inputs=test_utils.network_inputs())
 @settings(suppress_health_check=suppressed, max_examples=2)
-def test_standardize_preserves_behavior(model, standardized_model, inputs):
+def test_standardize_preserves_behavior(model, standardized_model, inputs) -> None:
     inputs = test_utils.prepare_inputs(inputs)
     with torch.no_grad():
         outputs = (model(inputs), standardized_model(inputs))
     assert torch.allclose(*outputs, rtol=1e-3)
 
 
-def test_permutation_standardization(model, model2):
+def test_permutation_standardization(model, model2) -> None:
     test_utils.make_identical(model, model2)
 
     model_layers = standardize.get_layers(model)
@@ -54,7 +53,7 @@ def test_permutation_standardization(model, model2):
     assert test_utils.are_isomorphism(model, model2)
 
 
-def test_weight_standardization(model, model2):
+def test_weight_standardization(model, model2) -> None:
     test_utils.make_identical(model, model2)
 
     model_layers = standardize.get_layers(model)

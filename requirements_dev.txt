@@ -1,4 +1,0 @@
--r requirements.txt
-hypothesis
-pytest
-pre-commit
