@@ -25,14 +25,14 @@ repos:
     rev: v0.5.16
     hooks:
       - id: infer-missing-annotations
-  # - repo: local
-  #   hooks:
-  #     - id: mypy
-  #       name: mypy
-  #       entry: mypy
-  #       language: system
-  #       files: '\.py'
-  #       fail_fast: true
+  - repo: local
+    hooks:
+       - id: mypy
+         name: mypy
+         entry: mypy
+         language: system
+         files: '\.py'
+         fail_fast: true
   # - repo: local
   #   hooks:
   #     - id: run-tests
