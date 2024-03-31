@@ -1,6 +1,6 @@
 from package_utils.context.entry_point import create_entry_point
 
-from revnets import main
+from revnets.main import main
 
 from ..context import context
 

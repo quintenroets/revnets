@@ -2,7 +2,6 @@ import math
 
 import torch
 from hypothesis import strategies
-
 from revnets.evaluations import weights
 from revnets.networks import models
 from revnets.utils import config
