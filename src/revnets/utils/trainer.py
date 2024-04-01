@@ -1,72 +1,61 @@
-import contextlib
+from collections.abc import Iterator
 
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import RichModelSummary
+from pytorch_lightning.callbacks import Callback, RichModelSummary
+from pytorch_lightning.callbacks.progress.rich_progress import (
+    RichProgressBar,
+    RichProgressBarTheme,
+)
 
-from . import pl_logger
-from .config import config
-from .progress_bar import ProgressBar
+from ..context import context
 
 
 class Trainer(pl.Trainer):
     def __init__(
         self,
         accelerator: str = "auto",
-        callbacks=None,
+        callbacks: list[Callback] = None,
         logger=None,
         max_epochs=None,
         precision=None,
         barebones: bool = False,
         **kwargs,
     ) -> None:
-        if config.quiet_prediction:
-            pl_logger.Quiet().__enter__()  # remove logging messages
-        if logger is None and config.log:
-            logger = config.logger
-        try:
-            get_ipython()
-            is_notebook = True
-        except NameError:
-            is_notebook = False
-
-        extra_callbacks = (
-            [] if barebones or is_notebook else [RichModelSummary(), ProgressBar()]
-        )
-        callbacks = (callbacks or []) + extra_callbacks
-
+        config = context.config
+        callbacks = list(self.generate_callbacks(callbacks, barebones))
         super().__init__(
             accelerator=accelerator,
             barebones=barebones,
             callbacks=callbacks,
             logger=logger,
-            max_epochs=max_epochs or config.epochs,
-            num_sanity_val_steps=config.num_sanity_val_steps,
+            max_epochs=max_epochs or context.config.reconstruction_training.epochs,
+            num_sanity_val_steps=config.number_of_validation_sanity_steps,
             limit_train_batches=config.limit_batches,
             limit_val_batches=config.limit_batches,
             limit_test_batches=config.limit_batches,
-            default_root_dir=str(config.log_folder),
+            default_root_dir=context.log_path_str,
             precision=precision or config.precision,
             sync_batchnorm=True,
             # gradient_clip_val=config.gradient_clip_val,
             **kwargs,
         )
 
+    @classmethod
+    def generate_callbacks(
+        cls, callbacks: list[Callback], barebones: bool
+    ) -> Iterator[Callback]:
+        if callbacks is not None:
+            yield from callbacks
+        extra_callbacks = not barebones and not context.is_running_in_notebook
+        if extra_callbacks:
+            yield RichModelSummary()
+            theme = RichProgressBarTheme(
+                metrics_format=".3e", metrics_text_delimiter="\n"
+            )
+            yield RichProgressBar(theme=theme)
+
     @property
-    def context_manager(self):
-        return (
-            pl_logger.Quiet() if config.quiet_prediction else contextlib.nullcontext()
-        )
-
-    def predict(self, *args, **kwargs):
-        with self.context_manager:
-            return super().predict(*args, **kwargs)
-
-    def fit(self, *args, **kwargs):
-        with self.context_manager:
-            return super().fit(*args, **kwargs)
-
-    @property
-    def log_message(self):
+    def log_message(self) -> str:
         # slow import
         from ..utils.table import Table  # noqa: autoimport
 

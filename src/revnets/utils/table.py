@@ -1,12 +1,12 @@
 import cli
 from rich import table
 
-from .path import Path
+from ..models import Path
 
 
 class Table(table.Table):
     @property
-    def text(self):
+    def text(self) -> str:
         from rich.console import Console  # noqa: autoimport
 
         with Path.tempfile() as tmp:

@@ -8,7 +8,6 @@ from torch.utils.data import TensorDataset
 
 from revnets import data
 from revnets.networks.models.mediumnet import Model
-from revnets.utils import config
 
 from ... import networks
 from . import weights

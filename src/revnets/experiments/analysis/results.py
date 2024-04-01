@@ -9,8 +9,8 @@ from torch.utils.data import TensorDataset
 
 from revnets.data import random
 from revnets.networks.models.mediumnet import Model
-from revnets.utils import Path, config
 
+from ...models import Path
 from . import weights
 
 

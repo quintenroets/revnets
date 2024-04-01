@@ -3,8 +3,8 @@ from collections.abc import Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 
+from ..models import Path
 from ..utils.colors import get_colors
-from ..utils.path import Path
 
 
 class Experiment:
