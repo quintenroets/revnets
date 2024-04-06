@@ -6,6 +6,10 @@ import torch
 
 from .internal_neurons import InternalNeurons
 
+from typing import TypeVar
+
+T = TypeVar("T")
+
 
 @dataclass
 class Standardizer:
@@ -22,11 +26,6 @@ class Standardizer:
         self.standardize_order()
 
     def standardize_order(self) -> None:
-        model_layers = get_layers(model)
-        pprint(model_layers)
-        raise Exception
-        return
-        standardize_scale(model, tanh=tanh)
         raise NotImplementedError
         """For layers in zip(model_layers, model_layers[1:]):
 
@@ -34,22 +33,34 @@ class Standardizer:
         """
 
     def standardize_scale(self) -> None:
-        for neurons in self.generate_internal_neurons():
+        for neurons in self.internal_neurons:
             neurons.standardize_scale()
 
-        """
-        if not tanh:
-            # 2) optimize mae by distributing last layer scale factor over all layers
-            out_scale = scale.get_scales(model_layers[-1])
-            out_scale_total = sum(out_scale) / len(out_scale)
-            avg_scale = out_scale_total ** (1 / len(model_layers))
-            for layers in zip(model_layers, model_layers[1:]):
-                scale.standardize_layers(*layers, scale=avg_scale, tanh=tanh)
-        """
+    def optimize_mae(self) -> None:
+        # optimize mae by distributing last layer scale factor over all layers
+        if all(neuron.has_norm_isomorphism for neuron in self.internal_neurons):
+            scale = self.calculate_average_scale_per_layer()
+            for neurons in self.internal_neurons:
+                neurons.standardized_scale = scale
+                neurons.standardize_scale()
+
+    def calculate_average_scale_per_layer(self) -> float:
+        last_neuron_scales = self.internal_neurons[-1]
+        last_neuron_scale = sum(last_neuron_scales) / len(last_neuron_scales)
+        return last_neuron_scale ** (1 / len(self.internal_neurons))
+
+    @cached_property
+    def internal_neurons(self) -> list[InternalNeurons]:
+        neurons = self.generate_internal_neurons()
+        return list(neurons)
 
     def generate_internal_neurons(self) -> Iterator[InternalNeurons]:
-        for incoming, outgoing in zip(self.model_layers, self.model_layers[1:]):
-            yield InternalNeurons(incoming, outgoing)
+        for triplet in self.generate_triplets(self.model_layers):
+            yield InternalNeurons(*triplet)
+
+    @classmethod
+    def generate_triplets(cls, items: list[T]) -> Iterator[tuple[T, T, T]]:
+        yield from zip(items, items[1:], items[2:])
 
     @cached_property
     def model_layers(self) -> list[torch.nn.Module]:
@@ -62,7 +73,6 @@ class Standardizer:
 
 def generate_layers(model: torch.nn.Module) -> Iterator[torch.nn.Module]:
     children = list(model.children())
-    pprint(children)
     if children:
         for child in children:
             yield from generate_layers(child)

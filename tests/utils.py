@@ -1,26 +1,19 @@
 import math
 
 import torch
-from hypothesis import strategies
 from revnets import networks
 from revnets.evaluations import weights
 from torch.nn import Sequential
 
-MAX_SIZE = 100
+
+def extract_input_size(network: Sequential) -> int:
+    layers = network.children()
+    return next(layers).weight.shape[1]
 
 
-def get_input_size():
-    raise NotImplementedError
-    model = initialize_model()
-    return model.layer1.weight.shape[1]
-
-
-def network_inputs():
-    floats = strategies.floats(min_value=-10.0, max_value=10.0)
-    input_size = get_input_size()
-    size = min(input_size, MAX_SIZE)
-    list_of_floats = strategies.lists(elements=floats, min_size=size, max_size=size)
-    return list_of_floats
+def create_network_inputs(network: Sequential) -> torch.Tensor:
+    size = 1, extract_input_size(network)
+    return torch.rand(size) * 20 - 10
 
 
 def initialize_model(**kwargs) -> Sequential:
@@ -30,19 +23,13 @@ def initialize_model(**kwargs) -> Sequential:
     ).create_network()
 
 
-def prepare_inputs(inputs: list[float]):
-    deterministic_size = get_input_size() - MAX_SIZE
-    inputs = inputs + [0] * deterministic_size
-    return torch.Tensor(inputs).unsqueeze(0)
-
-
-def are_isomorphism(model, model2, tanh: bool = False):
+def are_isomorphism(model, model2):
     """
     Check that models are different but equal up to isomorphism.
     """
 
-    evaluator = weights.mse.Evaluator(model2, None, use_align=False, tanh=tanh)
-    aligned_evaluator = weights.mse.Evaluator(model2, None, use_align=True, tanh=tanh)
+    evaluator = weights.mse.Evaluator(model2, None)
+    aligned_evaluator = weights.mse.Evaluator(model2, None, use_align=True)
     for evaluator_used in evaluator, aligned_evaluator:
         evaluator_used.original = model.to(evaluator.device)
 

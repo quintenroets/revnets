@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from torch.nn import LeakyReLU, ReLU, Tanh
 
 import torch
 
@@ -8,28 +9,44 @@ from . import order
 @dataclass
 class InternalNeurons:
     incoming: torch.nn.Module
+    activation: torch.nn.Module
     outgoing: torch.nn.Module
+    standardized_scale: float = 1
 
-    def standardize_scale(self, standardized_scale: float = 1) -> None:
+    @property
+    def has_norm_isomorphism(self) -> bool:
+        activations = ReLU, LeakyReLU
+        return isinstance(self.activation, activations)
+
+    @property
+    def has_sign_isomorphism(self) -> bool:
+        return isinstance(self.activation, Tanh)
+
+    @property
+    def has_scale_isomorphism(self) -> bool:
+        return self.has_norm_isomorphism or self.has_sign_isomorphism
+
+    def standardize_scale(self) -> None:
         """
         Standardize by multiplying incoming weights and biases by scale and outgoing
         weights with the inverse scale.
         """
-        scale_factors = calculate_incoming_weight_scales(self.incoming)
-        scale_factors /= standardized_scale
+        if self.has_scale_isomorphism:
+            self._standardize_scale()
+
+    def _standardize_scale(self) -> None:
+        scale_factors = self.calculate_scale_factors(self.incoming)
+        scale_factors /= self.standardized_scale
         rescale_incoming_weights(self.incoming, 1 / scale_factors)
         rescale_outgoing_weights(self.outgoing, scale_factors)
 
-
-def calculate_incoming_weight_scales(layer: torch.nn.Module) -> torch.Tensor:
-    weights = order.get_layer_weights(layer)
-    tanh = False
-    if tanh:
-        # tanh has sign invariance instead of scale invariance
-        scales = torch.sign(weights.sum(dim=1))
-    else:
-        scales = weights.norm(dim=1, p=2)
-    return scales
+    def calculate_scale_factors(self, layer: torch.nn.Module) -> torch.Tensor:
+        weights = order.get_layer_weights(layer)
+        return (
+            torch.sign(weights.sum(dim=1))
+            if self.has_sign_isomorphism
+            else weights.norm(dim=1, p=2)
+        )
 
 
 def rescale_incoming_weights(layer, scales) -> None:
