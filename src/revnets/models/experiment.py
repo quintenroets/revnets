@@ -9,7 +9,7 @@ from .path import Path
 
 @dataclass
 class Experiment(SerializationMixin):
-    reconstruction_technique: list[str] = field(default_factory=lambda: ["empty"])
+    reconstruction_technique: list[str] = field(default_factory=lambda: ["cheat"])
     network_to_reconstruct: list[str] = field(
         default_factory=lambda: ["mininet", "mininet"]
     )

@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 import torch
 
-from ...networks.models.metrics import Metrics
-from ...utils.trainer import Trainer
+from revnets.training import Metrics, Trainer
+
 from .. import base
 from .attack_model import AttackModel
 

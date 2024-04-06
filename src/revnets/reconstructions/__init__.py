@@ -1,3 +1,3 @@
-# from . import cheat, empty, outputs_supervision, retrain
-from . import empty
+# from . import outputs_supervision, retrain
+from . import cheat, empty
 from .base import Reconstructor

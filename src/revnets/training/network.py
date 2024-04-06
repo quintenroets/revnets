@@ -9,7 +9,7 @@ from torch import nn
 from .metrics import Metrics, Phase
 
 
-class Model(pl.LightningModule):
+class Network(pl.LightningModule):
     def __init__(self, model) -> None:
         super().__init__()
         self.model: torch.nn.Module = model

@@ -1,11 +1,12 @@
 from functools import cached_property
 
 from package_utils.context import Context as Context_
+from torch import nn
 
-from ..models import Config, HyperParameters, Options, Path, Secrets
+from ..models import Activation, Config, HyperParameters, Options, Path
 
 
-class Context(Context_[Options, Config, Secrets]):
+class Context(Context_[Options, Config, None]):
     @property
     def training(self) -> HyperParameters:
         return (
@@ -48,5 +49,17 @@ class Context(Context_[Options, Config, Secrets]):
     def log_path_str(self) -> str:
         return str(self.log_path)
 
+    @property
+    def activation_layer(self) -> nn.Module:
+        activation = context.config.target_network_training.activation
+        match activation:
+            case Activation.leaky_relu:
+                activation_layer = nn.LeakyReLU()
+            case Activation.relu:
+                activation_layer = nn.ReLU()
+            case Activation.tanh:
+                activation_layer = nn.Tanh()
+        return activation_layer
 
-context = Context(Options, Config, Secrets)
+
+context = Context(Options, Config, None)

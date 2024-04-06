@@ -9,7 +9,7 @@ from .experiment import Experiment
 class LaunchPlan:
     @classmethod
     def reconstruction_techniques(cls) -> Iterator[ModuleType]:
-        yield reconstructions.empty
+        yield reconstructions.cheat
 
     @classmethod
     def networks_to_reconstruct(cls) -> Iterator[ModuleType]:
@@ -18,7 +18,8 @@ class LaunchPlan:
 
     @classmethod
     def seeds(cls) -> Iterator[int]:
-        yield from (77, 78, 79)
+        yield 77
+        # yield from (77, 78, 79)
 
     @classmethod
     def experiments_to_launch(cls) -> Iterator[models.Experiment]:

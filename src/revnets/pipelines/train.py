@@ -1,41 +1,51 @@
 from abc import ABC
+from dataclasses import dataclass
 
 import torch
+from pytorch_lightning import LightningModule
+from torch.nn import Sequential
+
+from revnets import training
+from revnets.networks import NetworkFactory
+from revnets.training import Trainer
 
 from ..context import context
 from ..data.base import Dataset
 from ..models import Path
-from ..utils.trainer import Trainer
 from . import base
-from .models import Model, trainable
 
 
-class Network(base.Network, ABC):
-    def create_trained_model(self) -> Model:
-        model = self.create_model()
+@dataclass
+class Pipeline(base.Pipeline, ABC):
+    network_factory: NetworkFactory
+
+    def create_initialized_network(self) -> Sequential:
+        return self.network_factory.create_network(seed=context.config.experiment.seed)
+
+    def create_trained_network(self) -> Sequential:
         if not self.weights_path.exists():
-            self.train(model)
-            self.save_weights(model)
-        self.load_weights(model)
-        return model
+            self.creat_trained_weights()
+        return self.load_trained_network()
 
-    def create_initialized_model(self) -> Model:
-        torch.manual_seed(context.config.experiment.seed)
-        return self.create_model()
+    def load_trained_network(self) -> Sequential:
+        network = self.network_factory.create_network()
+        self.load_weights(network)
+        return network
 
-    @classmethod
-    def create_model(cls) -> Model:
-        raise NotImplementedError
+    def create_trained_weights(self) -> None:
+        seed = context.config.experiment.target_network_seed
+        network = self.network_factory.create_network(seed)
+        self.train(network)
+        self.save_weights(network)
 
-    def train(self, model: torch.nn.Module) -> None:
-        train_model = trainable.Model(model)
-        torch.manual_seed(context.config.experiment.target_network_seed)
+    def train(self, network: torch.nn.Module) -> None:
+        trainable_network = training.Network(network)
         data = self.create_dataset()
-        self.run_training(train_model, data)
+        self.run_training(trainable_network, data)
 
     @classmethod
-    def run_training(cls, model: trainable.Model, data: Dataset) -> None:
-        data.calibrate(model)
+    def run_training(cls, network: LightningModule, data: Dataset) -> None:
+        data.calibrate(network)
         trainer = Trainer(max_epochs=context.config.target_network_training.epochs)
         trainer.fit(model, data)
         trainer.test(model, data)

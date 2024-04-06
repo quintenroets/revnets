@@ -2,14 +2,15 @@ import math
 
 import torch
 from hypothesis import strategies
+from revnets import networks
 from revnets.evaluations import weights
-from revnets.networks import models
-from revnets.utils import config
+from torch.nn import Sequential
 
 MAX_SIZE = 100
 
 
 def get_input_size():
+    raise NotImplementedError
     model = initialize_model()
     return model.layer1.weight.shape[1]
 
@@ -22,11 +23,11 @@ def network_inputs():
     return list_of_floats
 
 
-def initialize_model(**kwargs):
-    torch.manual_seed(config.manual_seed)
-    return models.mediumnet_images.Model(
+def initialize_model(**kwargs) -> Sequential:
+    # torch.manual_seed(config.manual_seed)
+    return networks.mediumnet_images.NetworkFactory(
         input_size=784, hidden_size1=100, hidden_size2=50, **kwargs
-    )
+    ).create_network()
 
 
 def prepare_inputs(inputs: list[float]):

@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import torch
+from pytorch_lightning import LightningModule
 from torch.utils import data
 from torch.utils.data import ConcatDataset, Subset
 
@@ -122,5 +123,5 @@ class Dataset(pl.LightningDataModule):
                 dataset = self.train_val_dataset
         return dataset  # noqa
 
-    def calibrate(self, model) -> None:
+    def calibrate(self, network: LightningModule) -> None:
         self.eval_batch_size = utils.batch_size.get_max_batch_size(model, self)

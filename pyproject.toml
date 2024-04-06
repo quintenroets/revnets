@@ -57,6 +57,8 @@ no_implicit_reexport = false
 pythonpath = [
     "src", ".",
 ]
+addopts = "-p no:warnings"
+
 
 [tool.ruff]
 fix = true

@@ -3,7 +3,8 @@ from dataclasses import dataclass
 import pytorch_lightning as pl
 import torchmetrics
 
-from ...utils.trainer import Trainer
+from revnets.training import Trainer
+
 from .. import base
 
 

@@ -2,8 +2,9 @@ from dataclasses import dataclass
 
 import torch
 
+from revnets.training import Network
+
 from ..data import Dataset
-from ..networks.train import Network
 
 
 @dataclass
