@@ -5,10 +5,11 @@ import cli
 import numpy as np
 import torch
 
-from .. import evaluations, networks, reconstructions
+from revnets import pipelines
+from revnets.pipelines import Pipeline
+
+from .. import evaluations, reconstructions
 from ..context import context
-from ..networks.models.base import Model
-from ..networks.train import Network
 from ..reconstructions import Reconstructor
 from ..utils import NamedClass
 
@@ -22,7 +23,8 @@ class Experiment(NamedClass):
     def run(self) -> None:
         self.set_seed()
         cli.console.rule(context.config.experiment.title)
-        evaluation = evaluations.evaluate(self.reconstruction, self.network)
+        reconstruction = self.reconstructor.create_reconstruction()
+        evaluation = evaluations.evaluate(reconstruction, self.pipeline)
         evaluation.show()
         context.results_path.yaml = evaluation.dict()
 
@@ -37,18 +39,14 @@ class Experiment(NamedClass):
         return module
 
     @property
-    def network(self) -> Network:
-        names = context.config.experiment.network_to_reconstruct
-        return self.extract_module(networks, names).Network()
+    def pipeline(self) -> Pipeline:
+        names = context.config.experiment.pipeline
+        return self.extract_module(pipelines, names).Pipeline()
 
     @property
     def reconstructor(self) -> Reconstructor:
         names = context.config.experiment.reconstruction_technique
-        return self.extract_module(reconstructions, names).Reconstructor(self.network)
-
-    @property
-    def reconstruction(self) -> Model:
-        return self.reconstructor.reconstruct()
+        return self.extract_module(reconstructions, names).Reconstructor(self.pipeline)
 
     @classmethod
     def set_seed(cls) -> None:

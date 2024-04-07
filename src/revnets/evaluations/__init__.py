@@ -13,11 +13,11 @@ def evaluate(reconstruction, pipeline: Pipeline):
     # attack_evaluation = apply(attack)
 
     return Evaluation(
-        weights_MSE=apply(weights.mse),
-        weights_MAE=apply(weights.mae),
-        weights_max_AE=apply(weights.max_ae),
-        weights_MAE_layers=apply(weights.layers_mae),
-        test_outputs_MAE=apply(outputs.test).mae,
+        # weights_MSE=apply(weights.mse),
+        # weights_MAE=apply(weights.mae),
+        # weights_max_AE=apply(weights.max_ae),
+        # weights_MAE_layers=apply(weights.layers_mae),
+        # test_outputs_MAE=apply(outputs.test).mae,
         # test_acc=format_percentage(attack_evaluation.test.accuracy),
         # adversarial_test_acc=
         # format_percentage(attack_evaluation.adversarial.accuracy),

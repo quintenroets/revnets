@@ -4,7 +4,8 @@ from pytorch_lightning import LightningModule
 from torch.utils import data
 from torch.utils.data import ConcatDataset, Subset
 
-from .. import utils
+from revnets import training
+
 from ..context import context
 from .split import Split
 from .utils import split_train_val
@@ -124,4 +125,4 @@ class Dataset(pl.LightningDataModule):
         return dataset  # noqa
 
     def calibrate(self, network: LightningModule) -> None:
-        self.eval_batch_size = utils.batch_size.get_max_batch_size(model, self)
+        self.eval_batch_size = training.calculate_max_batch_size(network, self)

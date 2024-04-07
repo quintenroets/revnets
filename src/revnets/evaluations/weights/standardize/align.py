@@ -8,14 +8,14 @@ from . import order, standardize
 def align(
     model: torch.nn.Module, model_to_align: torch.nn.Module, tanh: bool = None
 ) -> None:
-    standardize.standardize_scale(model, tanh=tanh)
-    standardize.standardize_scale(model_to_align, tanh=tanh)
+    standardize.Standardizer(model).standardize_scale()
+    standardize.Standardizer(model_to_align).standardize_scale()
 
     # align neurons of model_to_align to neurons of model
     # to achieve a minimal weight difference
 
-    model_layers = standardize.get_layers(model)
-    model_layers_to_align = standardize.get_layers(model_to_align)
+    model_layers = list(standardize.generate_layers(model))
+    model_layers_to_align = list(standardize.generate_layers(model_to_align))
 
     layer_pairs = zip(model_layers, model_layers[1:])
     layer_pairs_to_align = zip(model_layers_to_align, model_layers_to_align[1:])

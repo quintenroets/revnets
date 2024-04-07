@@ -2,7 +2,8 @@ import itertools
 from collections.abc import Iterator
 from types import ModuleType
 
-from .. import models, networks, reconstructions
+from revnets import models, pipelines, reconstructions
+
 from .experiment import Experiment
 
 
@@ -12,9 +13,9 @@ class LaunchPlan:
         yield reconstructions.cheat
 
     @classmethod
-    def networks_to_reconstruct(cls) -> Iterator[ModuleType]:
-        # yield networks.mininet_images.mininet_100
-        yield networks.mininet.mininet
+    def pipelines(cls) -> Iterator[ModuleType]:
+        # yield pipelines.mininet_images.mininet_100
+        yield pipelines.mininet.mininet
 
     @classmethod
     def seeds(cls) -> Iterator[int]:
@@ -25,7 +26,7 @@ class LaunchPlan:
     def experiments_to_launch(cls) -> Iterator[models.Experiment]:
         combinations = itertools.product(
             cls.reconstruction_techniques(),
-            cls.networks_to_reconstruct(),
+            cls.pipelines(),
             cls.seeds(),
         )
         for combination in combinations:

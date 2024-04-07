@@ -3,22 +3,12 @@ from dataclasses import dataclass
 import torch
 
 from ...context import context
-from ...models import Activation
 from .. import base
 from . import standardize
 
 
 @dataclass
 class Evaluator(base.Evaluator):
-    tanh: bool = None
-
-    def __post_init__(self) -> None:
-        if self.tanh is None:
-            self.tanh = (
-                context.config.reconstruction_training.activation == Activation.tanh
-            )
-        super().__post_init__()
-
     def evaluate(self):
         return self.calculate_distance() if self.standardize_networks() else None
 
@@ -26,12 +16,10 @@ class Evaluator(base.Evaluator):
         standardized = self.same_architecture()
         if standardized:
             if context.config.evaluation.use_align:
-                standardize.align.align(
-                    self.original, self.reconstruction, tanh=self.tanh
-                )
+                standardize.align.align(self.original, self.reconstruction)
             else:
-                for model in (self.original, self.reconstruction):
-                    standardize.standardize.standardize(model, tanh=self.tanh)
+                for network in (self.original, self.reconstruction):
+                    standardize.standardize.Standardizer(network).standardize_scale()
         return standardized
 
     def same_architecture(self):

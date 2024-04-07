@@ -25,7 +25,7 @@ class HyperParameters:
 class Evaluation:
     adversarial_epsilon: float = 0.1
     visualize_attack: bool = False
-    use_align: bool = True
+    use_align: bool = False
 
 
 @dataclass
@@ -47,7 +47,8 @@ class Config(SerializationMixin):
     sampling_data_size: int = 10000
     n_rounds: int = None
     n_networks: int = 2
-    weight_variance_downscale_factor: float = None
+    weight_variance_downscale_factor: float | None = None
+    start_reconstruction_with_zero_biases: bool = False
     gradient_clip_val: int = None
 
     debug: bool = False

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import torch
 
-from revnets.training import Network
+from revnets.pipelines import Pipeline
 
 from ..data import Dataset
 
@@ -10,13 +10,15 @@ from ..data import Dataset
 @dataclass
 class Evaluator:
     reconstruction: torch.nn.Module
-    network: Network | None
+    pipeline: Pipeline | None
 
     def __post_init__(self) -> None:
-        if self.network is not None:
-            self.original: torch.nn.Module = self.network.create_trained_model()
-            self.original = self.original.to(self.device)
         self.reconstruction = self.reconstruction.to(self.device)
+
+    @property
+    def original(self) -> torch.nn.Module:
+        assert self.pipeline is not None
+        return self.pipeline.create_trained_network().to(self.device)
 
     @property
     def device(self):

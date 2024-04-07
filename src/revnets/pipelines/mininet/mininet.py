@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from revnets.networks import NetworkFactory, mininet
 
@@ -8,7 +8,7 @@ from .. import train
 
 @dataclass
 class Pipeline(train.Pipeline):
-    network_factory: NetworkFactory = mininet.NetworkFactory
+    network_factory: NetworkFactory = field(default_factory=mininet.NetworkFactory)
 
     @classmethod
     def create_dataset(cls):

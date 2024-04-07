@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from torch.nn import LeakyReLU, ReLU, Tanh
 
 import torch
+from torch.nn import LeakyReLU, ReLU, Tanh
 
 from . import order
 

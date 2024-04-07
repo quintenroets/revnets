@@ -1,11 +1,13 @@
-import pytest
 from types import ModuleType
-from torch.nn import Sequential
+
+import pytest
 import torch
-from torch import nn
 from revnets.evaluations.weights.standardize import standardize
-from revnets.networks import mininet
 from revnets.evaluations.weights.standardize.standardize import Standardizer
+from revnets.networks import mininet
+from torch import nn
+from torch.nn import Sequential
+
 from tests.utils import create_network_inputs
 
 activation_layers = nn.ReLU(), nn.LeakyReLU(), nn.Tanh()
@@ -46,9 +48,11 @@ def test_standardize_preserves_functionality(
 
 def verify_functional_preservation(network: Sequential) -> None:
     inputs = create_network_inputs(network)
-    outputs = network(inputs)
+    with torch.no_grad():
+        outputs = network(inputs)
     standardize.Standardizer(network).standardize_scale()
-    outputs_after_standardization = network(inputs)
+    with torch.no_grad():
+        outputs_after_standardization = network(inputs)
     outputs_are_closes = torch.isclose(outputs, outputs_after_standardization)
     assert torch.all(outputs_are_closes)
 

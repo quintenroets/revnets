@@ -1,12 +1,11 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from functools import cached_property
+from typing import TypeVar
 
 import torch
 
 from .internal_neurons import InternalNeurons
-
-from typing import TypeVar
 
 T = TypeVar("T")
 

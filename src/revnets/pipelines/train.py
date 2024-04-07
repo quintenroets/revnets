@@ -24,7 +24,7 @@ class Pipeline(base.Pipeline, ABC):
 
     def create_trained_network(self) -> Sequential:
         if not self.weights_path.exists():
-            self.creat_trained_weights()
+            self.create_trained_weights()
         return self.load_trained_network()
 
     def load_trained_network(self) -> Sequential:
@@ -39,7 +39,9 @@ class Pipeline(base.Pipeline, ABC):
         self.save_weights(network)
 
     def train(self, network: torch.nn.Module) -> None:
-        trainable_network = training.Network(network)
+        trainable_network = training.Network(
+            network, learning_rate=context.config.target_network_training.learning_rate
+        )
         data = self.create_dataset()
         self.run_training(trainable_network, data)
 
@@ -47,8 +49,8 @@ class Pipeline(base.Pipeline, ABC):
     def run_training(cls, network: LightningModule, data: Dataset) -> None:
         data.calibrate(network)
         trainer = Trainer(max_epochs=context.config.target_network_training.epochs)
-        trainer.fit(model, data)
-        trainer.test(model, data)
+        trainer.fit(network, data)
+        trainer.test(network, data)
 
     @classmethod
     def create_dataset(cls) -> Dataset:
@@ -59,7 +61,7 @@ class Pipeline(base.Pipeline, ABC):
         dataset.prepare()
         sample = dataset.train_val_dataset[0][0]
         inputs = sample.unsqueeze(0)
-        model = self.create_initialized_model()
+        model = self.create_initialized_network()
         outputs = model(inputs)[0]
         size = outputs.shape[-1]
         return size
@@ -78,7 +80,7 @@ class Pipeline(base.Pipeline, ABC):
         path: Path = (
             Path.weights
             / "trained_targets"
-            / "_".join(config.network_to_reconstruct)
+            / "_".join(config.pipeline)
             / str(config.target_network_seed)
         )
         path.create_parent()

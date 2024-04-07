@@ -4,12 +4,12 @@ from ..utils import NamedClass
 
 
 class Pipeline(NamedClass):
-    def create_trained_model(self) -> Sequential:
+    def create_trained_network(self) -> Sequential:
         raise NotImplementedError
 
-    def create_initialized_model(self) -> Sequential:
+    def create_initialized_network(self) -> Sequential:
         raise NotImplementedError
 
     @classmethod
     def get_base_name(cls):
-        return Network.__module__
+        return Pipeline.__module__

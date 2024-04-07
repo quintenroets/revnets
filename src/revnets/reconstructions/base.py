@@ -1,50 +1,45 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import torch
+from torch.nn import Sequential
 
-from revnets.evaluations.weights.standardize.standardize import get_layers
+from revnets.evaluations.weights.standardize.standardize import generate_layers
+from revnets.pipelines import Pipeline
 
 from ..context import context
-from ..networks.models.base import Model
-from ..networks.train import Network
 from ..utils import NamedClass
 
 
 @dataclass
 class Reconstructor(NamedClass):
-    network: Network
-    reconstruction: Model = None
+    pipeline: Pipeline
     downscale_factor: float = context.config.weight_variance_downscale_factor
+    reconstruction: Sequential = field(init=False)
 
     def __post_init__(self) -> None:
-        self.original: Model = self.network.create_trained_model()
-        self.reconstruction = self.initialize_reconstruction()
+        self.reconstruction = self.pipeline.create_initialized_network()
 
-    def reconstruct(self):
+    def create_reconstruction(self):
+        if self.downscale_factor is not None:
+            self.scale_weights()
+        if context.config.start_reconstruction_with_zero_biases:
+            self.set_biases()
         self.reconstruct_weights()
         return self.reconstruction
 
-    def initialize_reconstruction(self):
-        reconstruction = self.network.create_initialized_model()
-        if self.downscale_factor is not None:
-            self.scale_weights(reconstruction)
-        self.set_biases(reconstruction)
-        return reconstruction
-
-    def scale_weights(self, model) -> None:
-        layers = get_layers(model)
+    def scale_weights(self) -> None:
+        layers = generate_layers(self.reconstruction)
         for layer in layers:
             layer.weight.data /= self.downscale_factor
 
-    @classmethod
-    def set_biases(cls, model) -> None:
-        layers = get_layers(model)
+    def set_biases(self) -> None:
+        layers = generate_layers(self.reconstruction)
         for layer in layers:
             bias = torch.zeros_like(layer.bias, dtype=layer.bias.dtype)
             layer.bias = torch.nn.Parameter(bias)
 
-    def reconstruct_weights(self) -> None:
-        pass
+    def reconstruct_weights(self, network: Sequential) -> None:
+        raise NotImplementedError
 
     @classmethod
     def get_base_name(cls):

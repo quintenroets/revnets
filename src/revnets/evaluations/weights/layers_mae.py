@@ -6,8 +6,8 @@ from .standardize import standardize
 
 class Evaluator(mae.Evaluator):
     def iterate_compared_layers(self, device=None):
-        original_layers = standardize.get_layers(self.original)
-        reconstruction_layers = standardize.get_layers(self.reconstruction)
+        original_layers = standardize.generate_layers(self.original)
+        reconstruction_layers = standardize.generate_layers(self.reconstruction)
         get_weights = standardize.order.get_layer_weights
         for original, reconstruction in zip(original_layers, reconstruction_layers):
             original_weights = get_weights(original, device)

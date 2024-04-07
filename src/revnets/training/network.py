@@ -1,19 +1,20 @@
 from collections.abc import Sequence
-from typing import Any
 
 import pytorch_lightning as pl
-import torch.nn
 import torchmetrics
-from torch import nn
+from torch import nn, optim
 
 from .metrics import Metrics, Phase
 
 
 class Network(pl.LightningModule):
-    def __init__(self, model) -> None:
+    def __init__(
+        self, model: nn.Module, learning_rate: float, do_log: bool = True
+    ) -> None:
         super().__init__()
-        self.model: torch.nn.Module = model
-        self.do_log: bool = True
+        self.learning_rate = learning_rate
+        self.model = model
+        self.do_log = do_log
 
     def forward(self, inputs):
         return self.model(inputs)
@@ -49,8 +50,8 @@ class Network(pl.LightningModule):
         )
         return accuracy.item()
 
-    def configure_optimizers(self) -> Any:
-        return self.model.configure_optimizers()
+    def configure_optimizers(self) -> optim.Optimizer:
+        return optim.Adam(self.parameters(), lr=self.learning_rate)
 
     def log_metrics(self, metrics: Metrics, phase: Phase) -> None:
         if phase != Phase.SILENT:

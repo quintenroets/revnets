@@ -39,7 +39,7 @@ class TuneModel(pl.LightningModule):
         return self.model.configure_optimizers()
 
 
-def get_max_batch_size(
+def calculate_max_batch_size(
     model: pl.LightningModule, data: Dataset, method: str = "validate"
 ):
     tune_model = TuneModel(model, data)

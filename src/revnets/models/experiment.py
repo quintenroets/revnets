@@ -10,9 +10,7 @@ from .path import Path
 @dataclass
 class Experiment(SerializationMixin):
     reconstruction_technique: list[str] = field(default_factory=lambda: ["cheat"])
-    network_to_reconstruct: list[str] = field(
-        default_factory=lambda: ["mininet", "mininet"]
-    )
+    pipeline: list[str] = field(default_factory=lambda: ["mininet", "mininet"])
     seed: int = 0
     target_network_seed: int = 999
 
@@ -22,11 +20,9 @@ class Experiment(SerializationMixin):
     @property
     def names(self) -> tuple[str, ...]:
         seeds = f"{self.seed}_{self.target_network_seed}"
-        return (
-            "_".join(self.reconstruction_technique),
-            "_".join(self.network_to_reconstruct),
-            seeds,
-        )
+        reconstruction = "_".join(self.reconstruction_technique)
+        pipeline = "_".join(self.pipeline)
+        return (reconstruction, pipeline, seeds)
 
     @property
     def name(self) -> str:
@@ -41,7 +37,7 @@ class Experiment(SerializationMixin):
         yield from (
             *self.reconstruction_technique,
             "|",
-            *self.network_to_reconstruct,
+            *self.pipeline,
             "|",
             self.seed,
             "|",
