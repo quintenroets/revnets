@@ -11,8 +11,6 @@ class Experiment:
     seed: int = 0
 
     def to_model(self) -> models.Experiment:
-        return models.Experiment(
-            reconstruction_technique=self.reconstruction_technique.Reconstructor.relative_module,
-            pipeline=self.pipeline.Pipeline.relative_module,
-            seed=self.seed,
-        )
+        reconstruction = self.reconstruction_technique.Reconstructor.relative_module
+        pipeline = self.pipeline.Pipeline.relative_module
+        return models.Experiment(reconstruction, pipeline, self.seed)
