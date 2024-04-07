@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 
 from package_utils.dataclasses.mixins import SerializationMixin
 
@@ -30,18 +30,18 @@ class Experiment(SerializationMixin):
 
     @property
     def title(self) -> str:
-        parts = (str(part) for part in self.generate_title_parts())
+        parts = self.generate_title_parts()
         return " ".join(parts).title()
 
-    def generate_title_parts(self) -> Iterator[str | int]:
+    def generate_title_parts(self) -> Iterator[str]:
         yield from (
             *self.reconstruction_technique,
             "|",
             *self.pipeline,
             "|",
-            self.seed,
+            str(self.seed),
             "|",
-            self.target_network_seed,
+            str(self.target_network_seed),
         )
 
     @property
@@ -49,7 +49,7 @@ class Experiment(SerializationMixin):
         path = Path.results
         for name in self.names:
             path /= name
-        return path
+        return cast(Path, path)
 
     @property
     def config_path(self) -> Path:

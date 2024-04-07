@@ -9,37 +9,22 @@ from torch.utils.data import TensorDataset
 from revnets import data
 from revnets.networks.models.mediumnet import Model
 
-from ... import networks
 from . import weights
 
 
 @dataclass
 class Experiment(weights.Experiment):
-    def get_networks(cls):
-        return (
-            # networks.mininet.mininet
-            # networks.mininet.mininet_40,
-            # networks.mininet.mininet_100,
-            # networks.mediumnet.mediumnet_20,
-            # networks.mediumnet.mediumnet_40,
-            networks.mininet_images.mininet_small,
-            # networks.mininet_images.mininet_100,
-            # networks.mininet_images.mininet_128,
-            # networks.mininet_images.mininet_200,
-        )
-
-    def run_reconstruction(self, reconstruction) -> None:
-        # super().run_reconstruction(reconstruction)
-        # self.visualize_inputs()
+    def run_reconstruction(self, reconstruction: torch.nn.Module) -> None:
+        super().run_reconstruction(reconstruction)
+        self.visualize_inputs()
         models = {
-            # "reconstruction": reconstruction,
-            # "initialization": self.network.get_architecture(),
+            "reconstruction": reconstruction,
+            "initialization": self.network.get_architecture(),
             "target": self.network.trained_network,
         }
 
-        if config.is_notebook or True:
-            for name, model in models.items():
-                self.visualize_activations(model, name=name)
+        for name, model in models.items():
+            self.visualize_activations(model, name=name)
 
     def visualize_inputs(self) -> None:
         random_inputs = self.get_inputs()

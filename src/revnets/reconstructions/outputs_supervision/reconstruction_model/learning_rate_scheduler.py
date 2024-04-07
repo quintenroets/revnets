@@ -1,13 +1,17 @@
-from revnets.utils import config
+from typing import Any
+
+from revnets.context import context
 
 from . import stabilize
 
 
-class ReconstructModel(stabilize.ReconstructModel):
-    def __init__(self, *args, schedule_learning_rate: bool = True, **kwargs) -> None:
+class ReconstructNetwork(stabilize.ReconstructNetwork):
+    def __init__(
+        self, *args: Any, schedule_learning_rate: bool = True, **kwargs: Any
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.schedule_learning_rate = schedule_learning_rate
-        self.losses = []
+        self.losses: list[float] = []
 
     def log_learning_rate(self) -> None:
         self.log("learning rate", self.learning_rate, prog_bar=True)
@@ -21,7 +25,7 @@ class ReconstructModel(stabilize.ReconstructModel):
         super().on_train_epoch_end()
 
     @property
-    def logged_loss(self):
+    def logged_loss(self) -> float:
         metrics = self.trainer.callback_metrics
         return metrics["train l1 loss"].item()
 
@@ -48,12 +52,14 @@ class ReconstructModel(stabilize.ReconstructModel):
             1e-11: 3e-12,
         }
 
-        target_scale = 1
+        target_scale = 1.0
         for threshold, scale in transitions.items():
             if self.logged_loss < threshold:
                 target_scale = scale
 
-        target_learning_rate = config.lr * target_scale
+        target_learning_rate = (
+            context.config.target_network_training.learning_rate * target_scale
+        )
         if target_learning_rate < self.learning_rate:
             self.learning_rate = target_learning_rate
             self.log_learning_rate()

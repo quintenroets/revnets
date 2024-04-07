@@ -24,4 +24,4 @@ class NetworkFactory(NamedClass):
 
     @classmethod
     def get_base_name(cls):
-        return Model.__module__
+        return NetworkFactory.__module__

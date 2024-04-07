@@ -41,7 +41,7 @@ class Dataset(output_supervision.Dataset):
 
     @classmethod
     def get_dtype(cls):
-        return torch.float64 if config.precision == 64 else torch.float32
+        return torch.float64 if context.config.precision == 64 else torch.float32
 
     def get_train_inputs(self):
         self.original_dataset.prepare()

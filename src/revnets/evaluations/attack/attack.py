@@ -17,10 +17,9 @@ class Evaluation:
 
 class Evaluator(base.Evaluator):
     def evaluate(self) -> Evaluation:
-        return self.compare_attacks(config)
+        return self.compare_attacks()
 
-    def compare_attacks(self, _):
-        # config argument passed to determine cache entry
+    def compare_attacks(self):
         dataset = self.get_dataset()
         dataset.prepare()
         model = AttackModel(self.original, self.reconstruction)

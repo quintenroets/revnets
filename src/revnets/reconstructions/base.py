@@ -13,13 +13,13 @@ from ..utils import NamedClass
 @dataclass
 class Reconstructor(NamedClass):
     pipeline: Pipeline
-    downscale_factor: float = context.config.weight_variance_downscale_factor
+    downscale_factor: float | None = context.config.weight_variance_downscale_factor
     reconstruction: Sequential = field(init=False)
 
     def __post_init__(self) -> None:
         self.reconstruction = self.pipeline.create_initialized_network()
 
-    def create_reconstruction(self):
+    def create_reconstruction(self) -> Sequential:
         if self.downscale_factor is not None:
             self.scale_weights()
         if context.config.start_reconstruction_with_zero_biases:
@@ -38,9 +38,9 @@ class Reconstructor(NamedClass):
             bias = torch.zeros_like(layer.bias, dtype=layer.bias.dtype)
             layer.bias = torch.nn.Parameter(bias)
 
-    def reconstruct_weights(self, network: Sequential) -> None:
+    def reconstruct_weights(self) -> None:
         raise NotImplementedError
 
     @classmethod
-    def get_base_name(cls):
+    def get_base_name(cls) -> str:
         return Reconstructor.__module__

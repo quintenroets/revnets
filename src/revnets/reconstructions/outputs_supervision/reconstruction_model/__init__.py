@@ -1,1 +1,1 @@
-from .revive import ReconstructModel
+from .revive import ReconstructNetwork

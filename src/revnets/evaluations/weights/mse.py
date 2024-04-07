@@ -9,7 +9,7 @@ from . import standardize
 
 @dataclass
 class Evaluator(base.Evaluator):
-    def evaluate(self):
+    def evaluate(self) -> float:
         return self.calculate_distance() if self.standardize_networks() else None
 
     def standardize_networks(self):

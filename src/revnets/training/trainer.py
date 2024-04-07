@@ -1,4 +1,5 @@
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
+from typing import Any
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import Callback, RichModelSummary
@@ -14,12 +15,11 @@ class Trainer(pl.Trainer):
     def __init__(
         self,
         accelerator: str = "auto",
-        callbacks: list[Callback] = None,
-        logger=None,
-        max_epochs=None,
-        precision=None,
+        callbacks: Sequence[Callback] | None = None,
+        max_epochs: int | None = None,
+        precision: int | None = None,
         barebones: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         config = context.config
         callbacks = list(self.generate_callbacks(callbacks, barebones))
@@ -27,7 +27,6 @@ class Trainer(pl.Trainer):
             accelerator=accelerator,
             barebones=barebones,
             callbacks=callbacks,
-            logger=logger,
             max_epochs=max_epochs or context.config.reconstruction_training.epochs,
             num_sanity_val_steps=config.number_of_validation_sanity_steps,
             limit_train_batches=config.limit_batches,
@@ -42,7 +41,7 @@ class Trainer(pl.Trainer):
 
     @classmethod
     def generate_callbacks(
-        cls, callbacks: list[Callback], barebones: bool
+        cls, callbacks: list[Callback] | None, barebones: bool
     ) -> Iterator[Callback]:
         if callbacks is not None:
             yield from callbacks
@@ -56,8 +55,7 @@ class Trainer(pl.Trainer):
 
     @property
     def log_message(self) -> str:
-        # slow import
-        from ..utils.table import Table  # noqa: autoimport
+        from ..utils.table import Table
 
         table = Table()
         table.add_column("Test metric", style="cyan", no_wrap=True)
@@ -66,9 +64,9 @@ class Trainer(pl.Trainer):
         for name, value in self.logged_metrics.items():
             if name != "step":
                 name = name.replace("test ", "")
-                value = value.item()
+                value_float = value.item()
                 display_format = ".3%" if "accuracy" in name else ".3f"
-                value = f"{value:{display_format}}".replace("%", " %")
-                table.add_row(name, value)
+                value_str = f"{value_float :{display_format}}".replace("%", " %")
+                table.add_row(name, value_str)
 
         return table.text

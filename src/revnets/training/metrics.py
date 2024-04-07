@@ -2,6 +2,7 @@ from dataclasses import dataclass, fields
 from enum import Enum
 
 import torch
+from simple_classproperty import classproperty
 
 
 class Phase(Enum):
@@ -18,12 +19,12 @@ class MetricName(Enum):
 
 @dataclass
 class LogMetrics:
-    def dict(self):
+    def dict(self) -> dict[str, float]:
         return {name: getattr(self, name) for name in self.names}
 
     @classmethod
-    @property
-    def names(cls):
+    @classproperty
+    def names(cls) -> list[str]:
         return [field.name for field in fields(cls)]
 
 

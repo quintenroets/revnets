@@ -10,6 +10,7 @@ from torch.utils.data import TensorDataset
 from revnets.data import random
 from revnets.networks.models.mediumnet import Model
 
+from ...context import context
 from ...models import Path
 from . import weights
 
@@ -81,7 +82,7 @@ class Experiment(weights.Experiment):
             "original": self.network.trained_network,
         }
 
-        if config.is_notebook:
+        if context.is_running_in_notebook:
             for name, model in models.items():
                 self.visualize_activations(model, name=name)
 

@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 import math
 from dataclasses import dataclass
 
 import torch
+from simple_classproperty import classproperty
 from torch import nn
 
-from revnets.networks.models.metrics import LogMetrics
-from revnets.utils import config
+from revnets import training
+from revnets.context import context
 
 
 @dataclass
-class Metrics(LogMetrics):
+class Metrics(training.LogMetrics):
     shape: torch.Size
     l1_loss_sum: torch.Tensor
     l2_loss_sum: torch.Tensor
@@ -20,16 +23,16 @@ class Metrics(LogMetrics):
         self.batch_size = self.shape[0]
 
     @property
-    def l1_loss(self):
+    def l1_loss(self) -> torch.Tensor:
         return self.l1_loss_sum / self.size
 
     @property
-    def l2_loss(self):
+    def l2_loss(self) -> torch.Tensor:
         return self.l2_loss_sum / self.size
 
     @property
-    def loss_sum(self):
-        match config.loss_criterion:
+    def loss_sum(self) -> torch.Tensor:
+        match context.config.loss_criterion:
             # case "smooth_l1":
             # loss = self.smooth_l1_loss
             case "l1":
@@ -37,25 +40,26 @@ class Metrics(LogMetrics):
             case "l2":
                 loss = self.l2_loss_sum
             case _:
-                message = f"Invalid loss criterion {config.loss_criterion}"
+                message = f"Invalid loss criterion {context.config.loss_criterion}"
                 raise Exception(message)
-        if self.batch_size != config.batch_size:
-            # optimizer expects a loss summed over config.batch_size elements
+        if self.batch_size != context.config.reconstruction_training.batch_size:
+            # optimizer expects a loss summed over
+            # reconstruction_training.batch_size elements
             # scale loss appropriately if less effective elements in batch
-            loss *= config.batch_size / self.batch_size
+            loss *= context.config.reconstruction_training.batch_size / self.batch_size
         return loss
 
     @property
-    def loss(self):
+    def loss(self) -> torch.Tensor:
         return self.loss_sum / self.size
 
     @classmethod
-    @property
-    def names(cls):  # noqa
+    @classproperty
+    def names(cls) -> tuple[str, ...]:
         return ("l1_loss",)
 
     @classmethod
-    def from_results(cls, outputs: torch.Tensor, targets: torch.Tensor):
+    def from_results(cls, outputs: torch.Tensor, targets: torch.Tensor) -> Metrics:
         return cls(
             shape=outputs.shape,
             l1_loss_sum=nn.functional.l1_loss(outputs, targets, reduction="sum"),

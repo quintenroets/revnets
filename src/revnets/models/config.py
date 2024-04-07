@@ -17,7 +17,7 @@ class HyperParameters:
     learning_rate: float
     epochs: int | None = None
     bias_learning_rate: float | None = None
-    batch_size: int | None = None
+    batch_size: int = 1
     activation: Enum = Activation.leaky_relu
 
 
@@ -45,11 +45,11 @@ class Config(SerializationMixin):
 
     early_stopping_patience: int = 100
     sampling_data_size: int = 10000
-    n_rounds: int = None
+    n_rounds: int | None = None
     n_networks: int = 2
     weight_variance_downscale_factor: float | None = None
     start_reconstruction_with_zero_biases: bool = False
-    gradient_clip_val: int = None
+    gradient_clip_val: int | None = None
 
     debug: bool = False
     debug_batch_limit: int = 1
@@ -58,14 +58,14 @@ class Config(SerializationMixin):
 
     device: int = 1
     precision: int = 64
-    always_train: bool = None
+    always_train: bool = False
     loss_criterion: str = "l1"
     validation_ratio: float = 0
 
     console_metrics_refresh_interval: float = 0.5
 
     @property
-    def number_of_validation_sanity_steps(self) -> int:
+    def number_of_validation_sanity_steps(self) -> int | None:
         return 0 if self.debug else None
 
     @property

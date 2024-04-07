@@ -1,48 +1,53 @@
-from __future__ import annotations
-
 import typing
+from typing import Literal
 
-import pytorch_lightning as pl
+import torch
+from pytorch_lightning import LightningModule
 from pytorch_lightning.tuner.tuning import Tuner
+from torch.optim import Optimizer
+from torch.utils.data import DataLoader
 
 from ..context import context
 from .trainer import Trainer
 
 if typing.TYPE_CHECKING:
     from ..data import Dataset  # noqa: autoimport
+from .network import Network
 
 
-class TuneModel(pl.LightningModule):
-    def __init__(self, model, data) -> None:
+class TuneModel(LightningModule):
+    def __init__(self, model: Network, data: Dataset) -> None:
         super().__init__()
-        self.model: pl.LightningModule = model
+        self.model = model
         self.data = data
         self.batch_size = 1
         self.old_batch_size = self.data.batch_size
         self.automatic_optimization = False
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> DataLoader[torch.Tensor]:
         self.data.eval_batch_size = self.batch_size
         return self.data.val_dataloader()
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch: torch.Tensor, batch_idx: int) -> None:
         return self.model.validation_step(batch, batch_idx)
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> DataLoader[torch.Tensor]:
         self.data.batch_size = self.batch_size
         return self.data.train_dataloader()
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch: torch.Tensor, batch_idx: int) -> torch.Tensor:
         return self.model.training_step(batch, batch_idx)
 
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> Optimizer:
         return self.model.configure_optimizers()
 
 
 def calculate_max_batch_size(
-    model: pl.LightningModule, data: Dataset, method: str = "validate"
-):
-    tune_model = TuneModel(model, data)
+    network: Network,
+    data: Dataset,
+    method: Literal["fit", "validate", "test", "predict"] = "validate",
+) -> int:
+    tune_model = TuneModel(network, data)
     data.prepare()
 
     trainer = Trainer(max_epochs=1, devices=1)
@@ -50,7 +55,7 @@ def calculate_max_batch_size(
 
     print(f"Calculating max {method} batch size")
 
-    model.do_log = False
+    network.do_log = False
     old_batch_size = data.batch_size
     try:
         batch_size = context.config.reconstruction_training.batch_size
@@ -59,7 +64,7 @@ def calculate_max_batch_size(
         message = "Batch size of 2 does not fit in GPU, impossible to start training"
         raise Exception(message)
 
-    model.do_log = True
+    network.do_log = True
     data.batch_size = old_batch_size
 
     safety_factor = 2 if method == "validate" else 1

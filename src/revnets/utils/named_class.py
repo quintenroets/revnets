@@ -3,7 +3,7 @@ from simple_classproperty import classproperty
 
 class NamedClass:
     @classmethod
-    def get_base_name(cls):
+    def get_base_name(cls) -> str:
         raise NotImplementedError
 
     @classmethod

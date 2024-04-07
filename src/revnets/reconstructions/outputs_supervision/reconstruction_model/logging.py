@@ -1,13 +1,15 @@
+from typing import Any
+
 from revnets.evaluations import weights
 
 from ....evaluations.weights.mae import Evaluator
-from . import model
+from . import network
 
 
-class ReconstructModel(model.ReconstructModel):
+class ReconstructNetwork(network.ReconstructNetwork):
     def __init__(
         self,
-        *args,
+        *args: Any,
         visualize: bool = False,
         visualization_interval: int = 10,
         calculate_interval: int = 5,
@@ -42,5 +44,5 @@ class ReconstructModel(model.ReconstructModel):
                 self.visualizer.evaluate()
 
     @property
-    def is_visualization_epoch(self):
+    def is_visualization_epoch(self) -> bool:
         return (self.trainer.current_epoch + 1) % self.visualization_interval == 0

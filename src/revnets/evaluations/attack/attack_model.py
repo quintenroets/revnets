@@ -11,9 +11,11 @@ from torch import nn
 
 from revnets.training import Metrics
 
+from ...context import context
+
 
 class LossMetric(torchmetrics.Metric):
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[None]:
         pass
 
     def __init__(self, **kwargs) -> None:
@@ -25,7 +27,7 @@ class LossMetric(torchmetrics.Metric):
         self.loss_sum += nn.functional.cross_entropy(outputs, labels, reduction="sum")
         self.num_examples += len(outputs)
 
-    def compute(self):
+    def compute(self) -> float:
         return self.loss_sum / self.num_examples
 
 
@@ -35,13 +37,13 @@ class RunningMetrics:
         self.accuracy = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)
         self.loss = LossMetric().to(device)
 
-    def compute(self):
+    def compute(self) -> Metrics:
         return Metrics(
             accuracy=self.accuracy.compute().item(), loss=self.loss.compute().item()
         )
 
 
-class AttackModel(pl.LightningModule):
+class AttackNetwork(pl.LightningModule):
     def __init__(self, original, reconstruction) -> None:
         super().__init__()
         self.original = original
@@ -54,7 +56,7 @@ class AttackModel(pl.LightningModule):
 
         self.test, self.adversarial, self.adversarial_transfer = (None,) * 3
         self.attack = None
-        self.visualize = config.visualize_attack
+        self.visualize = context.config.visualize_attack
 
     def test_step(self, batch, batch_idx) -> None:
         inputs, labels = batch
@@ -82,7 +84,7 @@ class AttackModel(pl.LightningModule):
             plt.legend()
             plt.show()
 
-    def get_adversarial_inputs(self, inputs):
+    def get_adversarial_inputs(self, inputs) -> torch.Tensor:
         if self.model_under_attack is None:
             self.configure_attack(inputs)
 
@@ -111,7 +113,7 @@ class AttackModel(pl.LightningModule):
             device_type="gpu",
         )
         self.attack = FastGradientMethod(
-            self.model_under_attack, eps=config.adversarial_epsilon
+            self.model_under_attack, eps=context.config.evaluation.adversarial_epsilon
         )
 
     def on_test_epoch_end(self) -> None:
