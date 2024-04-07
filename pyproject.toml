@@ -57,6 +57,7 @@ no_implicit_reexport = false
 
 [[tool.mypy.overrides]]
 module = [
+    "art.*",
     "kneed.*",
     "scipy.*",
     "sklearn.*",

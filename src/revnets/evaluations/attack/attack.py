@@ -1,11 +1,12 @@
 from dataclasses import dataclass
+from typing import cast
 
 import torch
 
 from revnets.training import Metrics, Trainer
 
 from .. import base
-from .attack_model import AttackModel
+from .network import AttackNetwork
 
 
 @dataclass
@@ -19,10 +20,10 @@ class Evaluator(base.Evaluator):
     def evaluate(self) -> Evaluation:
         return self.compare_attacks()
 
-    def compare_attacks(self):
+    def compare_attacks(self) -> Evaluation:
         dataset = self.get_dataset()
         dataset.prepare()
-        model = AttackModel(self.original, self.reconstruction)
+        model = AttackNetwork(self.original, self.reconstruction)
         dataset.calibrate(model)
         dataloader = dataset.test_dataloader()
         precision = 32  # adversarial attack library only works with precision 32
@@ -30,4 +31,6 @@ class Evaluator(base.Evaluator):
         for network in (model.reconstruction, model.original):
             network.to(dtype)
         Trainer(precision=precision).test(model, dataloaders=dataloader)
-        return Evaluation(model.test, model.adversarial, model.adversarial_transfer)
+        untyped_metrics = model.test, model.adversarial, model.adversarial_transfer
+        metrics = cast(tuple[Metrics, ...], untyped_metrics)
+        return Evaluation(*metrics)

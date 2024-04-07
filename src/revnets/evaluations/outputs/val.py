@@ -1,8 +1,13 @@
 from dataclasses import dataclass
+from typing import Any, cast
 
 import pytorch_lightning as pl
+import torch
 import torchmetrics
+from torch.nn import Module
+from torch.utils.data import DataLoader
 
+from revnets.data import Dataset
 from revnets.training import Trainer
 
 from .. import base
@@ -21,15 +26,15 @@ class FormattedMetrics:
 
 
 class CompareModel(pl.LightningModule):
-    def __init__(self, model1, model2) -> None:
+    def __init__(self, model1: Module, model2: Module) -> None:
         super().__init__()
         self.model1 = model1
         self.model2 = model2
         self.mae_metric = torchmetrics.MeanAbsoluteError()
         self.mse_metric = torchmetrics.MeanSquaredError()
-        self.metrics = None
+        self.metrics: Metrics | None = None
 
-    def test_step(self, batch, batch_idx) -> None:
+    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
         inputs, labels = batch
         models = (self.model1, self.model2)
         outputs = [model(inputs) for model in models]
@@ -43,10 +48,10 @@ class CompareModel(pl.LightningModule):
 
 
 class Evaluator(base.Evaluator):
-    def evaluate(self):
+    def evaluate(self) -> Metrics:
         return self.compare_outputs()
 
-    def compare_outputs(self):
+    def compare_outputs(self) -> Metrics:
         model = CompareModel(self.original, self.reconstruction)
 
         dataset = self.get_dataset()
@@ -56,14 +61,14 @@ class Evaluator(base.Evaluator):
         dataloader = self.get_dataloader(dataset)
 
         Trainer().test(model, dataloaders=dataloader)  # noqa
-        return model.metrics
+        return cast(Metrics, model.metrics)
 
     @classmethod
-    def get_dataloader(cls, dataset):
+    def get_dataloader(cls, dataset: Dataset) -> DataLoader[tuple[torch.Tensor, ...]]:
         return dataset.val_dataloader()
 
     @classmethod
-    def format_evaluation(cls, value: Metrics, **kwargs):
+    def format_evaluation(cls, value: Metrics, **kwargs: Any) -> FormattedMetrics:  # type: ignore[override]
         values = (value.mae, value.mse)
         formatted_values = (
             super(Evaluator, cls).format_evaluation(value, **kwargs) for value in values

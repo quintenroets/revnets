@@ -1,14 +1,13 @@
-import matplotlib.pyplot as plt
-from typing import Iterator
-from simple_classproperty import classproperty
-from torch.nn import Module
+from collections.abc import Iterator
 from typing import Any
+
+import matplotlib.pyplot as plt
 import torch
+from torch.nn import Module
 
 from ...utils.colors import get_colors
 from . import layers_mae
-
-from .standardize import generate_layers, extract_layer_weights
+from .standardize import extract_layer_weights, generate_layers
 
 cpu = torch.device("cpu")
 

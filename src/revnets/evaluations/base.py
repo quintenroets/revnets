@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any, cast
 
 import torch
 
@@ -28,17 +29,18 @@ class Evaluator:
     @classmethod
     def format_evaluation(
         cls, value: float | tuple[float, ...] | None, precision: int = 3
-    ):
+    ) -> str:
         if value is None:
             result = "/"
         elif isinstance(value, float):
             result = f"{value:.{precision}e}"
         else:
-            result = value
+            result = cast(str, value)
         return result
 
-    def evaluate(self):
+    def evaluate(self) -> Any:
         raise NotImplementedError
 
     def get_dataset(self) -> Dataset:
+        assert self.pipeline is not None
         return self.pipeline.create_dataset()

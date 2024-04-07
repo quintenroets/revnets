@@ -1,4 +1,4 @@
-from collections.abc import Iterator, Sequence
+from typing import Any, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,43 +8,42 @@ import torchmetrics
 from art.attacks.evasion import FastGradientMethod
 from art.estimators.classification import PyTorchClassifier
 from torch import nn
+from torch.nn import Module
 
+from revnets.context import context
 from revnets.training import Metrics
-
-from ...context import context
 
 
 class LossMetric(torchmetrics.Metric):
-    def __iter__(self) -> Iterator[None]:
-        pass
-
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.add_state("loss_sum", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("num_examples", default=torch.tensor(0), dist_reduce_fx="sum")
 
-    def update(self, outputs, labels: Sequence[str]) -> None:
+    def update(self, outputs: torch.Tensor, labels: torch.Tensor) -> None:
         self.loss_sum += nn.functional.cross_entropy(outputs, labels, reduction="sum")
         self.num_examples += len(outputs)
 
-    def compute(self) -> float:
-        return self.loss_sum / self.num_examples
+    def compute(self) -> torch.Tensor:
+        value = self.loss_sum / self.num_examples
+        return cast(torch.Tensor, value)
 
 
 class RunningMetrics:
     def __init__(self) -> None:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.accuracy = torchmetrics.Accuracy("multiclass", num_classes=10).to(device)
-        self.loss = LossMetric().to(device)
+        self.accuracy = torchmetrics.Accuracy("multiclass", num_classes=10).to(
+            context.device
+        )
+        self.loss = LossMetric().to(context.device)
 
     def compute(self) -> Metrics:
-        return Metrics(
-            accuracy=self.accuracy.compute().item(), loss=self.loss.compute().item()
-        )
+        accuracy = self.accuracy.compute().item()  # type: ignore[func-returns-value]
+        loss = self.loss.compute()
+        return Metrics(accuracy, loss)
 
 
 class AttackNetwork(pl.LightningModule):
-    def __init__(self, original, reconstruction) -> None:
+    def __init__(self, original: Module, reconstruction: Module) -> None:
         super().__init__()
         self.original = original
         self.reconstruction = reconstruction
@@ -54,11 +53,13 @@ class AttackNetwork(pl.LightningModule):
         self.adversarial_metric = RunningMetrics()
         self.adversarial_transfer_metric = RunningMetrics()
 
-        self.test, self.adversarial, self.adversarial_transfer = (None,) * 3
-        self.attack = None
-        self.visualize = context.config.visualize_attack
+        self.test: Metrics | None = None
+        self.adversarial: Metrics | None = None
+        self.adversarial_transfer: Metrics | None = None
+        self.attack: FastGradientMethod | None = None
+        self.visualize = context.config.evaluation.visualize_attack
 
-    def test_step(self, batch, batch_idx) -> None:
+    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
         inputs, labels = batch
         adversarial_inputs = self.get_adversarial_inputs(inputs)
 
@@ -74,7 +75,9 @@ class AttackNetwork(pl.LightningModule):
         )
 
     @classmethod
-    def show_comparison(cls, inputs, adversarial_inputs) -> None:
+    def show_comparison(
+        cls, inputs: torch.Tensor, adversarial_inputs: torch.Tensor
+    ) -> None:
         length = len(inputs[0])
         indices = np.flip(np.arange(length))
 
@@ -84,25 +87,30 @@ class AttackNetwork(pl.LightningModule):
             plt.legend()
             plt.show()
 
-    def get_adversarial_inputs(self, inputs) -> torch.Tensor:
+    def get_adversarial_inputs(self, inputs: torch.Tensor) -> torch.Tensor:
         if self.model_under_attack is None:
             self.configure_attack(inputs)
 
         attack_inputs = inputs.cpu().numpy()
+        assert self.attack is not None
         with torch.inference_mode(mode=False):
             adversarial_inputs = self.attack.generate(x=attack_inputs)
         return torch.Tensor(adversarial_inputs).to(inputs.device)
 
     @classmethod
     def evaluate_inputs(
-        cls, model, inputs, labels: Sequence[str], metric: RunningMetrics
+        cls,
+        model: Module,
+        inputs: torch.Tensor,
+        labels: torch.Tensor,
+        metric: RunningMetrics,
     ) -> None:
         outputs = model(inputs)
         _, predictions = outputs.max(1)
         metric.accuracy.update(predictions, labels)
         metric.loss.update(outputs, labels)
 
-    def configure_attack(self, inputs) -> None:
+    def configure_attack(self, inputs: torch.Tensor) -> None:
         outputs = self.reconstruction(inputs)
         self.model_under_attack = PyTorchClassifier(
             model=self.reconstruction,
