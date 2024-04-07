@@ -1,5 +1,6 @@
 from functools import cached_property
 
+import torch
 from package_utils.context import Context as Context_
 from torch import nn
 
@@ -60,6 +61,11 @@ class Context(Context_[Options, Config, None]):
             case Activation.tanh:
                 activation_layer = nn.Tanh()
         return activation_layer
+
+    @cached_property
+    def device(self) -> torch.device:
+        name = "cuda" if torch.cuda.is_available() else "cpu"
+        return torch.device(name)
 
 
 context = Context(Options, Config, None)

@@ -1,23 +1,28 @@
 import json
+from collections.abc import Iterator
+
+import torch
 
 from . import layers_mae
 
 
 class Evaluator(layers_mae.Evaluator):
-    def calculate_distance(self):
+    def calculate_distance(self) -> dict[str, float]:  # type: ignore[override]
         return {
             name: self.calculate_weights_distance(original, reconstructed)
             for name, original, reconstructed in self.iterate_named_compared_layers()
         }
 
-    def iterate_named_compared_layers(self):
+    def iterate_named_compared_layers(
+        self,
+    ) -> Iterator[tuple[str, torch.Tensor, torch.Tensor]]:
         keys = self.original.state_dict().keys()
         original_values = self.original.state_dict().values()
         reconstruction_values = self.reconstruction.state_dict().values()
         yield from zip(keys, original_values, reconstruction_values)
 
     @classmethod
-    def format_evaluation(cls, value, precision: int = 3) -> str:
+    def format_evaluation(cls, value: dict[str, float], precision: int = 3) -> str:  # type: ignore[override]
         if value:
             values = {
                 name: super(layers_mae.Evaluator, cls).format_evaluation(layer_value)

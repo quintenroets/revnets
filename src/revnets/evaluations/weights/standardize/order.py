@@ -1,21 +1,31 @@
+from dataclasses import dataclass
+
 import torch
+from torch import nn
+
+from revnets.models import InternalNeurons
+
+from .utils import extract_layer_weights
 
 
-def standardize_layers(layer1, layer2) -> None:
-    sort_indices = get_output_sort_order(layer1)
-    permute_output_neurons(layer1, sort_indices)
-    permute_input_neurons(layer2, sort_indices)
+@dataclass
+class Standardizer:
+    neurons: InternalNeurons
+
+    def run(self) -> None:
+        sort_indices = calculate_sort_order(self.neurons.incoming)
+        permute_output_weights(self.neurons.incoming, sort_indices)
+        permute_input_weights(self.neurons.outgoing, sort_indices)
 
 
-def get_output_sort_order(layer):
-    weights = get_layer_weights(layer)
-    total_output_weights = weights.norm(dim=1, p=1)
-    # use l1-norm because l2-norm is already standardized
-    _, output_sort_order = torch.sort(total_output_weights)
-    return output_sort_order
+def calculate_sort_order(layer: nn.Module) -> torch.Tensor:
+    weights = extract_layer_weights(layer)
+    p = 1  # use l1-norm because l2-norm is already standardized
+    total_output_weights = weights.norm(dim=1, p=p)
+    return torch.sort(total_output_weights)[1]
 
 
-def permute_input_neurons(layer, sort_indices) -> None:
+def permute_input_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
     length = len(sort_indices)
     for param in layer.parameters():
         shape = param.data.shape
@@ -23,7 +33,7 @@ def permute_input_neurons(layer, sort_indices) -> None:
             param.data = param.data[:, sort_indices]
 
 
-def permute_output_neurons(layer, sort_indices) -> None:
+def permute_output_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
     length = len(sort_indices)
     for param in layer.parameters():
         shape = param.shape
@@ -32,13 +42,3 @@ def permute_output_neurons(layer, sort_indices) -> None:
             param.data = (
                 param.data[sort_indices] if dims == 1 else param.data[sort_indices, :]
             )
-
-
-def get_layer_weights(layer, device=None) -> torch.Tensor:
-    with torch.no_grad():
-        connection_weights, bias_weights = layer.parameters()
-        weights = (connection_weights, bias_weights.reshape(-1, 1))
-        weights = torch.hstack(weights)
-        if device is not None:
-            weights = weights.to(device)
-        return weights

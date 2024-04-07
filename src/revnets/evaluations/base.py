@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import torch
 
+from revnets.context import context
 from revnets.pipelines import Pipeline
 
 from ..data import Dataset
@@ -13,25 +14,21 @@ class Evaluator:
     pipeline: Pipeline | None
 
     def __post_init__(self) -> None:
-        self.reconstruction = self.reconstruction.to(self.device)
+        self.reconstruction = self.reconstruction.to(context.device)
 
     @property
     def original(self) -> torch.nn.Module:
         assert self.pipeline is not None
-        return self.pipeline.create_trained_network().to(self.device)
-
-    @property
-    def device(self):
-        return (
-            torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-        )
+        return self.pipeline.create_trained_network().to(context.device)
 
     def get_evaluation(self) -> str:
         evaluation = self.evaluate()
         return self.format_evaluation(evaluation)
 
     @classmethod
-    def format_evaluation(cls, value, precision: int = 3):
+    def format_evaluation(
+        cls, value: float | tuple[float, ...] | None, precision: int = 3
+    ):
         if value is None:
             result = "/"
         elif isinstance(value, float):
@@ -44,4 +41,4 @@ class Evaluator:
         raise NotImplementedError
 
     def get_dataset(self) -> Dataset:
-        return self.network.create_dataset()
+        return self.pipeline.create_dataset()
