@@ -15,4 +15,5 @@ def main() -> None:
 def launch(experiment: Experiment) -> None:
     experiment.prepare_config(context.options.config_path.yaml)
     print(experiment.config_path)
+    cli.run("ls")
     # cli.run("revnets", "--config-path", experiment.config_path)
