@@ -1,5 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
+from typing import cast
 
 import torch
 from pytorch_lightning import LightningModule
@@ -64,7 +65,7 @@ class Pipeline(base.Pipeline, ABC):
         model = self.create_initialized_network()
         outputs = model(inputs)[0]
         size = outputs.shape[-1]
-        return size
+        return cast(int, size)
 
     def load_weights(self, model: torch.nn.Module) -> None:
         state = torch.load(self.weights_path_str)

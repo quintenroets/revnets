@@ -1,12 +1,22 @@
 import pickle
 
+import numpy as np
 import requests
 import torch
+from numpy.typing import NDArray
+from package_utils.dataclasses import SerializationMixin
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import TensorDataset
 
 from ..models import Path
 from . import base
+
+
+class RawData(SerializationMixin):
+    x: NDArray[np.float32]
+    y: NDArray[np.float32]
+    x_test: NDArray[np.float32]
+    y_test: NDArray[np.float32]
 
 
 class Dataset(base.Dataset):
@@ -17,28 +27,24 @@ class Dataset(base.Dataset):
     def prepare_data(self) -> None:
         data = self.get_data()
 
-        x = data["x"]
-        y = data["y"]
-        x_test = data["x_test"]
-        y_test = data["y_test"]
-
         scaler = StandardScaler()
-        x = scaler.fit_transform(x)
-        x_test = scaler.transform(x_test)
+        data.x = scaler.fit_transform(data.x)
+        data.x_test = scaler.transform(data.x_test)
 
-        x = torch.Tensor(x)
-        x_test = torch.Tensor(x_test)
+        x = torch.Tensor(data.x)
+        x_test = torch.Tensor(data.x_test)
 
-        y = torch.LongTensor(y)
-        y_test = torch.LongTensor(y_test)
+        y = torch.LongTensor(data.y)
+        y_test = torch.LongTensor(data.y_test)
 
         self.train_val_dataset = TensorDataset(x, y)
         self.test_dataset = TensorDataset(x_test, y_test)
 
-    def get_data(self):
+    def get_data(self) -> RawData:
         self.check_download()
         with self.path.open("rb") as fp:
-            return pickle.load(fp)
+            data = pickle.load(fp)
+        return RawData.from_dict(data)
 
     def check_download(self) -> None:
         if not self.path.exists():

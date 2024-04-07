@@ -45,7 +45,7 @@ class Config(SerializationMixin):
 
     early_stopping_patience: int = 100
     sampling_data_size: int = 10000
-    n_rounds: int | None = None
+    n_rounds: int = 2
     n_networks: int = 2
     weight_variance_downscale_factor: float | None = None
     start_reconstruction_with_zero_biases: bool = False

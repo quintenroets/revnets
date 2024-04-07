@@ -1,7 +1,11 @@
 from dataclasses import dataclass
+from typing import Any
 
 import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader, TensorDataset
+import torch
+from numpy.typing import ArrayLike
+from torch import nn
+from torch.utils.data import DataLoader, Dataset, TensorDataset
 
 from revnets.data import output_supervision
 from revnets.utils.colors import get_colors
@@ -26,11 +30,11 @@ class Reconstructor(difficult_train_inputs.Reconstructor):
         train_inputs = self.data.get_all_inputs(output_supervision.Split.train)
         train_losses = self.get_sorted_losses(train_inputs)
         elbow = self.get_elbow(train_losses)
-        elbow_y = train_losses[elbow]
+        elbow_y = train_losses[elbow].item()
 
         difficult_existing_inputs = self.extract_difficult_inputs()
         self.visualize_samples(difficult_existing_inputs)
-        difficult_inputs = self.sample_difficult_inputs()
+        difficult_inputs = self.get_difficult_inputs()
         self.visualize_samples(difficult_inputs)
         random_inputs = self.data.generate_random_inputs(difficult_inputs.shape)
         random_scales = [0, 1, 1 / 10, 1 / 100]
@@ -79,22 +83,25 @@ class Reconstructor(difficult_train_inputs.Reconstructor):
         plt.show()
 
     @classmethod
-    def get_new_ticks(cls, ticks, extra_tick):
+    def get_new_ticks(cls, ticks: Any, extra_tick: int | float) -> ArrayLike:
         ticks = [t for t in list(ticks)[0] if t >= 0]
         return [*ticks, extra_tick]
 
-    def get_sorted_losses(self, inputs):
+    def get_sorted_losses(self, inputs: torch.Tensor) -> torch.Tensor:
         dataset = TensorDataset(inputs)
         outputs = self.get_predictions(dataset, self.reconstruction)
-        targets = self.get_predictions(dataset, self.original)
+        target_network = self.pipeline.create_trained_network()
+        targets = self.get_predictions(dataset, target_network)
         return self.calculate_sorted_losses(outputs, targets)[0]
 
-    def get_predictions(self, dataset, model):
+    def get_predictions(
+        self, dataset: Dataset[tuple[torch.Tensor, ...]], network: nn.Module
+    ) -> torch.Tensor:
         dataloader = DataLoader(dataset, batch_size=self.data.eval_batch_size)
-        return self.data.get_predictions(dataloader, model)
+        return self.data.get_predictions(dataloader, network)
 
     @classmethod
-    def visualize_samples(cls, samples) -> None:
+    def visualize_samples(cls, samples: torch.Tensor) -> None:
         colors = get_colors()
         fig, ax = plt.subplots(figsize=(10, 10))
         for features in samples:

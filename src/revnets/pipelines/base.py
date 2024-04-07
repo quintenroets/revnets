@@ -11,5 +11,5 @@ class Pipeline(NamedClass):
         raise NotImplementedError
 
     @classmethod
-    def get_base_name(cls):
+    def get_base_name(cls) -> str:
         return Pipeline.__module__

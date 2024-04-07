@@ -9,7 +9,7 @@ from . import correlated_features
 class Dataset(correlated_features.Dataset):
     covariance_scale: float = 0.1
 
-    def get_distribution_parameters(self):
+    def get_distribution_parameters(self) -> tuple[torch.Tensor, torch.Tensor]:
         train_inputs = self.get_train_inputs().numpy()
         train_inputs = train_inputs.reshape(len(train_inputs), -1)
         n_features = train_inputs.shape[1]

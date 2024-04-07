@@ -43,7 +43,7 @@ class TuneModel(LightningModule):
 
 
 def calculate_max_batch_size(
-    network: Network,
+    network: Network | LightningModule,
     data: Dataset,
     method: Literal["fit", "validate", "test", "predict"] = "validate",
 ) -> int:
@@ -55,7 +55,8 @@ def calculate_max_batch_size(
 
     print(f"Calculating max {method} batch size")
 
-    network.do_log = False
+    if isinstance(network, Network):
+        network.do_log = False
     old_batch_size = data.batch_size
     try:
         batch_size = context.config.reconstruction_training.batch_size
@@ -64,7 +65,8 @@ def calculate_max_batch_size(
         message = "Batch size of 2 does not fit in GPU, impossible to start training"
         raise Exception(message)
 
-    network.do_log = True
+    if isinstance(network, Network):
+        network.do_log = True
     data.batch_size = old_batch_size
 
     safety_factor = 2 if method == "validate" else 1

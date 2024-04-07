@@ -8,7 +8,7 @@ from ..context import context
 from ..utils import NamedClass
 
 
-@dataclass
+@dataclass(frozen=True)
 class NetworkFactory(NamedClass):
     activation_layer: torch.nn.Module = context.activation_layer
     output_size: int = 10
@@ -23,5 +23,5 @@ class NetworkFactory(NamedClass):
         raise NotImplementedError
 
     @classmethod
-    def get_base_name(cls):
+    def get_base_name(cls) -> str:
         return NetworkFactory.__module__

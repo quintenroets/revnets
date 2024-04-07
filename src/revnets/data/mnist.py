@@ -17,7 +17,7 @@ class Dataset(base.Dataset):
         for train in (False, True):
             datasets.MNIST(self.path, train=train, download=True)
 
-    def setup(self, stage: str = None) -> None:
+    def setup(self, stage: str | None = None) -> None:
         self.train_val_dataset = datasets.MNIST(
             self.path, train=True, download=True, transform=self.transform
         )

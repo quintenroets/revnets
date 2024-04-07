@@ -2,7 +2,7 @@ from collections.abc import Iterable
 
 from torch import nn
 
-from . import mininet
+from .. import mininet
 
 
 class NetworkFactory(mininet.NetworkFactory):

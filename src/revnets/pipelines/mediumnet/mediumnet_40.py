@@ -1,7 +1,10 @@
-from . import mediumnet
+from revnets import networks
+from revnets.networks import NetworkFactory
+
+from ..mininet import mininet
 
 
-class Network(mediumnet.Network):
-    @classmethod
-    def initialize_model(cls):
-        return cls.get_model_module().Model(hidden_size1=40, hidden_size2=20)
+class Pipeline(mininet.Pipeline):
+    network_factory: NetworkFactory = networks.mediumnet.NetworkFactory(
+        hidden_size1=40, hidden_size2=20
+    )

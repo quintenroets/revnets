@@ -1,2 +1,2 @@
-from . import mediumnet, mediumnet_images, mininet, mininet_images
+from . import images, mediumnet, mininet
 from .base import NetworkFactory

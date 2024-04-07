@@ -3,10 +3,10 @@ from dataclasses import dataclass
 
 from torch import nn
 
-from . import mediumnet
+from .. import mediumnet
 
 
-@dataclass
+@dataclass(frozen=True)
 class NetworkFactory(mediumnet.NetworkFactory):
     input_size: int = 784
     hidden_size1: int = 512
