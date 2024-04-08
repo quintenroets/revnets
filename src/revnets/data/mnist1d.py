@@ -1,4 +1,5 @@
 import pickle
+from dataclasses import dataclass
 
 import numpy as np
 import requests
@@ -12,6 +13,7 @@ from ..models import Path
 from . import base
 
 
+@dataclass
 class RawData(SerializationMixin):
     x: NDArray[np.float32]
     y: NDArray[np.float32]
