@@ -15,7 +15,8 @@ class Evaluator(mae.Evaluator):
         for original, reconstruction in zip(original_layers, reconstruction_layers):
             original_weights = extract_layer_weights(original, device)
             reconstruction_weights = extract_layer_weights(reconstruction, device)
-            yield original_weights, reconstruction_weights
+            if original_weights is not None and reconstruction_weights is not None:
+                yield original_weights, reconstruction_weights
 
     def calculate_distance(self) -> tuple[float, ...]:
         return tuple(

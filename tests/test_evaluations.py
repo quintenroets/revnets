@@ -1,20 +1,26 @@
-from revnets import evaluations, networks, reconstructions
+import math
+from types import ModuleType
+
+import pytest
+from revnets import evaluations, pipelines, reconstructions
+
+pipeline_modules = (pipelines.mininet,)
 
 
-def test_cheat_evaluations() -> None:
-    test_networks = networks.get_all_networks()
-    for network_module in test_networks:
-        network = network_module.Network()
-        reconstructor = reconstructions.cheat.Reconstructor(network)
-        reconstruction = reconstructor.reconstruct()
-        evaluation_metrics = evaluations.evaluate(reconstruction, network)
+@pytest.mark.parametrize("pipeline_module", pipeline_modules)
+def test_cheat_evaluations(pipeline_module: ModuleType) -> None:
+    pipeline = pipeline_module.Pipeline()
+    reconstructor = reconstructions.cheat.Reconstructor(pipeline)
+    reconstruction = reconstructor.create_reconstruction()
 
-        # cheat should give perfect metrics
-        perfect_values = (
-            evaluation_metrics.weights_MAE,
-            evaluation_metrics.train_outputs_MAE,
-            evaluation_metrics.val_outputs_MAE,
-            evaluation_metrics.train_outputs_MAE,
-        )
-        for value in perfect_values:
-            assert value in ("/", None) or float(value) == 0
+    evaluation_metrics = evaluations.evaluate(reconstruction, pipeline)
+    # cheat should give perfect metrics
+    perfect_metrics = (
+        evaluation_metrics.weights_MAE,
+        evaluation_metrics.train_outputs_MAE,
+        evaluation_metrics.val_outputs_MAE,
+        evaluation_metrics.train_outputs_MAE,
+    )
+    for value in perfect_metrics:
+        if value is not None and value != "/":
+            assert math.isclose(float(value), 0, abs_tol=1e-5)

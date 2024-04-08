@@ -25,8 +25,9 @@ class Evaluator(layers_mae.Evaluator):
         layers = generate_layers(network)
         for i, layer in enumerate(layers):
             weights = self.extract_layer_weights(layer)
-            title = f"{name} layer {i + 1} weights".capitalize()
-            self.visualize_weights(weights, title)
+            if weights is not None:
+                title = f"{name} layer {i + 1} weights".capitalize()
+                self.visualize_weights(weights, title)
 
     @classmethod
     def visualize_weights(
@@ -80,5 +81,5 @@ class Evaluator(layers_mae.Evaluator):
         return super().iterate_compared_layers(device=device)
 
     @classmethod
-    def extract_layer_weights(cls, layer: Module) -> torch.Tensor:
+    def extract_layer_weights(cls, layer: Module) -> torch.Tensor | None:
         return extract_layer_weights(layer, device=cpu)

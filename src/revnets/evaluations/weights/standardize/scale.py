@@ -6,7 +6,7 @@ from torch.nn import Module
 
 from revnets.models import InternalNeurons
 
-from .utils import extract_layer_weights
+from .utils import extract_linear_layer_weights
 
 
 @dataclass
@@ -28,7 +28,7 @@ class Standardizer:
         rescale_outgoing_weights(self.neurons.outgoing, scale_factors)
 
     def calculate_scale_factors(self, layer: Module) -> torch.Tensor:
-        weights = extract_layer_weights(layer)
+        weights = extract_linear_layer_weights(layer)
         scale_factors = (
             torch.sign(weights.sum(dim=1))
             if self.neurons.has_sign_isomorphism

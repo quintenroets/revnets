@@ -1,8 +1,18 @@
 import torch
-from torch.nn import Module
+from torch.nn import Linear, Module
 
 
 def extract_layer_weights(
+    layer: Module, device: torch.device | None = None
+) -> torch.Tensor | None:
+    if isinstance(layer, Linear):
+        weights = extract_linear_layer_weights(layer, device)
+    else:
+        weights = None
+    return weights
+
+
+def extract_linear_layer_weights(
     layer: Module, device: torch.device | None = None
 ) -> torch.Tensor:
     with torch.no_grad():

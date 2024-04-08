@@ -11,7 +11,6 @@ from .network import Standardizer, generate_internal_neurons
 def align(model: Module, target: Module) -> None:
     Standardizer(model).standardize_scale()
     Standardizer(target).standardize_scale()
-
     # align internal neurons of model to internal neurons of target
     # to achieve a minimal weight difference
     neurons = generate_internal_neurons(model)
@@ -27,8 +26,8 @@ def align_internal_neurons(neurons: InternalNeurons, target: InternalNeurons) ->
 
 
 def calculate_optimal_order(layer: Module, target: Module) -> torch.Tensor:
-    weights = order.extract_layer_weights(layer)
-    target_weights = order.extract_layer_weights(target)
-    distances = torch.cdist(weights, target_weights, p=1).numpy()
+    weights = order.extract_linear_layer_weights(layer)
+    target_weights = order.extract_linear_layer_weights(target)
+    distances = torch.cdist(target_weights, weights, p=1).numpy()
     indices = linear_sum_assignment(distances)[1]
     return torch.from_numpy(indices)
