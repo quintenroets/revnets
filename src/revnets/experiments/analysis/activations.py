@@ -83,6 +83,7 @@ class Experiment(weights.Experiment):
     def create_inputs(self) -> torch.Tensor:
         dataset = self.pipeline.create_dataset()
         dataset.prepare()
+        assert dataset.train_val_dataset is not None
         item = dataset.train_val_dataset[0]
         inputs, targets = item
         n_features = inputs.shape[0]

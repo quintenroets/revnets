@@ -1,17 +1,17 @@
+from dataclasses import dataclass
+
 from torchvision import datasets, transforms
 
 from ..models import Path
 from . import base
 
 
+@dataclass
 class Dataset(base.Dataset):
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.path = Path.data / "mnist"
-        self.transform = transforms.Compose(
-            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
-        )
+    path: str = str(Path.data / "mnist")
+    transform: transforms.Compose = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+    )
 
     def prepare_data(self) -> None:
         for train in (False, True):

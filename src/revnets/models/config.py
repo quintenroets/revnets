@@ -66,7 +66,7 @@ class Config(SerializationMixin):
 
     @property
     def number_of_validation_sanity_steps(self) -> int | None:
-        return 0 if self.debug else None
+        return 0 if self.debug else 0
 
     @property
     def limit_batches(self) -> int | None:

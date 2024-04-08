@@ -21,13 +21,12 @@ class RawData(SerializationMixin):
     y_test: NDArray[np.float32]
 
 
+@dataclass
 class Dataset(base.Dataset):
-    def __init__(self) -> None:
-        super().__init__()
-        self.path = Path.data / "mnist_1D.pkl"
+    path: Path = Path.data / "mnist_1D.pkl"
 
     def prepare_data(self) -> None:
-        data = self.get_data()
+        data = self.load_data()
 
         scaler = StandardScaler()
         data.x = scaler.fit_transform(data.x)
@@ -42,11 +41,11 @@ class Dataset(base.Dataset):
         self.train_val_dataset = TensorDataset(x, y)
         self.test_dataset = TensorDataset(x_test, y_test)
 
-    def get_data(self) -> RawData:
+    def load_data(self) -> RawData:
         self.check_download()
         with self.path.open("rb") as fp:
             data = pickle.load(fp)
-        return RawData.from_dict(data)
+        return RawData(data["x"], data["y"], data["x_test"], data["y_test"])
 
     def check_download(self) -> None:
         if not self.path.exists():

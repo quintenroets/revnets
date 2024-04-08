@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import cast
 
 import torch
 from pytorch_lightning import LightningDataModule, LightningModule
@@ -22,13 +23,16 @@ class Dataset(LightningDataModule):
     """
 
     eval_batch_size: int = field(init=False)
-    train_val_dataset: data.Dataset[tuple[torch.Tensor, ...]] = field(init=False)
-    train_dataset: data.Dataset[tuple[torch.Tensor, ...]] = field(init=False)
-    val_dataset: data.Dataset[tuple[torch.Tensor, ...]] = field(init=False)
-    test_dataset: data.Dataset[tuple[torch.Tensor, ...]] = field(init=False)
+    train_val_dataset: data.Dataset[tuple[torch.Tensor, ...]] | None = None
+    train_dataset: data.Dataset[tuple[torch.Tensor, ...]] | None = None
+    val_dataset: data.Dataset[tuple[torch.Tensor, ...]] | None = None
+    test_dataset: data.Dataset[tuple[torch.Tensor, ...]] | None = None
     repetition_factor: float | None = None
     batch_size: int = context.config.target_network_training.batch_size
     validation_ratio = context.config.validation_ratio
+
+    def __post_init__(self) -> None:
+        super().__init__()
 
     def prepare(self) -> None:
         self.prepare_data()
@@ -136,7 +140,7 @@ class Dataset(LightningDataModule):
                 dataset = self.test_dataset
             case Split.train_val:
                 dataset = self.train_val_dataset
-        return dataset
+        return cast(data.Dataset[tuple[torch.Tensor, ...]], dataset)
 
     def calibrate(self, network: Network | LightningModule) -> None:
         self.eval_batch_size = training.calculate_max_batch_size(network, self)

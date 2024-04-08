@@ -60,6 +60,7 @@ class Pipeline(base.Pipeline, ABC):
     def calculate_output_size(self) -> int:
         dataset = self.create_dataset()
         dataset.prepare()
+        assert dataset.train_val_dataset is not None
         sample = dataset.train_val_dataset[0][0]
         inputs = sample.unsqueeze(0)
         model = self.create_initialized_network()
