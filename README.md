@@ -1,6 +1,6 @@
 # Revnets
 ![Python version](https://img.shields.io/badge/python-3.10+-brightgreen)
-![Operating system](https://img.shields.io/badge/os-linux%20%7c%20macOS%20%7c%20windows-brightgreen)
+![Operating system](https://img.shields.io/badge/os-linux%20%7c%20macOS-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-64%25-brightgreen)
 
 Reverse engineer internal parameters of black box neural networks
