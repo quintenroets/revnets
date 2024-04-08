@@ -1,4 +1,5 @@
 from types import ModuleType
+from typing import cast
 
 from .. import experiments
 from ..context import context
@@ -11,9 +12,10 @@ def main() -> None:
 
 
 def extract_experiment_module(name: str) -> ModuleType:
-    experiment_module = experiments
+    module: ModuleType = experiments
     analysis_keyword = "_analysis"
     if analysis_keyword in name:
         name = name.replace(analysis_keyword, "")
-        experiment_module = experiments.analysis
-    return getattr(experiment_module, name)
+        module = experiments.analysis
+    experiment_module = getattr(module, name)
+    return cast(ModuleType, experiment_module)

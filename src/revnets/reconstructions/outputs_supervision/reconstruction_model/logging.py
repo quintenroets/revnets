@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from revnets.evaluations import weights
 
@@ -35,7 +35,8 @@ class ReconstructNetwork(network.ReconstructNetwork):
 
     def get_weights_MAE(self) -> float:
         evaluator = Evaluator(self.model, self.network)
-        return evaluator.evaluate()
+        result = evaluator.evaluate()
+        return cast(float, result)
 
     def visualize(self, before_training: bool = False) -> None:
         if self.do_visualize:

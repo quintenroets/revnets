@@ -25,9 +25,9 @@ class Context(Context_[Options, Config, None]):
         return self.training.batch_size
 
     @cached_property
-    def is_running_in_notebook(self):
+    def is_running_in_notebook(self) -> bool:
         try:
-            get_ipython()
+            get_ipython()  # type: ignore[name-defined]
             is_in_notebook = True
         except NameError:
             is_in_notebook = False
@@ -53,6 +53,7 @@ class Context(Context_[Options, Config, None]):
     @property
     def activation_layer(self) -> nn.Module:
         activation = context.config.target_network_training.activation
+        activation_layer: nn.Module
         match activation:
             case Activation.leaky_relu:
                 activation_layer = nn.LeakyReLU()

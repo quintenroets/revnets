@@ -15,7 +15,7 @@ class Activation(Enum):
 @dataclass(frozen=True)
 class HyperParameters:
     learning_rate: float
-    epochs: int | None = None
+    epochs: int = 1
     bias_learning_rate: float | None = None
     batch_size: int = 1
     activation: Enum = Activation.leaky_relu
@@ -36,7 +36,7 @@ class Config(SerializationMixin):
         epochs=100, learning_rate=1.0e-2, batch_size=32
     )
     reconstruction_training: HyperParameters = HyperParameters(
-        learning_rate=0.1, batch_size=256
+        epochs=10, learning_rate=0.1, batch_size=256
     )
     reconstruction_training_debug: HyperParameters = HyperParameters(
         epochs=3, learning_rate=0.1, batch_size=16

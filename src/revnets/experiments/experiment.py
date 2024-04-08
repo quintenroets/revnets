@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from types import ModuleType
+from typing import cast
 
 import cli
 import numpy as np
@@ -29,7 +30,7 @@ class Experiment(NamedClass):
         context.results_path.yaml = evaluation.dict()
 
     @classmethod
-    def get_base_name(cls):
+    def get_base_name(cls) -> str:
         return Experiment.__module__
 
     @classmethod
@@ -41,12 +42,15 @@ class Experiment(NamedClass):
     @property
     def pipeline(self) -> Pipeline:
         names = context.config.experiment.pipeline
-        return self.extract_module(pipelines, names).Pipeline()
+        pipeline = self.extract_module(pipelines, names).Pipeline()
+        return cast(Pipeline, pipeline)
 
     @property
     def reconstructor(self) -> Reconstructor:
         names = context.config.experiment.reconstruction_technique
-        return self.extract_module(reconstructions, names).Reconstructor(self.pipeline)
+        module = self.extract_module(reconstructions, names)
+        reconstructor = module.Reconstructor(self.pipeline)
+        return cast(Reconstructor, reconstructor)
 
     @classmethod
     def set_seed(cls) -> None:

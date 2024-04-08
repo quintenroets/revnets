@@ -1,4 +1,4 @@
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator
 from typing import Any
 
 import pytorch_lightning as pl
@@ -15,7 +15,7 @@ class Trainer(pl.Trainer):
     def __init__(
         self,
         accelerator: str = "auto",
-        callbacks: Sequence[Callback] | None = None,
+        callbacks: list[Callback] | None = None,
         max_epochs: int | None = None,
         precision: int | None = None,
         barebones: bool = False,

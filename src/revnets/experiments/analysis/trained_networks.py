@@ -1,26 +1,23 @@
 from dataclasses import dataclass
 
-from revnets.utils.trainer import Trainer
+from revnets.training import Network, Trainer
 
-from ...networks.models import trainable
-from ...networks.train import Network
 from .. import experiment
 
 
 @dataclass
 class Experiment(experiment.Experiment):
-    network: Network = None
-
-    def run_network(self) -> None:
-        dataset = self.network.dataset()
-        model = trainable.Model(self.network.trained_network)
+    def run(self) -> None:
+        dataset = self.pipeline.create_dataset()
+        trained_network = self.pipeline.create_trained_network()
+        network = Network(trained_network, learning_rate=0)
         dataset.prepare()
-        dataset.calibrate(model)
-        trainer = Trainer()
+        dataset.calibrate(network)
         dataloaders = (
             dataset.train_dataloader(),
             dataset.val_dataloader(),
             dataset.test_dataloader(),
         )
+        trainer = Trainer()
         for dataloader in dataloaders:
-            trainer.test(model, dataloader)
+            trainer.test(network, dataloader)

@@ -1,16 +1,12 @@
 from dataclasses import dataclass
 
-from ... import networks, reconstructions
+from ... import reconstructions
 from .. import experiment
 
 
 @dataclass
 class Experiment(experiment.Experiment):
-    @classmethod
-    def get_networks(cls):
-        return (networks.mininet.mininet,)
-
-    def run_network(self) -> None:
+    def run(self) -> None:
         technique = reconstructions.outputs_supervision.iterative_sampling.analysis
-        reconstructor = technique.Reconstructor(self.network)
-        reconstructor.reconstruct()
+        reconstructor = technique.Reconstructor(self.pipeline)
+        reconstructor.create_reconstruction()

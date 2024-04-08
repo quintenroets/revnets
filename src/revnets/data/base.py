@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import cast
 
 import torch
 from pytorch_lightning import LightningDataModule, LightningModule
@@ -137,7 +136,7 @@ class Dataset(LightningDataModule):
                 dataset = self.test_dataset
             case Split.train_val:
                 dataset = self.train_val_dataset
-        return cast(data.Dataset[tuple[torch.Tensor, ...]], dataset)
+        return dataset
 
     def calibrate(self, network: Network | LightningModule) -> None:
         self.eval_batch_size = training.calculate_max_batch_size(network, self)

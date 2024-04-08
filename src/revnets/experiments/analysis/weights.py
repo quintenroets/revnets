@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from torch.nn import Module
+
 from ...evaluations import outputs, weights
 from .. import experiment
 
@@ -10,10 +12,10 @@ class Experiment(experiment.Experiment):
         reconstruction = self.reconstructor.create_reconstruction()
         self.run_reconstruction(reconstruction)
 
-    def run_reconstruction(self, reconstruction) -> None:
+    def run_reconstruction(self, reconstruction: Module) -> None:
         evaluators = (weights.mae, outputs.val, weights.visualizer)
         for evaluator_module in evaluators:
-            evaluator = evaluator_module.Evaluator(reconstruction, self.network)
+            evaluator = evaluator_module.Evaluator(reconstruction, self.pipeline)
             evaluation = evaluator.evaluate()
             if evaluation is not None:
                 print("---------")

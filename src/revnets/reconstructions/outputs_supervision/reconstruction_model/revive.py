@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn import init
 
-from revnets.evaluations.weights.standardize.standardize import generate_layers
+from revnets.evaluations.weights.standardize import generate_layers
 
 from . import learning_rate_scheduler
 

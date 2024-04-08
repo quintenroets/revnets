@@ -14,8 +14,10 @@ class Experiment(experiment.Experiment):
 
     def run(self) -> None:
         original_data = data.mnist1d.Dataset()
-        train_inputs = data.random.Dataset(original_data, None).get_train_inputs()
-        Dataset = data.correlated_features.Dataset(original_data, None)
+        train_inputs = data.random.Dataset(
+            original_dataset=original_data
+        ).get_train_inputs()
+        Dataset = data.correlated_features.Dataset(original_dataset=original_data)
         sampled_inputs = Dataset.generate_random_inputs(train_inputs.shape)
         n_samples = len(train_inputs)
         visualize_indices = np.random.choice(

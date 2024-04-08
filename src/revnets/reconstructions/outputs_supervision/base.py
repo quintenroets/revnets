@@ -64,7 +64,7 @@ class Reconstructor(empty.Reconstructor, Generic[T]):
         callback = EarlyStopping("train l1 loss", patience=patience, verbose=True)
         callbacks = [callback]
         trainer = Trainer(
-            callbacks=callbacks,
+            callbacks=callbacks,  # type: ignore[arg-type]
             max_epochs=context.config.target_network_training.epochs,
         )
         validation_ratio = context.config.validation_ratio

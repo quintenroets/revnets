@@ -1,4 +1,6 @@
 import cli
+from typing import Any
+from typing import cast
 
 from ..context import context
 from ..models import Experiment
@@ -15,7 +17,8 @@ def main() -> None:
 
 
 def launch(experiment: Experiment) -> None:
-    experiment.prepare_config(context.options.config_path.yaml)
+    config_dict = cast(dict[str, Any], context.options.config_path.yaml)
+    experiment.prepare_config(config_dict)
     print(experiment.config_path)
     cli.run("ls")
     # cli.run("revnets", "--config-path", experiment.config_path)

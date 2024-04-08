@@ -1,45 +1,46 @@
 from dataclasses import dataclass
+from typing import Any, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn.functional as F
+from torch.nn import Module
 from torch.utils.data import TensorDataset
 
-from revnets import data
-from revnets.networks.models.mediumnet import Model
+from revnets.data import random
 
 from . import weights
 
 
 @dataclass
 class Experiment(weights.Experiment):
+    n_inputs: int = 10000
+
     def run_reconstruction(self, reconstruction: torch.nn.Module) -> None:
         super().run_reconstruction(reconstruction)
         self.visualize_inputs()
         models = {
             "reconstruction": reconstruction,
-            "initialization": self.network.get_architecture(),
-            "target": self.network.trained_network,
+            "initialization": self.pipeline.create_initialized_network(),
+            "target": self.pipeline.create_trained_network(),
         }
 
         for name, model in models.items():
             self.visualize_activations(model, name=name)
 
     def visualize_inputs(self) -> None:
-        random_inputs = self.get_inputs()
-        dataset = self.network.dataset()
+        random_inputs = self.create_inputs()
+        dataset = self.pipeline.create_dataset()
         dataset.prepare()
-        train_inputs = dataset.train_val_dataset.tensors[0]
+        train_val_dataset = cast(TensorDataset, dataset.train_val_dataset)
+        train_inputs = train_val_dataset.tensors[0]
         for inputs in (random_inputs, train_inputs):
             self.visualize(inputs)
 
-    def visualize_activations(self, model: Model, **kwargs) -> None:
-        layers = {
-            # "first hidden": model.layer1,
-            # "second hidden": [model.layer1, model.layer2],
-            "output": model
-        }
+    def visualize_activations(self, network: Module, **kwargs: Any) -> None:
+        first_hidden = next(network.children())
+        layers = {"first hidden": first_hidden}
         for layer_name, model in layers.items():
             if isinstance(model, tuple) or isinstance(model, list):
                 model = torch.nn.Sequential(torch.nn.ModuleList(model))
@@ -48,48 +49,42 @@ class Experiment(weights.Experiment):
             )
 
     def visualize_model_outputs(
-        self, model, activation: bool = False, **kwargs
+        self, model: Module, activation: bool = False, **kwargs: Any
     ) -> None:
-        inputs = self.get_inputs()
-        outputs = self.get_outputs(inputs, model)
+        inputs = self.create_inputs()
+        outputs = self.extract_outputs(inputs, model)
         if activation:
             outputs = F.relu(outputs)
         self.visualize(outputs, **kwargs)
 
     @classmethod
-    def get_outputs(cls, inputs, model):
+    def extract_outputs(cls, inputs: torch.Tensor, model: Module) -> torch.Tensor:
         dataset = TensorDataset(inputs)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=len(inputs))
-        return data.random.Dataset.get_predictions(dataloader, model)
+        return random.Dataset.get_predictions(dataloader, model)
 
     @classmethod
     def visualize(
         cls,
-        outputs,
+        outputs: torch.Tensor,
         name: str | None = None,
         layer_name: str | None = None,
-        show_zero: bool = False,
     ) -> None:
         for out in outputs:
             plt.plot(out, linewidth=0.2, alpha=0.6)
-        if show_zero:
-            zero = np.zeros_like(outputs[0])
-            plt.plot(zero, linewidth=0.5, color="red")
-            max_feature_values = outputs.max(dim=0)[0]
-            plt.plot(max_feature_values, linewidth=0.5, color="blue", marker="o")
-        title = f"{name} network {layer_name} layer activations".capitalize()
+        zero = np.zeros_like(outputs[0])
+        plt.plot(zero, linewidth=0.5, color="red")
+        max_feature_values = outputs.max(dim=0)[0]
+        plt.plot(max_feature_values, linewidth=0.5, color="blue", marker="o")
+        title = f"{name} {layer_name} layer activations".capitalize()
         plt.title(title)
         plt.show()
 
-    def get_inputs(self):
-        dataset = self.network.dataset()
+    def create_inputs(self) -> torch.Tensor:
+        dataset = self.pipeline.create_dataset()
         dataset.prepare()
         item = dataset.train_val_dataset[0]
         inputs, targets = item
-        n_features = inputs.view(-1).shape[0]
-        n_inputs = 10000
-        shape = (n_inputs, n_features)
-        dataset_module = data.random
-        # dataset_module = data.arbitrary_correlated_features
-        dataset = dataset_module.Dataset(dataset, None)
-        return dataset.generate_random_inputs(shape)
+        n_features = inputs.shape[0]
+        shape = (self.n_inputs, n_features)
+        return random.Dataset(original_dataset=dataset).generate_random_inputs(shape)

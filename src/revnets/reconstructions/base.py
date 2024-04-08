@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import torch
 from torch.nn import Sequential
 
-from revnets.evaluations.weights.standardize.standardize import generate_layers
+from revnets.evaluations.weights.standardize import generate_layers
 from revnets.pipelines import Pipeline
 
 from ..context import context

@@ -24,14 +24,14 @@ class TuneModel(LightningModule):
         self.old_batch_size = self.data.batch_size
         self.automatic_optimization = False
 
-    def val_dataloader(self) -> DataLoader[torch.Tensor]:
+    def val_dataloader(self) -> DataLoader[tuple[torch.Tensor, ...]]:
         self.data.eval_batch_size = self.batch_size
         return self.data.val_dataloader()
 
     def validation_step(self, batch: torch.Tensor, batch_idx: int) -> None:
         return self.model.validation_step(batch, batch_idx)
 
-    def train_dataloader(self) -> DataLoader[torch.Tensor]:
+    def train_dataloader(self) -> DataLoader[tuple[torch.Tensor, ...]]:
         self.data.batch_size = self.batch_size
         return self.data.train_dataloader()
 
