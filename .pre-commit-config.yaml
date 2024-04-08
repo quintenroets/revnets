@@ -1,37 +1,62 @@
 repos:
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.7.5
+    hooks:
+      - id: docformatter
+        args: [--in-place, --make-summary-multi-line, --close-quotes-on-newline, --wrap-summaries, "88"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.4
+    rev: v0.3.5
     hooks:
       - id: ruff
+      - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
       - id: end-of-file-fixer
-  - repo: https://github.com/myint/docformatter
-    rev: v1.7.5
-    hooks:
-      - id: docformatter
-        args: [--in-place, --pre-summary-newline, --close-quotes-on-newline]
-  - repo: https://github.com/hadialqattan/pycln
-    rev: v2.4.0
-    hooks:
-      - id: pycln
-        args: [-q, --all, --exclude, __init__.py]
-        stages: [commit]
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: [--profile, black]
   - repo: https://github.com/psf/black
     rev: 24.3.0
     hooks:
       - id: black
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+  - repo: https://github.com/quintenroets/package-dev-tools
+    rev: v0.5.17
+    hooks:
+      - id: infer-missing-annotations
   - repo: local
     hooks:
-      - id: pytest-check
-        name: pytest-check
-        entry: pytest
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        files: '\.py'
+        fail_fast: true
+        require_serial: true
+  - repo: local
+    hooks:
+      - id: run-tests
+        name: run-tests
+        entry: coverage run
         language: system
         pass_filenames: false
         always_run: true
+        fail_fast: true
+  - repo: https://github.com/quintenroets/package-dev-tools
+    rev: v0.5.17
+    hooks:
+      - id: check-coverage
+  - repo: https://github.com/quintenroets/package-dev-tools
+    rev: v0.5.17
+    hooks:
+      - id: check-shields
+  - repo: https://github.com/quintenroets/package-dev-tools
+    rev: v0.5.17
+    hooks:
+      - id: check-version
+
+ci:
+    autofix_commit_msg: auto fixes from pre-commit hooks
+    autoupdate_commit_msg: 'pre-commit auto updates'
+    skip: [mypy, run-tests, check-coverage]

@@ -1,29 +1,19 @@
 # Revnets
+![Python version](https://img.shields.io/badge/python-3.10+-brightgreen)
+![Operating system](https://img.shields.io/badge/os-linux%20%7c%20macOS-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-64%25-brightgreen)
 
-Project to recover the weight of a blackbox neural network
-
-## Installation
-
-Make sure you are using python3.10+
-
-```shell
-pip install git+https://github.com/quintenroets/revnets
-```
-
-### Installation for development
-Clone the project and run 
-```shell
-pip install -e .
-```
-
+Reverse engineer internal parameters of black box neural networks
 
 ## Usage
+
+Run
 ```shell
 revnets
 ```
 
-The entry point of this command is the main function in revnets.main.main. 
-This command will start an experiment to recover the weights of a trained neural networks. 
+The entry point of this command is the main function in revnets.main.main.
+This command will start an experiment to recover the weights of a trained neural networks.
 Each experiment consists of three configurable components:
 1) networks: the trained networks that will be recovered
     - All possible networks are defined in [revnets.networks](revnets/networks)
@@ -35,9 +25,19 @@ Each experiment consists of three configurable components:
     - All possible evaluations are defined in [revnets.evaluations](revnets/evaluations)
     - The evaluations used in the experiment are configured in the [init file](revnets/evaluations/__init__.py)
 
-### Usage
 Hyperparameters and other options are specified in a config file located at [config.yaml](~/Documents/Scripts/assets/revnets/config/config.yaml)
 
 An example config file is provided at [config.yaml](examples/config.yaml)
 
 For all possible options, see [config.py](revnets/utils/config.py)
+
+## Installation
+```shell
+pip install git+https://github.com/quintenroets/revnets.git
+```
+
+### Installation for development
+Clone the project and run
+```shell
+pip install -e .
+```
