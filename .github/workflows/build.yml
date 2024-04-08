@@ -8,8 +8,36 @@ jobs:
     name: Check pre-commit hooks
     runs-on: ubuntu-latest
     steps:
-      - name: Check pre-commit hooks
-        uses: quintenroets/actions/validate/pre-commit@main
+      - name: Setup environment
+        uses: quintenroets/actions/setup/environment@main
+        with:
+          environment: dev
+          editable: true
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v4
+        env:
+          KEY:
+            pre-commit
+            ${{ runner.os }}
+            ${{ steps.determine-python-version.outputs.python_version }}
+        with:
+          save-always: true
+          path: |
+            ~/.cache/pre-commit
+            .mypy_cache
+          key: ${{ env.KEY }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: ${{ env.KEY }}
+
+      - name: Run hooks
+        shell: bash
+        run: |
+          hooks=("docformatter" "ruff" "ruff-format" "end-of-file-fixer" "black" "trailing-whitespace" "infer-missing-annotations" "mypy")
+          for hook in "${hooks[@]}"; do
+            pre-commit run --show-diff-on-failure --color=always --all-files $hook
+          done
+
 
   verify-packaging:
     name: Verify packaging
