@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 from typing import Literal
 
@@ -11,7 +13,7 @@ from ..context import context
 from .trainer import Trainer
 
 if typing.TYPE_CHECKING:
-    from ..data import Dataset  # noqa: autoimport
+    from ..data import Dataset
 from .network import Network
 
 
