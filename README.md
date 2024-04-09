@@ -15,7 +15,7 @@ revnets
 The entry point of this command is the main function in revnets.main.main.
 This command will start an experiment to recover the weights of a trained neural networks.
 Each experiment consists of three configurable components:
-1) pipelines: architecture + dataset that produces trained networks that will be recovered
+1) pipelines: architecture + dataset that produces target networks that will be recovered
     - All possible networks are defined in [revnets.pipelines](revnets/pipelines)
     - The networks used in the experiment are configured with the option network in the config file
 2) reconstructions: the techniques used to recover neural network weights
