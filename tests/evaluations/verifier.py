@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
@@ -5,11 +6,11 @@ from types import ModuleType
 from typing import cast
 
 import torch
+from revnets.context import context
 from revnets.evaluations.weights import standardize
 from revnets.evaluations.weights.standardize import Standardizer
-from revnets.models import InternalNeurons
-from torch import nn
-from torch.nn import Sequential
+from revnets.models import Activation, InternalNeurons
+from torch.nn import Module, Sequential
 
 
 class StandardizationType(Enum):
@@ -21,7 +22,7 @@ class StandardizationType(Enum):
 @dataclass
 class Verifier:
     network_module: ModuleType
-    activation_layer: nn.Module
+    activation: Activation
     standardization_type: StandardizationType
 
     def __post_init__(self) -> None:
@@ -43,9 +44,9 @@ class Verifier:
             case StandardizationType.scale:
                 Standardizer(self.network).standardize_scale()
             case StandardizationType.standardize:
-                return Standardizer(self.network).run()
+                Standardizer(self.network).run()
             case StandardizationType.align:
-                return standardize.align(self.network, self.target)
+                standardize.align(self.network, self.target)
 
     def test_functional_preservation(self) -> None:
         inputs = self.create_network_inputs()
@@ -54,9 +55,7 @@ class Verifier:
         self.apply_transformation()
         with torch.no_grad():
             outputs_after_transformation = self.network(inputs)
-        outputs_are_closes = torch.isclose(
-            outputs, outputs_after_transformation, rtol=1e-3
-        )
+        outputs_are_closes = torch.isclose(outputs, outputs_after_transformation)
         assert torch.all(outputs_are_closes)
 
     def verify_standardized_form(self) -> None:
@@ -78,18 +77,23 @@ class Verifier:
 
     def create_network(self) -> Sequential:
         Factory = self.network_module.NetworkFactory
-        factory = Factory(activation_layer=self.activation_layer)
+        factory = Factory(activation=self.activation)
         network = factory.create_network()
         return cast(Sequential, network)
 
     def create_network_inputs(self) -> torch.Tensor:
         size = 1, self.extract_input_size()
-        return torch.rand(size) * 20 - 10
+        return torch.rand(size, dtype=context.dtype) * 20 - 10
 
     def extract_input_size(self) -> int:
-        layers = self.network.children()
-        size = next(layers).weight.shape[1]
+        input_layer = next(self.extract_layers())
+        size = input_layer.weight.shape[1]
         return cast(int, size)
+
+    def extract_layers(self) -> Iterator[Module]:
+        for layer in self.network.children():
+            if hasattr(layer, "weight"):
+                yield layer
 
     def test_second_standardize_no_effect(self) -> None:
         self.apply_transformation()

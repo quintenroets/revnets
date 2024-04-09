@@ -16,8 +16,8 @@ class NetworkFactory(base.NetworkFactory):
     def create_layers(self) -> Iterable[nn.Module]:
         return (
             nn.Linear(self.input_size, self.hidden_size1),
-            self.activation_layer,
+            self.create_activation_layer(),
             nn.Linear(self.hidden_size1, self.hidden_size2),
-            self.activation_layer,
+            self.create_activation_layer(),
             nn.Linear(self.hidden_size2, self.output_size),
         )

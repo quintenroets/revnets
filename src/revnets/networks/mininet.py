@@ -15,6 +15,6 @@ class NetworkFactory(base.NetworkFactory):
     def create_layers(self) -> Iterable[torch.nn.Module]:
         return (
             nn.Linear(self.input_size, self.hidden_size),
-            self.activation_layer,
+            self.create_activation_layer(),
             nn.Linear(self.hidden_size, self.output_size),
         )
