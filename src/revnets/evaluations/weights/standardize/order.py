@@ -21,8 +21,8 @@ class Standardizer:
 def calculate_sort_order(layer: nn.Module) -> torch.Tensor:
     weights = extract_linear_layer_weights(layer)
     p = 1  # use l1-norm because l2-norm is already standardized
-    total_output_weights = weights.norm(dim=1, p=p)
-    return torch.sort(total_output_weights)[1]
+    sort_values = weights.norm(dim=1, p=p)
+    return torch.sort(sort_values)[1]
 
 
 def permute_input_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:

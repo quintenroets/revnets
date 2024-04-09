@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import TypeVar, cast
 
-from torch.nn import Module
+from torch.nn import Flatten, Module
 
 from revnets.models import InternalNeurons
 
@@ -57,7 +57,7 @@ def generate_internal_neurons(model: Module) -> Iterator[InternalNeurons]:
 
 
 def generate_triplets(items: list[T]) -> Iterator[tuple[T, T, T]]:
-    yield from zip(items, items[1:], items[2:])
+    yield from zip(items[::2], items[1::2], items[2::2])
 
 
 def generate_layers(model: Module) -> Iterator[Module]:
@@ -69,4 +69,5 @@ def generate_layers(model: Module) -> Iterator[Module]:
         for child in children:
             yield from generate_layers(child)
     else:
-        yield model
+        if not isinstance(model, Flatten):
+            yield model

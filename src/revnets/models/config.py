@@ -18,7 +18,7 @@ class HyperParameters:
     epochs: int = 1
     bias_learning_rate: float | None = None
     batch_size: int = 1
-    activation: Enum = Activation.leaky_relu
+    activation: Activation = Activation.leaky_relu
 
 
 @dataclass

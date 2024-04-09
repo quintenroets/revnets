@@ -2,9 +2,8 @@ from functools import cached_property
 
 import torch
 from package_utils.context import Context as Context_
-from torch import nn
 
-from ..models import Activation, Config, HyperParameters, Options, Path
+from ..models import Config, HyperParameters, Options, Path
 
 
 class Context(Context_[Options, Config, None]):
@@ -50,23 +49,21 @@ class Context(Context_[Options, Config, None]):
     def log_path_str(self) -> str:
         return str(self.log_path)
 
-    @property
-    def activation_layer(self) -> nn.Module:
-        activation = context.config.target_network_training.activation
-        activation_layer: nn.Module
-        match activation:
-            case Activation.leaky_relu:
-                activation_layer = nn.LeakyReLU()
-            case Activation.relu:
-                activation_layer = nn.ReLU()
-            case Activation.tanh:
-                activation_layer = nn.Tanh()
-        return activation_layer
-
     @cached_property
     def device(self) -> torch.device:
         name = "cuda" if torch.cuda.is_available() else "cpu"
         return torch.device(name)
+
+    @property
+    def dtype(self) -> torch.dtype:
+        match self.config.precision:
+            case 32:
+                dtype = torch.float32
+            case 64:
+                dtype = torch.float64
+            case _:
+                raise ValueError(f"Unsupported precision {self.config.precision}")
+        return dtype
 
 
 context = Context(Options, Config, None)
