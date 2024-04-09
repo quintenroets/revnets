@@ -5,5 +5,5 @@ from .path import Path
 
 @dataclass
 class Options:
-    config_path: Path = Path.config
+    config_path: Path = Path.config / "config.yaml"
     experiment: str | None = None

@@ -16,7 +16,7 @@ class ReconstructNetwork(network.ReconstructNetwork):
     ) -> None:
         super().__init__(*args)
         self.visualization_interval = visualization_interval
-        self.visualizer = weights.visualizer.Evaluator(self.model, self.network)
+        self.visualizer = weights.visualizer.Evaluator(self.model, self.pipeline)
         self.do_visualize = visualize
         self.calculate_interval = calculate_interval
         self.visualize(before_training=True)
@@ -34,7 +34,7 @@ class ReconstructNetwork(network.ReconstructNetwork):
         self.model.load_state_dict(state_dict)
 
     def get_weights_MAE(self) -> float:
-        evaluator = Evaluator(self.model, self.network)
+        evaluator = Evaluator(self.model, self.pipeline)
         result = evaluator.evaluate()
         return cast(float, result)
 

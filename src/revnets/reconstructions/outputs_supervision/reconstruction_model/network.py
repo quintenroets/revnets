@@ -15,8 +15,8 @@ from .metrics import Metrics
 class ReconstructNetwork(Network):
     def __init__(self, model: torch.nn.Module, pipeline: Pipeline) -> None:
         super().__init__(model, learning_rate=0)
-        self.pipeline = pipeline
         self._learning_rate = context.config.reconstruction_training.learning_rate
+        self.pipeline = pipeline
 
     def calculate_metrics(  # type: ignore[override]
         self,

@@ -30,14 +30,7 @@ class Reconstructor(empty.Reconstructor, Generic[T]):
 
     @cached_property
     def trained_weights_path(self) -> Path:
-        path = (
-            Path.weights
-            / "reconstructions"
-            / self.name
-            / self.pipeline.name
-            / self.pipeline.network_factory
-            / self.reconstruction.name
-        )
+        path = Path.weights / "reconstructions" / self.name / self.pipeline.name
         path.create_parent()
         return cast(Path, path)
 

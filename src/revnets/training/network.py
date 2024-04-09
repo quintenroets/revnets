@@ -13,7 +13,7 @@ class Network(pl.LightningModule):
         self, model: nn.Module, learning_rate: float, do_log: bool = True
     ) -> None:
         super().__init__()
-        self.learning_rate = learning_rate
+        self._learning_rate = learning_rate
         self.model = model
         self.do_log = do_log
 

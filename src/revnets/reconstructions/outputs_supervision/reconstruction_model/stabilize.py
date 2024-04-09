@@ -17,13 +17,10 @@ class ReconstructNetwork(logging.ReconstructNetwork):
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
+        output_size = self.pipeline.network_factory.output_size
+        self.learning_rate_scale = batch_size * output_size if use_loss_sum else 1
         self.clip_value = clip_value
         batch_size = context.config.reconstruction_training.batch_size
-        self.learning_rate_scale = (
-            batch_size * self.pipeline.network_factory.output_size
-            if use_loss_sum
-            else 1
-        )
         self._learning_rate /= self.learning_rate_scale
         self.use_loss_sum = use_loss_sum
         self.val = 0
