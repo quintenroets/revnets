@@ -60,7 +60,7 @@ class Config(SerializationMixin):
     precision: int = 64
     always_train: bool = False
     loss_criterion: str = "l1"
-    validation_ratio: float = 0
+    validation_ratio: float = 0.1
 
     console_metrics_refresh_interval: float = 0.5
 

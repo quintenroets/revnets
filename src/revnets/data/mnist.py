@@ -7,9 +7,9 @@ from . import base
 
 
 @dataclass
-class Dataset(base.Dataset):
+class DataModule(base.DataModule):
     path: str = str(Path.data / "mnist")
-    transform: transforms.Compose = transforms.Compose(
+    transformation: transforms.Compose = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
     )
 
@@ -18,10 +18,11 @@ class Dataset(base.Dataset):
             datasets.MNIST(self.path, train=train, download=True)
 
     def setup(self, stage: str | None = None) -> None:
-        self.train_val_dataset = datasets.MNIST(
-            self.path, train=True, download=True, transform=self.transform
+        self.train_validation = self.load_dataset(train=True)
+        self.test = self.load_dataset(train=False)
+        self.split_train_validation()
+
+    def load_dataset(self, train: bool) -> datasets.MNIST:
+        return datasets.MNIST(
+            self.path, train=train, download=True, transform=self.transformation
         )
-        self.test_dataset = datasets.MNIST(
-            self.path, train=False, download=True, transform=self.transform
-        )
-        super().setup()

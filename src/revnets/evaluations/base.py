@@ -7,7 +7,7 @@ import torch
 from revnets.context import context
 from revnets.pipelines import Pipeline
 
-from ..data import Dataset
+from ..data import DataModule
 
 
 @dataclass
@@ -42,6 +42,6 @@ class Evaluator:
     def evaluate(self) -> Any:
         raise NotImplementedError
 
-    def get_dataset(self) -> Dataset:
+    def load_data(self) -> DataModule:
         assert self.pipeline is not None
-        return self.pipeline.create_dataset()
+        return self.pipeline.load_prepared_data()

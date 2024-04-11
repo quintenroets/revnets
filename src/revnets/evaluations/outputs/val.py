@@ -7,7 +7,7 @@ import torchmetrics
 from torch.nn import Module
 from torch.utils.data import DataLoader
 
-from revnets.data import Dataset
+from revnets.data import DataModule
 from revnets.training import Trainer
 
 from .. import base
@@ -53,19 +53,14 @@ class Evaluator(base.Evaluator):
 
     def compare_outputs(self) -> Metrics:
         model = CompareModel(self.original, self.reconstruction)
-
-        dataset = self.get_dataset()
-        dataset.prepare()
-        dataset.calibrate(model)
-
-        dataloader = self.get_dataloader(dataset)
-
+        data = self.load_data()
+        dataloader = self.extract_dataloader(data)
         Trainer().test(model, dataloaders=dataloader)  # noqa
         return cast(Metrics, model.metrics)
 
     @classmethod
-    def get_dataloader(cls, dataset: Dataset) -> DataLoader[tuple[torch.Tensor, ...]]:
-        return dataset.val_dataloader()
+    def extract_dataloader(cls, data: DataModule) -> DataLoader[Any]:
+        return data.val_dataloader()
 
     @classmethod
     def format_evaluation(cls, value: Metrics, **kwargs: Any) -> FormattedMetrics:  # type: ignore[override]

@@ -17,6 +17,10 @@ class Network(pl.LightningModule):
         self.model = model
         self.do_log = do_log
 
+    @property
+    def learning_rate(self) -> float:
+        return self._learning_rate
+
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         outputs = self.model(inputs)
         return cast(torch.Tensor, outputs)

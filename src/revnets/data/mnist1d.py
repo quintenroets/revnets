@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pickle
 from dataclasses import dataclass
 
@@ -20,34 +22,54 @@ class RawData(SerializationMixin):
     x_test: NDArray[np.float32]
     y_test: NDArray[np.float32]
 
+    @classmethod
+    def from_path(cls, path: Path) -> RawData:
+        with path.open("rb") as fp:
+            data = pickle.load(fp)
+        return cls(data["x"], data["y"], data["x_test"], data["y_test"])
+
+    def scale(self) -> None:
+        scaler = StandardScaler()
+        self.x = scaler.fit_transform(self.x)
+        self.x_test = scaler.transform(self.x_test)
+
+    def extract_train_validation(self) -> TensorDataset:
+        x = torch.Tensor(self.x)
+        y = torch.LongTensor(self.y)
+        return TensorDataset(x, y)
+
+    def extract_test(self) -> TensorDataset:
+        x = torch.Tensor(self.x_test)
+        y = torch.LongTensor(self.y_test)
+        return TensorDataset(x, y)
+
 
 @dataclass
-class Dataset(base.Dataset):
-    path: Path = Path.data / "mnist_1D.pkl"
+class DataModule(base.DataModule):
+    path: Path = Path.data / "mnist_1D"
+    raw_path: Path = Path.data / "mnist_1D.pkl"
+    download_url: str = (
+        "https://github.com/greydanus/mnist1d/raw/master/mnist1d_data.pkl"
+    )
 
     def prepare_data(self) -> None:
-        data = self.load_data()
-
-        scaler = StandardScaler()
-        data.x = scaler.fit_transform(data.x)
-        data.x_test = scaler.transform(data.x_test)
-
-        x = torch.Tensor(data.x)
-        x_test = torch.Tensor(data.x_test)
-
-        y = torch.LongTensor(data.y)
-        y_test = torch.LongTensor(data.y_test)
-
-        self.train_val_dataset = TensorDataset(x, y)
-        self.test_dataset = TensorDataset(x_test, y_test)
-
-    def load_data(self) -> RawData:
-        self.check_download()
-        with self.path.open("rb") as fp:
-            data = pickle.load(fp)
-        return RawData(data["x"], data["y"], data["x_test"], data["y_test"])
-
-    def check_download(self) -> None:
         if not self.path.exists():
-            url = "https://github.com/greydanus/mnist1d/raw/master/mnist1d_data.pkl"
-            self.path.byte_content = requests.get(url, allow_redirects=True).content
+            if not self.raw_path.exists():
+                self.download()
+            self.process()
+
+    def download(self) -> None:
+        response = requests.get(self.download_url, allow_redirects=True)
+        self.raw_path.byte_content = response.content
+
+    def process(self) -> None:
+        raw_data = RawData.from_path(self.raw_path)
+        raw_data.scale()
+        data = raw_data.extract_train_validation(), raw_data.extract_test()
+        path = str(self.path)
+        torch.save(data, path)
+
+    def setup(self, stage: str) -> None:
+        path = str(self.path)
+        self.train_validation, self.test = torch.load(path)
+        self.split_train_validation()
