@@ -26,6 +26,7 @@ class Reconstructor(base.Reconstructor):
 
     def reconstruct_weights(self) -> None:
         if context.config.always_train or not self.trained_weights_path.exists():
+            self.load_weights()
             self.start_training()
             self.save_weights()
         self.load_weights()

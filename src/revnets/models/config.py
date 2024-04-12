@@ -30,22 +30,23 @@ class Evaluation:
 
 @dataclass
 class Config(SerializationMixin):
-    experiment: Experiment = field(default_factory=Experiment)
-    num_workers: int = 8
-    target_network_training: HyperParameters = HyperParameters(
-        epochs=100, learning_rate=1.0e-2, batch_size=32
-    )
+    sampling_data_size: int = 50000
     reconstruction_training: HyperParameters = HyperParameters(
-        epochs=10, learning_rate=0.1, batch_size=256
+        epochs=300, learning_rate=0.00001, batch_size=256
     )
+
+    experiment: Experiment = field(default_factory=Experiment)
     reconstruction_training_debug: HyperParameters = HyperParameters(
         epochs=3, learning_rate=0.1, batch_size=16
+    )
+    target_network_training: HyperParameters = HyperParameters(
+        epochs=100, learning_rate=1.0e-2, batch_size=32
     )
     evaluation: Evaluation = field(default_factory=Evaluation)
     evaluation_batch_size: int = 1000
 
+    num_workers: int = 8
     early_stopping_patience: int = 100
-    sampling_data_size: int = 10000
     n_rounds: int = 2
     n_networks: int = 2
     weight_variance_downscale_factor: float | None = None
@@ -59,7 +60,7 @@ class Config(SerializationMixin):
 
     device: int = 1
     precision: int = 64
-    always_train: bool = False
+    always_train: bool = True
     loss_criterion: str = "l1"
     validation_ratio: float = 0.1
 

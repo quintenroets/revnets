@@ -8,8 +8,13 @@ class NamedClass:
 
     @classmethod
     @classproperty
-    def name(cls) -> str:
+    def title(cls) -> str:
         return " ".join(cls.relative_module).capitalize()
+
+    @classmethod
+    @classproperty
+    def name(cls) -> str:
+        return "_".join(cls.relative_module)
 
     @classmethod
     @classproperty
