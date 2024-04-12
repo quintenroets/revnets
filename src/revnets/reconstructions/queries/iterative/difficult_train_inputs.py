@@ -4,9 +4,12 @@ from typing import cast
 import numpy as np
 import torch
 from kneed import KneeLocator
+from torch import nn
+from torch.utils.data import DataLoader
 
-from revnets.data import output_supervision
+from revnets.context import context
 
+from ..data import QueryDataSet
 from . import base
 
 
@@ -14,12 +17,11 @@ from . import base
 class Reconstructor(base.Reconstructor):
     noise_factor: float = 1 / 100
 
-    def get_difficult_inputs(self) -> torch.Tensor:
+    def create_difficult_samples(self) -> torch.Tensor:
         difficult_inputs = self.extract_difficult_inputs()
         recombined_inputs = self.recombine(difficult_inputs)
-        noise = self.data.generate_random_inputs(recombined_inputs.shape)
-        new_difficult_inputs = recombined_inputs + self.noise_factor * noise
-        return new_difficult_inputs
+        noise = self.create_random_inputs(recombined_inputs.shape)
+        return recombined_inputs + self.noise_factor * noise
 
     def recombine(self, inputs: torch.Tensor) -> torch.Tensor:
         new_samples_shape = self.num_samples, inputs.shape[-1]
@@ -30,24 +32,29 @@ class Reconstructor(base.Reconstructor):
         return inputs[new_samples, np.arange(new_samples.shape[1])]
 
     def extract_difficult_inputs(self) -> torch.Tensor:
-        split = output_supervision.Split.train
-        inputs = self.data.get_all_inputs(split)
-        targets = self.data.get_all_targets(split)
+        data = self.pipeline.load_prepared_data()
+        batch_size = len(data.train)  # type: ignore[arg-type]
+        dataloader = DataLoader(data.train, batch_size=batch_size, shuffle=False)
+        inputs = next(iter(dataloader))[0]
+        outputs = self.calculate_outputs(inputs, self.reconstruction)
+        target = self.pipeline.create_target_network()
+        targets = self.calculate_outputs(inputs, target)
+        high_loss_indices = self.extract_high_loss_indices(outputs, targets)
+        difficult_inputs = inputs[high_loss_indices]
+        return cast(torch.Tensor, difficult_inputs)
 
-        outputs_dataset = output_supervision.Dataset(
-            original_dataset=self.data, target_network=self.network
-        )
-        outputs = outputs_dataset.add_output_supervision(split).tensors[1]
+    def calculate_outputs(
+        self, inputs: torch.Tensor, network: nn.Module
+    ) -> torch.Tensor:
+        batch_size = context.config.evaluation_batch_size
+        query_dataset = QueryDataSet(target=network, evaluation_batch_size=batch_size)
+        return query_dataset.compute_targets(inputs)
 
-        high_loss_indices = self.get_high_loss_indices(outputs, targets)
-        high_loss_inputs = inputs[high_loss_indices]
-        return high_loss_inputs
-
-    def get_high_loss_indices(
+    def extract_high_loss_indices(
         self, outputs: torch.Tensor, targets: torch.Tensor
     ) -> torch.Tensor:
         sorted_losses, original_indices = self.calculate_sorted_losses(outputs, targets)
-        elbow = self.get_elbow(sorted_losses)
+        elbow = self.calculate_elbow(sorted_losses)
         return original_indices[:elbow]
 
     @classmethod
@@ -59,7 +66,7 @@ class Reconstructor(base.Reconstructor):
         return torch.sort(losses, descending=True)
 
     @classmethod
-    def get_elbow(cls, values: torch.Tensor) -> int:
+    def calculate_elbow(cls, values: torch.Tensor) -> int:
         elbow_range = range(len(values))
         elbow_result = KneeLocator(
             elbow_range, values, curve="convex", direction="decreasing"

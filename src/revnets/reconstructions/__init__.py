@@ -1,2 +1,2 @@
-from . import cheat, empty, outputs_supervision, retrain
+from . import cheat, empty, queries, retrain
 from .base import Reconstructor

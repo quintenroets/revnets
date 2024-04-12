@@ -3,7 +3,8 @@ from typing import cast
 
 import torch
 
-from revnets.training import Metrics, Trainer
+from revnets.training import Trainer
+from revnets.training.targets import Metrics
 
 from .. import base
 from .network import AttackNetwork
@@ -21,11 +22,9 @@ class Evaluator(base.Evaluator):
         return self.compare_attacks()
 
     def compare_attacks(self) -> Evaluation:
-        dataset = self.get_dataset()
-        dataset.prepare()
+        data = self.load_data()
         model = AttackNetwork(self.original, self.reconstruction)
-        dataset.calibrate(model)
-        dataloader = dataset.test_dataloader()
+        dataloader = data.test_dataloader()
         precision = 32  # adversarial attack library only works with precision 32
         dtype = torch.float32
         for network in (model.reconstruction, model.original):

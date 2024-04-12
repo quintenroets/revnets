@@ -1,21 +1,28 @@
-from typing import Any, cast
+from typing import Any, Generic, TypeVar, cast
 
 import pytorch_lightning as pl
 import torch
-import torchmetrics
 from torch import nn, optim
 
-from .metrics import Metrics, Phase
+from revnets.models import Phase
+
+from .metrics import Metrics as BaseMetrics
+
+Metrics = TypeVar("Metrics", bound=BaseMetrics)
 
 
-class Network(pl.LightningModule):
+class Network(pl.LightningModule, Generic[Metrics]):
     def __init__(
         self, model: nn.Module, learning_rate: float, do_log: bool = True
     ) -> None:
         super().__init__()
-        self.learning_rate = learning_rate
+        self._learning_rate = learning_rate
         self.model = model
         self.do_log = do_log
+
+    @property
+    def learning_rate(self) -> float:
+        return self._learning_rate
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         outputs = self.model(inputs)
@@ -39,18 +46,7 @@ class Network(pl.LightningModule):
         return metrics
 
     def calculate_metrics(self, outputs: torch.Tensor, labels: torch.Tensor) -> Metrics:
-        return Metrics(
-            loss=nn.functional.cross_entropy(outputs, labels),
-            accuracy=self.calculate_accuracy(outputs, labels),
-        )
-
-    @classmethod
-    def calculate_accuracy(cls, outputs: torch.Tensor, labels: torch.Tensor) -> float:
-        _, predictions = outputs.max(1)
-        accuracy = torchmetrics.functional.accuracy(
-            predictions, labels, task="multiclass", num_classes=10
-        )
-        return accuracy.item()
+        raise NotImplementedError
 
     def configure_optimizers(self) -> optim.Optimizer:
         return optim.Adam(self.parameters(), lr=self.learning_rate)

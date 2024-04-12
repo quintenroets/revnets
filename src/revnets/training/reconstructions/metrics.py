@@ -1,26 +1,29 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import torch
 from simple_classproperty import classproperty
 from torch import nn
 
-from revnets import training
 from revnets.context import context
+
+from .. import metrics
 
 
 @dataclass
-class Metrics(training.LogMetrics):
+class Metrics(metrics.Metrics):
     shape: torch.Size
     l1_loss_sum: torch.Tensor
     l2_loss_sum: torch.Tensor
     # smooth_l1_loss: torch.Tensor
+    loss: torch.Tensor = field(init=False)
 
     def __post_init__(self) -> None:
         self.size = math.prod(self.shape)
         self.batch_size = self.shape[0]
+        self.loss = self.loss_sum / self.size
 
     @property
     def l1_loss(self) -> torch.Tensor:
@@ -48,10 +51,6 @@ class Metrics(training.LogMetrics):
             # scale loss appropriately if less effective elements in batch
             loss *= context.config.reconstruction_training.batch_size / self.batch_size
         return loss
-
-    @property
-    def loss(self) -> torch.Tensor:
-        return self.loss_sum / self.size
 
     @classmethod
     @classproperty

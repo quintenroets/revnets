@@ -1,5 +1,5 @@
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 import torch
@@ -9,8 +9,9 @@ from torch.utils.data import DataLoader, Dataset
 
 from revnets.context import context
 from revnets.training import Trainer
+from revnets.training.reconstructions import Network
 
-from ..base import ReconstructNetwork
+from ..base import DataModule
 from . import base
 
 
@@ -20,7 +21,7 @@ class InputNetwork(LightningModule):
         shape: tuple[int, int],
         reconstructions: list[torch.nn.Sequential],
         learning_rate: float = 0.01,
-        verbose: bool = True,
+        verbose: bool = False,
     ) -> None:
         super().__init__()
         self.learning_rate = learning_rate
@@ -79,43 +80,34 @@ class EmptyDataset(Dataset[torch.Tensor]):
 @dataclass
 class Reconstructor(base.Reconstructor):
     n_networks: int = context.config.n_networks
-    networks: list[ReconstructNetwork] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         super().__post_init__()
-        self.reconstructions = [self.reconstruction]
-        for i in range(self.n_networks - 1):
-            reconstruction = self.network.get_architecture(seed=i)
-            self.reconstructions.append(reconstruction)
+        self.reconstructions = [
+            self.pipeline.network_factory.create_network(seed=seed + 100)
+            for seed in range(self.n_networks)
+        ]
 
     @property
     def feature_size(self) -> int:
-        return math.prod(self.data.input_shape)
+        return math.prod(self.input_shape)
 
-    def get_difficult_inputs(self) -> torch.Tensor:
+    def create_difficult_samples(self) -> torch.Tensor:
         shape = (self.num_samples, self.feature_size)
         network = InputNetwork(shape, self.reconstructions)
         self.fit_inputs_network(network)
         return network.get_optimized_inputs()
 
     @classmethod
-    def fit_inputs_network(cls, network: InputNetwork, epochs: int = 100) -> None:
-        trainer = Trainer(max_epochs=epochs, log_every_n_steps=1)
-        dummy_dataset = EmptyDataset()
-        dummy_dataloader = DataLoader(dummy_dataset)
-        trainer.fit(network, dummy_dataloader)
+    def fit_inputs_network(cls, network: InputNetwork) -> None:
+        max_epochs = context.config.max_difficult_inputs_epochs
+        trainer = Trainer(max_epochs=max_epochs, log_every_n_steps=1)
+        dataset = EmptyDataset()
+        dataloader = DataLoader(dataset)
+        trainer.fit(network, dataloader)
 
-    def start_training(self) -> None:
-        self.networks = [
-            ReconstructNetwork(reconstruction, self.network)
-            for reconstruction in self.reconstructions
-        ]
-        super().start_training()
-
-    def run_round(self) -> None:
-        for network in self.networks:
-            self.network = network
-            self.train_model(self.data)
-
-        if not self.is_last_round:
-            self.add_difficult_samples()
+    def run_round(self, data: DataModule) -> None:
+        trainer = self.create_trainer()
+        networks = [Network(reconstruction) for reconstruction in self.reconstructions]
+        for network in networks:
+            trainer.fit(network, data)

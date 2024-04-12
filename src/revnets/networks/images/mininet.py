@@ -1,10 +1,12 @@
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 from torch import nn
 
 from .. import mininet
 
 
+@dataclass(frozen=True)
 class NetworkFactory(mininet.NetworkFactory):
     input_size: int = 784
     hidden_size: int = 40

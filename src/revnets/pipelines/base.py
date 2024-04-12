@@ -4,7 +4,7 @@ from ..utils import NamedClass
 
 
 class Pipeline(NamedClass):
-    def create_trained_network(self) -> Sequential:
+    def create_target_network(self) -> Sequential:
         raise NotImplementedError
 
     def create_initialized_network(self) -> Sequential:

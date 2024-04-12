@@ -11,5 +11,5 @@ class Pipeline(train.Pipeline):
     network_factory: NetworkFactory = mininet.NetworkFactory()
 
     @classmethod
-    def create_dataset(cls) -> mnist1d.Dataset:
-        return mnist1d.Dataset()
+    def load_data(cls) -> mnist1d.DataModule:
+        return mnist1d.DataModule()
