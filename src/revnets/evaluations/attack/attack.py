@@ -3,7 +3,8 @@ from typing import cast
 
 import torch
 
-from revnets.training import Metrics, Trainer
+from revnets.training import Trainer
+from revnets.training.targets import Metrics
 
 from .. import base
 from .network import AttackNetwork

@@ -27,8 +27,11 @@ def test_context(context: Context, mocked_assets_path: None) -> Iterator[None]:
     hyperparameters = HyperParameters(epochs=1, learning_rate=1.0e-2, batch_size=32)
     target_network_training = context.config.target_network_training
     reconstruction_training = context.config.reconstruction_training
+    epochs = context.config.max_difficult_inputs_epochs
     context.config.target_network_training = hyperparameters
     context.config.reconstruction_training = hyperparameters
+    context.config.max_difficult_inputs_epochs = 1
     yield
     context.config.target_network_training = target_network_training
     context.config.reconstruction_training = reconstruction_training
+    context.config.max_difficult_inputs_epochs = epochs

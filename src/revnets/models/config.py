@@ -42,6 +42,7 @@ class Config(SerializationMixin):
         epochs=3, learning_rate=0.1, batch_size=16
     )
     evaluation: Evaluation = field(default_factory=Evaluation)
+    evaluation_batch_size: int = 1000
 
     early_stopping_patience: int = 100
     sampling_data_size: int = 10000
@@ -63,6 +64,7 @@ class Config(SerializationMixin):
     validation_ratio: float = 0.1
 
     console_metrics_refresh_interval: float = 0.5
+    max_difficult_inputs_epochs: int = 100
 
     @property
     def number_of_validation_sanity_steps(self) -> int | None:

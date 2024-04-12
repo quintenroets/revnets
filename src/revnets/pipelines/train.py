@@ -6,10 +6,10 @@ import torch
 from pytorch_lightning import LightningModule
 from torch.nn import Sequential
 
-from revnets import training
 from revnets.data import DataModule
 from revnets.networks import NetworkFactory
 from revnets.training import Trainer
+from revnets.training.targets import Network
 
 from ..context import context
 from ..models import Path
@@ -23,7 +23,7 @@ class Pipeline(base.Pipeline, ABC):
     def create_initialized_network(self) -> Sequential:
         return self.network_factory.create_network(seed=context.config.experiment.seed)
 
-    def create_trained_network(self) -> Sequential:
+    def create_target_network(self) -> Sequential:
         if not self.weights_path.exists():
             self.create_trained_weights()
         return self.load_trained_network()
@@ -40,9 +40,7 @@ class Pipeline(base.Pipeline, ABC):
         self.save_weights(network)
 
     def train(self, network: torch.nn.Module) -> None:
-        trainable_network = training.Network(
-            network, learning_rate=context.config.target_network_training.learning_rate
-        )
+        trainable_network = Network(network)
         data = self.load_data()
         self.run_training(trainable_network, data)
 

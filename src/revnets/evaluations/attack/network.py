@@ -11,7 +11,7 @@ from torch import nn
 from torch.nn import Module
 
 from revnets.context import context
-from revnets.training import Metrics
+from revnets.training.targets import Metrics
 
 
 class LossMetric(torchmetrics.Metric):
@@ -39,7 +39,7 @@ class RunningMetrics:
     def compute(self) -> Metrics:
         accuracy = self.accuracy.compute().item()  # type: ignore[func-returns-value]
         loss = self.loss.compute()
-        return Metrics(accuracy, loss)
+        return Metrics(loss, accuracy)
 
 
 class AttackNetwork(pl.LightningModule):

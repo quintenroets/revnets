@@ -21,7 +21,7 @@ class Evaluator:
     @cached_property
     def original(self) -> torch.nn.Module:
         assert self.pipeline is not None
-        return self.pipeline.create_trained_network().to(context.device)
+        return self.pipeline.create_target_network().to(context.device)
 
     def get_evaluation(self) -> str:
         evaluation = self.evaluate()

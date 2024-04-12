@@ -4,7 +4,7 @@ from typing import Any, TypeVar
 import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils import data
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, Subset, random_split
 
 from ..context import context
 
@@ -25,17 +25,13 @@ class DataModule(LightningDataModule):
         super().__init__()
 
     def split_train_validation(self) -> None:
-        split_sizes = self.calculate_split_sizes()
+        self.train, self.validation = self.split(self.train_validation)
+
+    def split(self, dataset: data.Dataset[Any]) -> list[Subset[Any]]:
+        split_sizes = [1 - self.validation_ratio, self.validation_ratio]
         seed = context.config.experiment.target_network_seed
         random_generator = torch.Generator().manual_seed(seed)
-        split = random_split(self.train_validation, split_sizes, random_generator)
-        self.train, self.validation = split
-
-    def calculate_split_sizes(self) -> tuple[int, int]:
-        total_size = len(self.train_validation)  # type: ignore[arg-type]
-        validation_size = int(self.validation_ratio * total_size)
-        train_size = total_size - validation_size
-        return train_size, validation_size
+        return random_split(dataset, split_sizes, random_generator)
 
     def train_dataloader(self, shuffle: bool = True) -> DataLoader[Any]:
         return DataLoader(self.train, batch_size=self.batch_size, shuffle=True)

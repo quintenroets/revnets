@@ -17,4 +17,4 @@ def test_target_network_training(
     pipeline_module: ModuleType, test_context: None
 ) -> None:
     pipeline: Pipeline = pipeline_module.Pipeline()
-    pipeline.create_trained_network()
+    pipeline.create_target_network()
