@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import pickle
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 import requests
 import torch
 from numpy.typing import NDArray
 from package_utils.dataclasses import SerializationMixin
+from simple_classproperty import classproperty
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import TensorDataset
 
@@ -46,8 +48,18 @@ class RawData(SerializationMixin):
 
 @dataclass
 class DataModule(base.DataModule):
-    path: Path = Path.data / "mnist_1D"
-    raw_path: Path = Path.data / "mnist_1D.pkl"
+    @classmethod
+    @classproperty
+    def path(cls) -> Path:
+        path = Path.data / "mnist_1D"
+        return cast(Path, path)
+
+    @classmethod
+    @classproperty
+    def raw_path(cls) -> Path:
+        path = Path.data / "mnist_1D.pkl"
+        return cast(Path, path)
+
     download_url: str = (
         "https://github.com/greydanus/mnist1d/raw/master/mnist1d_data.pkl"
     )

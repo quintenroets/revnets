@@ -37,4 +37,4 @@ class Evaluator:
         return result
 
     def evaluate(self) -> Any:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover

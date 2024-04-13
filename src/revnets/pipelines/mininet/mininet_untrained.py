@@ -5,4 +5,4 @@ from . import mininet
 
 class Pipeline(mininet.Pipeline):
     def train(self, model: torch.nn.Module) -> None:
-        pass
+        pass  # pragma: nocover

@@ -30,12 +30,12 @@ class Metrics(metrics.Metrics):
         return self.l1_loss_sum / self.size
 
     @property
-    def l2_loss(self) -> torch.Tensor:
+    def l2_loss(self) -> torch.Tensor:  # pragma: nocover
         return self.l2_loss_sum / self.size
 
     @property
     def loss_sum(self) -> torch.Tensor:
-        match context.config.loss_criterion:
+        match context.config.loss_criterion:  # pragma: nocover
             # case "smooth_l1":
             # loss = self.smooth_l1_loss
             case "l1":

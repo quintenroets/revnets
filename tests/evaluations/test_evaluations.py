@@ -4,6 +4,7 @@ from types import ModuleType
 import pytest
 from revnets import evaluations, pipelines, reconstructions
 from revnets.evaluations import analysis, attack, outputs, weights
+from revnets.evaluations.evaluate import format_percentage
 from revnets.pipelines import Pipeline
 
 evaluation_modules = (
@@ -50,4 +51,8 @@ def test_evaluations(
 ) -> None:
     reconstructor = reconstructions.empty.Reconstructor(pipeline)
     reconstruction = reconstructor.create_reconstruction()
-    evaluation_module.Evaluator(reconstruction, pipeline).evaluate()
+    evaluation_module.Evaluator(reconstruction, pipeline).get_evaluation()
+
+
+def test_format_percentage() -> None:
+    format_percentage(0.1)

@@ -34,8 +34,4 @@ class NetworkFactory(NamedClass):
         return Sequential(*layers)
 
     def create_layers(self) -> Iterable[torch.nn.Module]:
-        raise NotImplementedError
-
-    @classmethod
-    def get_base_name(cls) -> str:
-        return NetworkFactory.__module__
+        raise NotImplementedError  # pragma: nocover

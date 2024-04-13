@@ -66,7 +66,3 @@ class DataModule(base.DataModule):
         self.train = QueryDataSet(target, self.evaluation_batch_size)
         self.validation = QueryDataSet(target, self.evaluation_batch_size)
         self.test = QueryDataSet(target, self.evaluation_batch_size)
-
-    @property
-    def has_validation_data(self) -> bool:
-        return self.validation_ratio is not None and self.validation_ratio > 0

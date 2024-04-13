@@ -46,7 +46,7 @@ class Network(pl.LightningModule, Generic[Metrics]):
         return metrics
 
     def calculate_metrics(self, outputs: torch.Tensor, labels: torch.Tensor) -> Metrics:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover
 
     def configure_optimizers(self) -> optim.Optimizer:
         return optim.Adam(self.parameters(), lr=self.learning_rate)

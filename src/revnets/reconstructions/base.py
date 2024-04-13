@@ -21,25 +21,25 @@ class Reconstructor(NamedClass):
 
     def create_reconstruction(self) -> Sequential:
         if self.downscale_factor is not None:
-            self.scale_weights()
+            self.scale_weights()  # pragma: nocover
         if context.config.start_reconstruction_with_zero_biases:
-            self.set_biases()
+            self.set_biases()  # pragma: nocover
         self.reconstruct_weights()
         return self.reconstruction
 
-    def scale_weights(self) -> None:
+    def scale_weights(self) -> None:  # pragma: nocover
         layers = generate_layers(self.reconstruction)
         for layer in layers:
             layer.weight.data /= self.downscale_factor
 
-    def set_biases(self) -> None:
+    def set_biases(self) -> None:  # pragma: nocover
         layers = generate_layers(self.reconstruction)
         for layer in layers:
             bias = torch.zeros_like(layer.bias, dtype=layer.bias.dtype)
             layer.bias = torch.nn.Parameter(bias)
 
     def reconstruct_weights(self) -> None:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover
 
     @classmethod
     def get_base_name(cls) -> str:

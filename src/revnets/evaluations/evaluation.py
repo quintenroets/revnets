@@ -4,8 +4,10 @@ from collections.abc import Iterator
 from dataclasses import asdict, dataclass, fields
 from typing import TYPE_CHECKING
 
+import cli
+
 if TYPE_CHECKING:
-    from ..utils.table import Table
+    from rich.table import Table  # pragma: nocover
 
 
 @dataclass
@@ -40,10 +42,9 @@ class Evaluation:
     def values(self) -> Iterator[str]:
         yield from self.dict().values()
 
-    @property
-    def table(self) -> Table:
+    def create_table(self) -> Table:
         # slow import
-        from ..utils.table import Table
+        from rich.table import Table
 
         table = Table(show_lines=True)
         table.add_column("Metric", style="cyan", max_width=20, overflow="fold")
@@ -54,4 +55,5 @@ class Evaluation:
         return table
 
     def show(self) -> None:
-        self.table.show()
+        table = self.create_table()
+        cli.console.print(table)

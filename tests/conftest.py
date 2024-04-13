@@ -4,7 +4,7 @@ from unittest.mock import PropertyMock, patch
 import pytest
 from revnets.context import context as context_
 from revnets.context.context import Context
-from revnets.models import Config, HyperParameters, Path
+from revnets.models import Config, Evaluation, HyperParameters, Path
 
 
 @pytest.fixture(scope="session")
@@ -26,11 +26,13 @@ def mocked_assets_path() -> Iterator[None]:
 def test_context(context: Context, mocked_assets_path: None) -> Iterator[None]:
     config = context.config
     hyperparameters = HyperParameters(epochs=1, learning_rate=1.0e-2, batch_size=32)
+    evaluation = Evaluation(visualize_attack=True)
     context.loaders.config.value = Config(
         target_network_training=hyperparameters,
         reconstruction_training=hyperparameters,
         max_difficult_inputs_epochs=1,
         run_analysis=True,
+        evaluation=evaluation,
     )
     mock = patch("matplotlib.pyplot.show")
     with mock:

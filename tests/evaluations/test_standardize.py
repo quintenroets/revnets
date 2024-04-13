@@ -71,3 +71,11 @@ def test_second_standardize_no_effect(
 ) -> None:
     tester = Verifier(network_module, activation, standardization_type)
     tester.test_second_standardize_no_effect()
+
+
+@pytest.mark.parametrize("network_module", network_modules)
+@pytest.mark.parametrize("activation", activations)
+def test_optimize_mae(network_module: ModuleType, activation: Activation) -> None:
+    standardization_type = StandardizationType.standardize
+    tester = Verifier(network_module, activation, standardization_type)
+    tester.test_optimize_mae()

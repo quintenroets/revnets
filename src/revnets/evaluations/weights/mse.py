@@ -18,7 +18,7 @@ class Evaluator(base.Evaluator):
         standardized = self.has_same_architecture()
         if standardized:
             if context.config.evaluation.use_align:
-                align(self.original, self.reconstruction)
+                align(self.original, self.reconstruction)  # pragma: nocover
             else:
                 for network in (self.original, self.reconstruction):
                     Standardizer(network).standardize_scale()

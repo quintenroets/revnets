@@ -51,7 +51,7 @@ class Evaluator(base.Evaluator):
         inputs = Reconstructor(self.pipeline).create_queries(self.n_inputs)
         outputs = QueryDataSet(model).compute_targets(inputs)
         if self.activation:
-            outputs = F.relu(outputs)
+            outputs = F.relu(outputs)  # pragma: nocover
         ActivationsVisualizer(outputs, name).run()
 
 

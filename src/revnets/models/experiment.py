@@ -25,10 +25,6 @@ class Experiment(SerializationMixin):
         return (reconstruction, pipeline, seeds)
 
     @property
-    def name(self) -> str:
-        return "_".join(self.names)
-
-    @property
     def title(self) -> str:
         parts = self.generate_title_parts()
         return " ".join(parts).title()
