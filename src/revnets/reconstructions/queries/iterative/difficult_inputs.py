@@ -25,7 +25,7 @@ class InputNetwork(LightningModule):
     ) -> None:
         super().__init__()
         self.learning_rate = learning_rate
-        self.inputs_embedding = self.get_input_embeddings(shape)
+        self.inputs_embedding = self.create_input_embeddings(shape)
         self.reconstructions = torch.nn.ModuleList(reconstructions)
         self.verbose = verbose
 
@@ -34,7 +34,7 @@ class InputNetwork(LightningModule):
             print("\nAverage pairwise distances: ", end="\n\t")  # pragma: nocover
 
     @classmethod
-    def get_input_embeddings(cls, shape: tuple[int, int]) -> torch.nn.Embedding:
+    def create_input_embeddings(cls, shape: tuple[int, int]) -> torch.nn.Embedding:
         embeddings = torch.nn.Embedding(*shape)
         torch.nn.init.normal_(embeddings.weight)
         return embeddings

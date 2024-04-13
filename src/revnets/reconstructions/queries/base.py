@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from functools import cached_property
 from typing import cast
@@ -9,6 +11,10 @@ from revnets.context import context
 from revnets.models import Path
 from revnets.training import Trainer
 from revnets.training.reconstructions import Network
+from revnets.training.reconstructions.callbacks import (
+    LearningRateScheduler,
+    MAECalculator,
+)
 
 from .. import base
 from .data import DataModule
@@ -20,7 +26,8 @@ class Reconstructor(base.Reconstructor):
 
     @cached_property
     def trained_weights_path(self) -> Path:
-        path = Path.weights / "reconstructions" / self.name / self.pipeline.name
+        seed = str(context.config.experiment.seed)
+        path = Path.weights / "reconstructions" / self.name / self.pipeline.name / seed
         path.create_parent()
         return cast(Path, path)
 
@@ -35,13 +42,13 @@ class Reconstructor(base.Reconstructor):
 
     def create_trainer(self) -> Trainer:
         patience = context.config.early_stopping_patience
-        callback = EarlyStopping("train l1 loss", patience=patience, verbose=True)
-        callbacks = [callback]
-        max_epochs = context.config.reconstruction_training.epochs
-        return Trainer(
-            callbacks=callbacks,  # type: ignore[arg-type]
-            max_epochs=max_epochs,
+        callbacks = (
+            EarlyStopping("train l1 loss", patience=patience, verbose=True),
+            MAECalculator(self.reconstruction, self.pipeline),
+            LearningRateScheduler(),
         )
+        max_epochs = context.config.reconstruction_training.epochs
+        return Trainer(callbacks=callbacks, max_epochs=max_epochs)  # type: ignore[arg-type]
 
     def create_train_network(self) -> Network:
         return Network(self.reconstruction)

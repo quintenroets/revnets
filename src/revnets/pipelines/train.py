@@ -1,5 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
+from functools import cached_property
 
 import torch
 from pytorch_lightning import LightningModule
@@ -21,6 +22,10 @@ class Pipeline(base.Pipeline, ABC):
 
     def create_initialized_network(self) -> Sequential:
         return self.network_factory.create_network(seed=context.config.experiment.seed)
+
+    @cached_property
+    def target(self) -> Sequential:
+        return self.create_target_network()
 
     def create_target_network(self) -> Sequential:
         if not self.weights_path.exists():

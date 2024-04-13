@@ -1,21 +1,33 @@
 import math
+from dataclasses import dataclass
 from types import ModuleType
+from typing import cast
 
 import pytest
 from revnets import evaluations, pipelines, reconstructions
+from revnets.context import Context
 from revnets.evaluations import analysis, attack, outputs, weights
 from revnets.evaluations.evaluate import format_percentage
+from revnets.networks import mininet
 from revnets.pipelines import Pipeline
+from torch.nn import Sequential
 
-evaluation_modules = (
+from tests.evaluations import verifier
+from tests.evaluations.verifier import Standardization
+
+weight_evaluation_modules = (
     weights.mse,
     weights.mae,
     weights.max_ae,
     weights.layers_mae,
     weights.named_layers_mae,
+)
+
+evaluation_modules = (
+    *weight_evaluation_modules,
     attack.attack,
     outputs.train,
-    outputs.val,
+    outputs.validation,
     outputs.test,
     analysis.weights,
     analysis.activations,
@@ -52,6 +64,44 @@ def test_evaluations(
     reconstructor = reconstructions.empty.Reconstructor(pipeline)
     reconstruction = reconstructor.create_reconstruction()
     evaluation_module.Evaluator(reconstruction, pipeline).get_evaluation()
+
+
+@dataclass
+class Verifier(verifier.Verifier):
+    network: Sequential
+    target: Sequential
+
+    def __post_init__(self) -> None:
+        pass
+
+
+@pytest.mark.parametrize("evaluation_module", weight_evaluation_modules)
+def test_weight_evaluations(
+    evaluation_module: ModuleType, pipeline: Pipeline, test_context: Context
+) -> None:
+    reconstructor = reconstructions.empty.Reconstructor(pipeline)
+    reconstruction = reconstructor.create_reconstruction()
+    evaluator: weights.Evaluator = evaluation_module.Evaluator(reconstruction, pipeline)
+    evaluator.evaluate()
+    verify_evaluated_networks(evaluator, pipeline, test_context)
+
+
+def verify_evaluated_networks(
+    evaluator: weights.Evaluator, pipeline: Pipeline, context: Context
+) -> None:
+    use_align = context.config.evaluation.use_align
+    standardization = (
+        Standardization.align if use_align else Standardization.standardize
+    )
+    for network in (evaluator.target, evaluator.reconstruction):
+        network_verifier = Verifier(
+            network_module=mininet,
+            standardization_type=standardization,
+            activation=pipeline.network_factory.activation,
+            network=cast(Sequential, network),
+            target=pipeline.target,
+        )
+        network_verifier.verify_form()
 
 
 def test_format_percentage() -> None:

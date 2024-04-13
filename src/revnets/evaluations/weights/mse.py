@@ -18,10 +18,10 @@ class Evaluator(base.Evaluator):
         standardized = self.has_same_architecture()
         if standardized:
             if context.config.evaluation.use_align:
-                align(self.original, self.reconstruction)  # pragma: nocover
+                align(self.target, self.reconstruction)  # pragma: nocover
             else:
-                for network in (self.original, self.reconstruction):
-                    Standardizer(network).standardize_scale()
+                for network in (self.target, self.reconstruction):
+                    Standardizer(network).run()
         return standardized
 
     def has_same_architecture(self) -> bool:
@@ -31,9 +31,8 @@ class Evaluator(base.Evaluator):
         )
 
     def calculate_distance(self) -> float | tuple[float, ...]:
-        total_size = sum(
-            weights.numel() for weights in self.original.state_dict().values()
-        )
+        layer_weights = self.target.state_dict().values()
+        total_size = sum(weights.numel() for weights in layer_weights)
         total_distance = sum(
             self.calculate_weights_distance(original, reconstruction)
             for original, reconstruction in self.iterate_compared_layers()
@@ -52,6 +51,6 @@ class Evaluator(base.Evaluator):
 
     def iterate_compared_layers(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
         yield from zip(
-            self.original.state_dict().values(),
+            self.target.state_dict().values(),
             self.reconstruction.state_dict().values(),
         )

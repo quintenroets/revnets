@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Any, cast
 
 import torch
@@ -15,10 +14,7 @@ class Evaluator:
 
     def __post_init__(self) -> None:
         self.reconstruction = self.reconstruction.to(context.device)
-
-    @cached_property
-    def original(self) -> torch.nn.Module:
-        return self.pipeline.create_target_network().to(context.device)
+        self.target = self.pipeline.target.to(context.device)
 
     def get_evaluation(self) -> str:
         evaluation = self.evaluate()

@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import torch
 from torch.nn import Module
 
+from revnets.context import context
+
 from ...utils.colors import get_colors
 from ..weights import layers_mae
 from ..weights.standardize import extract_layer_weights, generate_layers
@@ -17,12 +19,10 @@ cpu = torch.device("cpu")
 class Evaluator(layers_mae.Evaluator):
     def evaluate(self) -> None:
         self.standardize_networks()
-        networks = {
-            "original": self.original,
-            "reconstruction": self.reconstruction,
-        }
-        for name, network in networks.items():
-            self.visualize_network_weights(network, name)
+        networks = {"target": self.target, "reconstruction": self.reconstruction}
+        if not context.config.evaluation.only_visualize_differences:
+            for name, network in networks.items():
+                self.visualize_network_weights(network, name)
         if self.has_same_architecture():
             self.visualize_network_differences()
 

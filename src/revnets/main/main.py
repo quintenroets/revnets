@@ -35,7 +35,8 @@ class Experiment:
         reconstruction = self.create_reconstruction(pipeline)
         evaluation = evaluations.evaluate(reconstruction, pipeline)
         evaluation.show()
-        context.results_path.yaml = evaluation.dict()
+        results = {"metrics": evaluation.dict(), "config": context.config.dict()}
+        context.results_path.yaml = results
 
     def create_reconstruction(self, pipeline: Pipeline) -> nn.Module:
         module = extract_module(reconstructions, self.config.reconstruction_technique)

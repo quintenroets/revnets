@@ -37,14 +37,14 @@ class Reconstructor(base.Reconstructor):
         dataloader = DataLoader(data.train, batch_size=batch_size, shuffle=False)
         inputs = next(iter(dataloader))[0]
         outputs = self.calculate_outputs(inputs, self.reconstruction)
-        target = self.pipeline.create_target_network()
-        targets = self.calculate_outputs(inputs, target)
+        targets = self.calculate_outputs(inputs, self.pipeline.target)
         high_loss_indices = self.extract_high_loss_indices(outputs, targets)
         difficult_inputs = inputs[high_loss_indices]
         return cast(torch.Tensor, difficult_inputs)
 
+    @classmethod
     def calculate_outputs(
-        self, inputs: torch.Tensor, network: nn.Module
+        cls, inputs: torch.Tensor, network: nn.Module
     ) -> torch.Tensor:
         batch_size = context.config.evaluation_batch_size
         query_dataset = QueryDataSet(target=network, evaluation_batch_size=batch_size)

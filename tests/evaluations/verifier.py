@@ -13,7 +13,7 @@ from revnets.models import Activation, InternalNeurons
 from torch.nn import Module, Sequential
 
 
-class StandardizationType(Enum):
+class Standardization(Enum):
     scale = "scale"
     standardize = "standardize"
     align = "align"
@@ -23,7 +23,7 @@ class StandardizationType(Enum):
 class Verifier:
     network_module: ModuleType
     activation: Activation
-    standardization_type: StandardizationType
+    standardization_type: Standardization
 
     def __post_init__(self) -> None:
         self.network = self.create_network()
@@ -34,18 +34,21 @@ class Verifier:
 
     def test_standardized_form(self) -> None:
         self.apply_transformation()
-        if self.standardization_type == StandardizationType.align:
+        self.verify_form()
+
+    def verify_form(self) -> None:
+        if self.standardization_type == Standardization.align:
             self.verify_aligned_form()
         else:
             self.verify_standardized_form()
 
     def apply_transformation(self) -> None:
         match self.standardization_type:
-            case StandardizationType.scale:
+            case Standardization.scale:
                 Standardizer(self.network).standardize_scale()
-            case StandardizationType.standardize:
+            case Standardization.standardize:
                 Standardizer(self.network).run()
-            case StandardizationType.align:
+            case Standardization.align:
                 standardize.align(self.network, self.target)
 
     def test_functional_preservation(self) -> None:
@@ -63,7 +66,7 @@ class Verifier:
         for neurons in neuron_layers:
             if neurons.has_scale_isomorphism:
                 verify_scale_standardized(neurons)
-            if self.standardization_type == StandardizationType.standardize:
+            if self.standardization_type == Standardization.standardize:
                 verify_order_standardized(neurons)
 
     def verify_aligned_form(self) -> None:
