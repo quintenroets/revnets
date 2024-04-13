@@ -24,7 +24,11 @@ class PredictNetwork(LightningModule):
 
 
 class QueryDataSet(TensorDataset):
-    def __init__(self, target: nn.Module, evaluation_batch_size: int) -> None:
+    def __init__(
+        self,
+        target: nn.Module,
+        evaluation_batch_size: int = context.config.evaluation_batch_size,
+    ) -> None:
         self.target = target
         self.evaluation_batch_size = evaluation_batch_size
         tensors = torch.Tensor([]), torch.Tensor([])

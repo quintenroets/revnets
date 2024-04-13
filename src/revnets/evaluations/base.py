@@ -13,14 +13,13 @@ from ..data import DataModule
 @dataclass
 class Evaluator:
     reconstruction: torch.nn.Module
-    pipeline: Pipeline | None
+    pipeline: Pipeline
 
     def __post_init__(self) -> None:
         self.reconstruction = self.reconstruction.to(context.device)
 
     @cached_property
     def original(self) -> torch.nn.Module:
-        assert self.pipeline is not None
         return self.pipeline.create_target_network().to(context.device)
 
     def get_evaluation(self) -> str:

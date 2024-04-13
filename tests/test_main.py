@@ -1,6 +1,6 @@
 import pytest
 import torch
-from revnets.main.main import main
+from revnets.main.main import Experiment
 
 gpu_available = torch.cuda.is_available()
 
@@ -9,4 +9,4 @@ gpu_available = torch.cuda.is_available()
     not gpu_available, reason="Only test model training if GPU is available"
 )
 def test_main() -> None:
-    main()
+    Experiment().run()

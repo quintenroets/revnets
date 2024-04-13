@@ -84,7 +84,7 @@ class Reconstructor(base.Reconstructor):
     def __post_init__(self) -> None:
         super().__post_init__()
         self.reconstructions = [
-            self.pipeline.network_factory.create_network(seed=seed + 100)
+            self.pipeline.network_factory.create_network(seed=seed)
             for seed in range(self.n_networks)
         ]
 

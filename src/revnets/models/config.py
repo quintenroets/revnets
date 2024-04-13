@@ -32,8 +32,10 @@ class Evaluation:
 class Config(SerializationMixin):
     sampling_data_size: int = 50000
     reconstruction_training: HyperParameters = HyperParameters(
-        epochs=300, learning_rate=0.00001, batch_size=256
+        epochs=300, learning_rate=0.01e-2, batch_size=2560
     )
+    reconstruct_from_checkpoint: bool = True
+    always_train: bool = False
 
     experiment: Experiment = field(default_factory=Experiment)
     reconstruction_training_debug: HyperParameters = HyperParameters(
@@ -60,7 +62,6 @@ class Config(SerializationMixin):
 
     device: int = 1
     precision: int = 64
-    always_train: bool = True
     loss_criterion: str = "l1"
     validation_ratio: float = 0.1
 
