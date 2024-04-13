@@ -10,7 +10,7 @@ class Evaluator(mae.Evaluator):
     def iterate_compared_layers(
         self, device: torch.device | None = None
     ) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
-        original_layers = generate_layers(self.original)
+        original_layers = generate_layers(self.target)
         reconstruction_layers = generate_layers(self.reconstruction)
         for original, reconstruction in zip(original_layers, reconstruction_layers):
             original_weights = extract_layer_weights(original, device)

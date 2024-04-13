@@ -16,8 +16,8 @@ class Evaluator(layers_mae.Evaluator):
     def iterate_named_compared_layers(
         self,
     ) -> Iterator[tuple[str, torch.Tensor, torch.Tensor]]:
-        keys = self.original.state_dict().keys()
-        original_values = self.original.state_dict().values()
+        keys = self.target.state_dict().keys()
+        original_values = self.target.state_dict().values()
         reconstruction_values = self.reconstruction.state_dict().values()
         yield from zip(keys, original_values, reconstruction_values)
 

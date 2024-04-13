@@ -22,7 +22,7 @@ class Experiment(SerializationMixin):
         seeds = f"{self.seed}_{self.target_network_seed}"
         reconstruction = "_".join(self.reconstruction_technique)
         pipeline = "_".join(self.pipeline)
-        return (reconstruction, pipeline, seeds)
+        return reconstruction, pipeline, seeds
 
     @property
     def title(self) -> str:
@@ -30,8 +30,9 @@ class Experiment(SerializationMixin):
         return " ".join(parts).title()
 
     def generate_title_parts(self) -> Iterator[str]:
+        for name in self.reconstruction_technique:
+            yield name.replace("_", " ")
         yield from (
-            *self.reconstruction_technique,
             "|",
             *self.pipeline,
             "|",

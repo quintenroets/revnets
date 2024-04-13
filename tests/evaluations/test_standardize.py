@@ -4,12 +4,12 @@ import pytest
 from revnets import networks
 from revnets.models import Activation
 
-from tests.evaluations.verifier import StandardizationType, Verifier
+from tests.evaluations.verifier import Standardization, Verifier
 
-standardization_types = (
-    StandardizationType.scale,
-    StandardizationType.standardize,
-    StandardizationType.align,
+standardizations = (
+    Standardization.scale,
+    Standardization.standardize,
+    Standardization.align,
 )
 network_modules = (
     networks.mininet,
@@ -26,11 +26,11 @@ activations = (
 
 @pytest.mark.parametrize("network_module", network_modules)
 @pytest.mark.parametrize("activation", activations)
-@pytest.mark.parametrize("standardization_type", standardization_types)
+@pytest.mark.parametrize("standardization_type", standardizations)
 def test_standardized_form(
     network_module: ModuleType,
     activation: Activation,
-    standardization_type: StandardizationType,
+    standardization_type: Standardization,
 ) -> None:
     tester = Verifier(network_module, activation, standardization_type)
     tester.test_standardized_form()
@@ -38,11 +38,11 @@ def test_standardized_form(
 
 @pytest.mark.parametrize("network_module", network_modules)
 @pytest.mark.parametrize("activation", activations)
-@pytest.mark.parametrize("standardization_type", standardization_types)
+@pytest.mark.parametrize("standardization_type", standardizations)
 def test_standardize_preserves_functionality(
     network_module: ModuleType,
     activation: Activation,
-    standardization_type: StandardizationType,
+    standardization_type: Standardization,
 ) -> None:
     tester = Verifier(network_module, activation, standardization_type)
     tester.test_functional_preservation()
@@ -50,11 +50,11 @@ def test_standardize_preserves_functionality(
 
 @pytest.mark.parametrize("network_module", network_modules)
 @pytest.mark.parametrize("activation", activations)
-@pytest.mark.parametrize("standardization_type", standardization_types)
+@pytest.mark.parametrize("standardization_type", standardizations)
 def test_standardized_form_and_functionality_preservation(
     network_module: ModuleType,
     activation: Activation,
-    standardization_type: StandardizationType,
+    standardization_type: Standardization,
 ) -> None:
     tester = Verifier(network_module, activation, standardization_type)
     tester.test_functional_preservation()
@@ -63,11 +63,11 @@ def test_standardized_form_and_functionality_preservation(
 
 @pytest.mark.parametrize("network_module", network_modules)
 @pytest.mark.parametrize("activation", activations)
-@pytest.mark.parametrize("standardization_type", standardization_types)
+@pytest.mark.parametrize("standardization_type", standardizations)
 def test_second_standardize_no_effect(
     network_module: ModuleType,
     activation: Activation,
-    standardization_type: StandardizationType,
+    standardization_type: Standardization,
 ) -> None:
     tester = Verifier(network_module, activation, standardization_type)
     tester.test_second_standardize_no_effect()
@@ -76,6 +76,6 @@ def test_second_standardize_no_effect(
 @pytest.mark.parametrize("network_module", network_modules)
 @pytest.mark.parametrize("activation", activations)
 def test_optimize_mae(network_module: ModuleType, activation: Activation) -> None:
-    standardization_type = StandardizationType.standardize
+    standardization_type = Standardization.standardize
     tester = Verifier(network_module, activation, standardization_type)
     tester.test_optimize_mae()

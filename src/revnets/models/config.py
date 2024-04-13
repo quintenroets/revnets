@@ -26,19 +26,21 @@ class Evaluation:
     adversarial_epsilon: float = 0.1
     visualize_attack: bool = False
     use_align: bool = False
+    run_analysis: bool = False
+    only_visualize_differences: bool = True
 
 
 @dataclass
 class Config(SerializationMixin):
-    sampling_data_size: int = 50000
+    sampling_data_size: int = 20000
     reconstruction_training: HyperParameters = HyperParameters(
-        epochs=300, learning_rate=0.01e-2, batch_size=2560
+        epochs=300, learning_rate=3e-2, batch_size=256
     )
     reconstruct_from_checkpoint: bool = True
     always_train: bool = False
-    run_analysis: bool = False
-
+    n_rounds: int = 2
     experiment: Experiment = field(default_factory=Experiment)
+
     reconstruction_training_debug: HyperParameters = HyperParameters(
         epochs=3, learning_rate=0.1, batch_size=16
     )
@@ -49,9 +51,9 @@ class Config(SerializationMixin):
     evaluation_batch_size: int = 1000
 
     num_workers: int = 8
-    early_stopping_patience: int = 100
-    n_rounds: int = 2
+    early_stopping_patience: int = 20
     n_networks: int = 2
+    visualization_interval = 10
     weight_variance_downscale_factor: float | None = None
     start_reconstruction_with_zero_biases: bool = False
     gradient_clip_val: int | None = None
@@ -75,3 +77,7 @@ class Config(SerializationMixin):
     @property
     def limit_batches(self) -> int | None:
         return self.debug_batch_limit if self.debug else None
+
+    def __post_init__(self) -> None:
+        if self.evaluation.run_analysis:
+            self.always_train = False

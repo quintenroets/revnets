@@ -37,8 +37,8 @@ class Reconstructor(random.Reconstructor):
 
     def extract_flattened_train_inputs(self) -> NDArray[np.float64]:
         inputs = self.extract_train_inputs().numpy()
-        flattened_iputs = inputs.reshape(len(inputs), -1)
-        return cast(NDArray[np.float64], flattened_iputs)
+        flattened_inputs = inputs.reshape(len(inputs), -1)
+        return cast(NDArray[np.float64], flattened_inputs)
 
     def regularize_covariance_matrix(self, matrix: torch.Tensor) -> torch.Tensor:
         shape = matrix.shape[0]

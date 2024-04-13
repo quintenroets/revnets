@@ -25,8 +25,7 @@ class Evaluator(base.Evaluator):
         self.visualize_train_inputs()
         models = {
             "reconstruction": self.reconstruction,
-            "initialization": self.pipeline.create_initialized_network(),
-            "target": self.pipeline.create_target_network(),
+            "target": self.pipeline.target,
         }
         for name, model in models.items():
             self.visualize_network(model, name)

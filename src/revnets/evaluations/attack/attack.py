@@ -23,7 +23,7 @@ class Evaluator(base.Evaluator):
 
     def compare_attacks(self) -> Evaluation:
         data = self.pipeline.load_prepared_data()
-        model = AttackNetwork(self.original, self.reconstruction)
+        model = AttackNetwork(self.target, self.reconstruction)
         dataloader = data.test_dataloader()
         precision = 32  # adversarial attack library only works with precision 32
         dtype = torch.float32

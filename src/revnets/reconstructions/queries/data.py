@@ -62,7 +62,7 @@ class DataModule(base.DataModule):
 
     def __post_init__(self) -> None:
         super().__post_init__()
-        target = self.pipeline.create_target_network()
+        target = self.pipeline.target
         self.train = QueryDataSet(target, self.evaluation_batch_size)
         self.validation = QueryDataSet(target, self.evaluation_batch_size)
         self.test = QueryDataSet(target, self.evaluation_batch_size)

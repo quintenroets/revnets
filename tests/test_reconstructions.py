@@ -18,10 +18,7 @@ reconstruction_modules = (
 
 
 @pytest.mark.parametrize("reconstruction_module", reconstruction_modules)
-def test_target_network_training(
-    reconstruction_module: ModuleType, test_context: None
-) -> None:
+def test_reconstructions(reconstruction_module: ModuleType, test_context: None) -> None:
     pipeline = Pipeline()
-    pipeline.create_target_network()
     reconstructor: Reconstructor = reconstruction_module.Reconstructor(pipeline)
     reconstructor.create_reconstruction()
