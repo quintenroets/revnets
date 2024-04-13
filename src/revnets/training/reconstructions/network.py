@@ -20,7 +20,3 @@ class Network(network.Network[Metrics]):
         targets: torch.Tensor,
     ) -> Metrics:
         return Metrics.from_results(outputs, targets)
-
-    @classmethod
-    def extract_loss(cls, metrics: Metrics) -> torch.Tensor:
-        return metrics.loss

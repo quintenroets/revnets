@@ -22,7 +22,7 @@ class Evaluator(base.Evaluator):
         return self.compare_attacks()
 
     def compare_attacks(self) -> Evaluation:
-        data = self.load_data()
+        data = self.pipeline.load_prepared_data()
         model = AttackNetwork(self.original, self.reconstruction)
         dataloader = data.test_dataloader()
         precision = 32  # adversarial attack library only works with precision 32

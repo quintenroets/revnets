@@ -24,7 +24,11 @@ class PredictNetwork(LightningModule):
 
 
 class QueryDataSet(TensorDataset):
-    def __init__(self, target: nn.Module, evaluation_batch_size: int) -> None:
+    def __init__(
+        self,
+        target: nn.Module,
+        evaluation_batch_size: int = context.config.evaluation_batch_size,
+    ) -> None:
         self.target = target
         self.evaluation_batch_size = evaluation_batch_size
         tensors = torch.Tensor([]), torch.Tensor([])
@@ -62,7 +66,3 @@ class DataModule(base.DataModule):
         self.train = QueryDataSet(target, self.evaluation_batch_size)
         self.validation = QueryDataSet(target, self.evaluation_batch_size)
         self.test = QueryDataSet(target, self.evaluation_batch_size)
-
-    @property
-    def has_validation_data(self) -> bool:
-        return self.validation_ratio is not None and self.validation_ratio > 0

@@ -31,5 +31,5 @@ def generate_color_maps(
     for number, color_map in mappers.items():
         if number_of_colors <= number:
             yield number_of_colors, color_map
-    color_maps = list(mappers[60]) * (number_of_colors // 60 + 1)
-    yield number_of_colors, tuple(color_maps)
+    color_maps = list(mappers[60]) * (number_of_colors // 60 + 1)  # pragma: nocover
+    yield number_of_colors, tuple(color_maps)  # pragma: nocover

@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -6,31 +7,40 @@ import torch
 from torch.nn import Module
 
 from ...utils.colors import get_colors
-from . import layers_mae
-from .standardize import extract_layer_weights, generate_layers
+from ..weights import layers_mae
+from ..weights.standardize import extract_layer_weights, generate_layers
 
 cpu = torch.device("cpu")
 
 
+@dataclass
 class Evaluator(layers_mae.Evaluator):
     def evaluate(self) -> None:
         self.standardize_networks()
-        networks = {"original": self.original, "reconstruction": self.reconstruction}
+        networks = {
+            "original": self.original,
+            "reconstruction": self.reconstruction,
+        }
         for name, network in networks.items():
             self.visualize_network_weights(network, name)
         if self.has_same_architecture():
             self.visualize_network_differences()
 
     def visualize_network_weights(self, network: Module, name: str) -> None:
+        layer_weights = self.generate_layer_weights(network)
+        for i, weights in enumerate(layer_weights):
+            title = f"{name} layer {i + 1} weights".capitalize()
+            self.visualize_layer_weights(weights, title)
+
+    def generate_layer_weights(self, network: Module) -> Iterator[torch.Tensor]:
         layers = generate_layers(network)
-        for i, layer in enumerate(layers):
+        for layer in layers:
             weights = self.extract_layer_weights(layer)
             if weights is not None:
-                title = f"{name} layer {i + 1} weights".capitalize()
-                self.visualize_weights(weights, title)
+                yield weights
 
     @classmethod
-    def visualize_weights(
+    def visualize_layer_weights(
         cls, weights: torch.Tensor, title: str, n_show: int | None = None
     ) -> None:
         weights = weights[:n_show]
@@ -42,7 +52,7 @@ class Evaluator(layers_mae.Evaluator):
         ax = cls.create_figure()
 
         for i, (neuron, color) in enumerate(zip(weights, colors)):
-            label = f"Neuron {i+1}"
+            label = f"Neuron {i + 1}"
             ax.plot(neuron, color=color, label=label)
 
         n_features = len(weights[0])
@@ -62,8 +72,8 @@ class Evaluator(layers_mae.Evaluator):
         layers = self.iterate_compared_layers()
         for i, (original, reconstructed) in enumerate(layers):
             weights = original - reconstructed
-            title = f"Layer {i+1} weight differences"
-            self.visualize_weights(weights, title)
+            title = f"Layer {i + 1} weight differences"
+            self.visualize_layer_weights(weights, title)
 
     @classmethod
     def create_figure(cls) -> Any:

@@ -104,6 +104,9 @@ class Verifier:
             is_close = torch.isclose(value, second_value)
             assert torch.all(is_close)
 
+    def test_optimize_mae(self) -> None:
+        Standardizer(self.network, optimize_mae=True).run()
+
 
 def verify_scale_standardized(neurons: InternalNeurons) -> None:
     neurons_standardizer = standardize.scale.Standardizer(neurons)

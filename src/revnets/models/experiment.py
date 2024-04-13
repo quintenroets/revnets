@@ -12,7 +12,7 @@ class Experiment(SerializationMixin):
     reconstruction_technique: list[str] = field(default_factory=lambda: ["cheat"])
     pipeline: list[str] = field(default_factory=lambda: ["mininet", "mininet"])
     seed: int = 0
-    target_network_seed: int = 999
+    target_network_seed: int = 900
 
     def __post_init__(self) -> None:
         assert self.seed != self.target_network_seed
@@ -23,10 +23,6 @@ class Experiment(SerializationMixin):
         reconstruction = "_".join(self.reconstruction_technique)
         pipeline = "_".join(self.pipeline)
         return (reconstruction, pipeline, seeds)
-
-    @property
-    def name(self) -> str:
-        return "_".join(self.names)
 
     @property
     def title(self) -> str:

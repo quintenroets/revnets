@@ -30,5 +30,5 @@ class Evaluator(layers_mae.Evaluator):
             }
             formatted_value = json.dumps(values, indent=4)
         else:
-            formatted_value = "/"
+            formatted_value = "/"  # pragma: nocover
         return formatted_value

@@ -52,21 +52,3 @@ class Trainer(pl.Trainer):
                 metrics_format=".3e", metrics_text_delimiter="\n"
             )
             yield RichProgressBar(theme=theme)
-
-    @property
-    def log_message(self) -> str:
-        from ..utils.table import Table
-
-        table = Table()
-        table.add_column("Test metric", style="cyan", no_wrap=True)
-        table.add_column("Value", style="magenta")
-
-        for name, value in self.logged_metrics.items():
-            if name != "step":
-                name = name.replace("test ", "")
-                value_float = value.item()
-                display_format = ".3%" if "accuracy" in name else ".3f"
-                value_str = f"{value_float :{display_format}}".replace("%", " %")
-                table.add_row(name, value_str)
-
-        return table.text

@@ -53,7 +53,7 @@ class Evaluator(base.Evaluator):
 
     def compare_outputs(self) -> Metrics:
         model = CompareModel(self.original, self.reconstruction)
-        data = self.load_data()
+        data = self.pipeline.load_prepared_data()
         dataloader = self.extract_dataloader(data)
         Trainer().test(model, dataloaders=dataloader)  # noqa
         return cast(Metrics, model.metrics)

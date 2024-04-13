@@ -1,18 +1,24 @@
 from types import ModuleType
-from typing import cast
 
 from torch.nn import Module
 
 from ..pipelines import Pipeline
-from . import weights
+from . import analysis, weights
+from .base import Evaluator
 from .evaluation import Evaluation
 
 
 def evaluate(reconstruction: Module, pipeline: Pipeline) -> Evaluation:
     def apply(evaluation_module: ModuleType) -> str:
-        evaluator = evaluation_module.Evaluator(reconstruction, pipeline)
-        result = evaluator.get_evaluation()
-        return cast(str, result)
+        evaluator: Evaluator = evaluation_module.Evaluator(reconstruction, pipeline)
+        return evaluator.get_evaluation()
+
+    analysis_modules = (analysis.weights,)
+    from revnets.context import context
+
+    if context.config.run_analysis:
+        for analysis_module in analysis_modules:
+            apply(analysis_module)
 
     # attack_evaluation = apply(attack)
 

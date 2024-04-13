@@ -8,6 +8,7 @@ from torch.nn import Flatten, Module
 from revnets.models import InternalNeurons
 
 from . import order, scale
+from .utils import extract_linear_layer_weights
 
 T = TypeVar("T")
 
@@ -15,6 +16,7 @@ T = TypeVar("T")
 @dataclass
 class Standardizer:
     model: Module
+    optimize_mae: bool = False
 
     def run(self) -> None:
         """
@@ -23,12 +25,14 @@ class Standardizer:
         self.standardize_scale()
         for neurons in self.internal_neurons:
             order.Standardizer(neurons).run()
+        if self.optimize_mae:
+            self.apply_optimize_mae()
 
     def standardize_scale(self) -> None:
         for neurons in self.internal_neurons:
             scale.Standardizer(neurons).run()
 
-    def optimize_mae(self) -> None:
+    def apply_optimize_mae(self) -> None:
         # optimize mae by distributing last layer scale factor over all layers
         if all(neuron.has_norm_isomorphism for neuron in self.internal_neurons):
             desired_scale = self.calculate_average_scale_per_layer()
@@ -37,7 +41,8 @@ class Standardizer:
                 scale.Standardizer(neurons).run()
 
     def calculate_average_scale_per_layer(self) -> float:
-        last_neuron_scales = self.internal_neurons[-1].outgoing.norm(dim=1, p=2)
+        weights = extract_linear_layer_weights(self.internal_neurons[-1].outgoing)
+        last_neuron_scales = weights.norm(dim=1, p=2)
         last_neuron_scale = sum(last_neuron_scales) / len(last_neuron_scales)
         num_internal_layers = len(self.internal_neurons)
         average_scale = last_neuron_scale ** (1 / num_internal_layers)

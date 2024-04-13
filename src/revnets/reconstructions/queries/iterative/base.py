@@ -43,4 +43,4 @@ class Reconstructor(correlated_features.Reconstructor):
         data.train.add(queries)
 
     def create_difficult_samples(self) -> torch.Tensor:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover

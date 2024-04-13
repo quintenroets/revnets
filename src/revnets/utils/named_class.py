@@ -4,12 +4,12 @@ from simple_classproperty import classproperty
 class NamedClass:
     @classmethod
     def get_base_name(cls) -> str:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover
 
     @classmethod
     @classproperty
     def name(cls) -> str:
-        return " ".join(cls.relative_module).capitalize()
+        return "_".join(cls.relative_module)
 
     @classmethod
     @classproperty

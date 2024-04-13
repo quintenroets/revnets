@@ -31,7 +31,7 @@ class InputNetwork(LightningModule):
 
     def on_train_start(self) -> None:
         if self.verbose:
-            print("\nAverage pairwise distances: ", end="\n\t")
+            print("\nAverage pairwise distances: ", end="\n\t")  # pragma: nocover
 
     @classmethod
     def get_input_embeddings(cls, shape: tuple[int, int]) -> torch.nn.Embedding:
@@ -53,7 +53,7 @@ class InputNetwork(LightningModule):
         distance_total = pairwise_distances.mean()
         loss = -distance_total
         if self.verbose:
-            print(f"{distance_total.item():.3f}", end=" ")
+            print(f"{distance_total.item():.3f}", end=" ")  # pragma: nocover
         return loss
 
     def training_step(self, batch: torch.Tensor, batch_idx: int) -> torch.Tensor:
@@ -84,7 +84,7 @@ class Reconstructor(base.Reconstructor):
     def __post_init__(self) -> None:
         super().__post_init__()
         self.reconstructions = [
-            self.pipeline.network_factory.create_network(seed=seed + 100)
+            self.pipeline.network_factory.create_network(seed=seed)
             for seed in range(self.n_networks)
         ]
 

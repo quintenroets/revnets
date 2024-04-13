@@ -80,8 +80,10 @@ class AttackNetwork(pl.LightningModule):
     ) -> None:
         length = len(inputs[0])
         indices = np.flip(np.arange(length))
+        inputs_numpy = inputs.cpu().numpy()[:10]
+        adversarial_inputs_numpy = adversarial_inputs.cpu().numpy()
 
-        for image, adversarial in zip(inputs, adversarial_inputs):
+        for image, adversarial in zip(inputs_numpy, adversarial_inputs_numpy):
             plt.plot(image, indices, color="green", label="original")
             plt.plot(adversarial, indices, color="red", label="adversarial")
             plt.legend()
@@ -115,7 +117,6 @@ class AttackNetwork(pl.LightningModule):
         self.model_under_attack = PyTorchClassifier(
             model=self.reconstruction,
             loss=torch.nn.CrossEntropyLoss(),
-            optimizer=self.reconstruction.configure_optimizers(),
             input_shape=inputs.shape[1:],
             nb_classes=outputs.shape[-1],
             device_type="gpu",

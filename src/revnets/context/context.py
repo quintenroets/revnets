@@ -3,31 +3,15 @@ from functools import cached_property
 import torch
 from package_utils.context import Context as Context_
 
-from ..models import Config, HyperParameters, Options, Path
+from ..models import Config, Options, Path
 
 
 class Context(Context_[Options, Config, None]):
-    @property
-    def training(self) -> HyperParameters:
-        return (
-            self.config.reconstruction_training_debug
-            if self.config.debug
-            else self.config.reconstruction_training
-        )
-
-    @property
-    def number_of_epochs(self) -> int:
-        return self.training.epochs
-
-    @property
-    def batch_size(self) -> int:
-        return self.training.batch_size
-
     @cached_property
     def is_running_in_notebook(self) -> bool:
         try:
             get_ipython()  # type: ignore[name-defined]
-            is_in_notebook = True
+            is_in_notebook = True  # pragma: nocover
         except NameError:
             is_in_notebook = False
         return is_in_notebook
@@ -56,7 +40,7 @@ class Context(Context_[Options, Config, None]):
 
     @property
     def dtype(self) -> torch.dtype:
-        match self.config.precision:
+        match self.config.precision:  # pragma: nocover
             case 32:
                 dtype = torch.float32
             case 64:

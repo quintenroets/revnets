@@ -1,21 +1,54 @@
+from dataclasses import dataclass
 from types import ModuleType
-from typing import cast
 
-from .. import experiments
+import cli
+import numpy as np
+import torch
+from torch import nn
+
+from revnets import pipelines
+from revnets.models import Experiment as Config
+from revnets.pipelines import Pipeline
+
+from .. import evaluations, reconstructions
 from ..context import context
+from ..reconstructions import Reconstructor
 
 
-def main() -> None:
-    name = context.options.experiment
-    module = experiments.experiment if name is None else extract_experiment_module(name)
-    module.Experiment().run()
+@dataclass
+class Experiment:
+    """
+    Reverse engineer internal parameters of black box neural networks.
+    """
+
+    @property
+    def config(self) -> Config:
+        return context.config.experiment
+
+    def run(self) -> None:
+        set_seed()
+        cli.console.rule(self.config.title)
+        self.run_experiment()
+
+    def run_experiment(self) -> None:
+        pipeline: Pipeline = extract_module(pipelines, self.config.pipeline).Pipeline()
+        reconstruction = self.create_reconstruction(pipeline)
+        evaluation = evaluations.evaluate(reconstruction, pipeline)
+        evaluation.show()
+        context.results_path.yaml = evaluation.dict()
+
+    def create_reconstruction(self, pipeline: Pipeline) -> nn.Module:
+        module = extract_module(reconstructions, self.config.reconstruction_technique)
+        reconstructor: Reconstructor = module.Reconstructor(pipeline)
+        return reconstructor.create_reconstruction()
 
 
-def extract_experiment_module(name: str) -> ModuleType:
-    module: ModuleType = experiments
-    analysis_keyword = "_analysis"
-    if analysis_keyword in name:
-        name = name.replace(analysis_keyword, "")
-        module = experiments.analysis
-    experiment_module = getattr(module, name)
-    return cast(ModuleType, experiment_module)
+def set_seed() -> None:
+    torch.manual_seed(context.config.experiment.seed)
+    np.random.seed(context.config.experiment.seed)
+
+
+def extract_module(module: ModuleType, names: list[str]) -> ModuleType:
+    for name in names:
+        module = getattr(module, name)
+    return module

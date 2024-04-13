@@ -25,7 +25,10 @@ class Reconstructor(base.Reconstructor):
         return cast(Path, path)
 
     def reconstruct_weights(self) -> None:
-        if context.config.always_train or not self.trained_weights_path.exists():
+        weights_saved = self.trained_weights_path.exists()
+        if context.config.reconstruct_from_checkpoint and weights_saved:
+            self.load_weights()  # pragma: nocover
+        if context.config.always_train or not weights_saved:
             self.start_training()
             self.save_weights()
         self.load_weights()
@@ -71,4 +74,4 @@ class Reconstructor(base.Reconstructor):
             dataset.add(validation_queries)
 
     def create_queries(self, num_samples: int) -> torch.Tensor:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover

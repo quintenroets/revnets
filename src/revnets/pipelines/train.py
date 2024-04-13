@@ -1,6 +1,5 @@
 from abc import ABC
 from dataclasses import dataclass
-from typing import cast
 
 import torch
 from pytorch_lightning import LightningModule
@@ -52,7 +51,7 @@ class Pipeline(base.Pipeline, ABC):
 
     @classmethod
     def load_data(cls) -> DataModule:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover
 
     @classmethod
     def load_prepared_data(cls) -> DataModule:
@@ -60,16 +59,6 @@ class Pipeline(base.Pipeline, ABC):
         data.prepare_data()
         data.setup("train")
         return data
-
-    def calculate_output_size(self) -> int:
-        data = self.load_data()
-        data.prepare_data()
-        sample = data.train_validation[0][0]
-        inputs = sample.unsqueeze(0)
-        model = self.create_initialized_network()
-        outputs = model(inputs)[0]
-        size = outputs.shape[-1]
-        return cast(int, size)
 
     def load_weights(self, model: torch.nn.Module) -> None:
         state = torch.load(self.weights_path_str)

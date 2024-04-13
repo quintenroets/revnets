@@ -41,12 +41,6 @@ class Path(superpathlib.Path):
 
     @classmethod
     @classproperty
-    def outputs(cls: type[T]) -> T:
-        path = cls.assets / "outputs"
-        return typing.cast(T, path)
-
-    @classmethod
-    @classproperty
     def results(cls: type[T]) -> T:
         path = cls.assets / "results"
         return typing.cast(T, path)
