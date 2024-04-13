@@ -6,7 +6,7 @@ from torch.nn import Module
 from revnets.context import context
 
 from ..pipelines import Pipeline
-from . import outputs, weights
+from . import analysis, outputs, weights
 from .base import Evaluator
 from .evaluation import Evaluation
 
@@ -17,8 +17,6 @@ def evaluate(reconstruction: Module, pipeline: Pipeline) -> Evaluation:
         return evaluator.get_evaluation()
 
     if context.config.evaluation.run_analysis:
-        from . import analysis
-
         analysis_modules = (analysis.weights,)
         for analysis_module in analysis_modules:
             apply(analysis_module)

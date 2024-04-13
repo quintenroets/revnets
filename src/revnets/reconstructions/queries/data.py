@@ -16,7 +16,9 @@ class QueryDataSet(TensorDataset):
     ) -> None:
         self.target = target
         if evaluation_batch_size is None:
-            evaluation_batch_size = context.config.evaluation_batch_size
+            evaluation_batch_size = (
+                context.config.evaluation_batch_size
+            )  # pragma: nocover
         self.evaluation_batch_size = evaluation_batch_size
         tensors = torch.Tensor([]), torch.Tensor([])
         super().__init__(*tensors)

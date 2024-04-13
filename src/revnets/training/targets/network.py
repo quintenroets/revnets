@@ -9,11 +9,7 @@ from .metrics import Metrics
 
 
 class Network(network.Network[Metrics]):
-    def __init__(
-        self,
-        model: nn.Module,
-        do_log: bool = True,
-    ) -> None:
+    def __init__(self, model: nn.Module, do_log: bool = True) -> None:
         learning_rate = context.config.target_network_training.learning_rate
         super().__init__(model, learning_rate, do_log)
 

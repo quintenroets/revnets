@@ -11,6 +11,16 @@ pipeline_modules = (
     pipelines.images.mediumnet_small,
 )
 
+all_pipeline_modules = (
+    *pipeline_modules,
+    pipelines.mininet.mininet_40,
+    pipelines.mininet.mininet_100,
+    pipelines.images.mininet_100,
+    pipelines.images.mininet_128,
+    pipelines.images.mininet_200,
+    pipelines.mediumnet.mediumnet_40,
+)
+
 
 @pytest.mark.parametrize("pipeline_module", pipeline_modules)
 def test_target_network_training(
@@ -18,3 +28,9 @@ def test_target_network_training(
 ) -> None:
     pipeline: Pipeline = pipeline_module.Pipeline()
     pipeline.create_target_network()
+
+
+@pytest.mark.parametrize("pipeline_module", all_pipeline_modules)
+def test_network_factory(pipeline_module: ModuleType, test_context: None) -> None:
+    pipeline: Pipeline = pipeline_module.Pipeline()
+    pipeline.create_network_factory()
