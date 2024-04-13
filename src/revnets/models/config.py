@@ -36,6 +36,7 @@ class Config(SerializationMixin):
     )
     reconstruct_from_checkpoint: bool = True
     always_train: bool = False
+    run_analysis: bool = False
 
     experiment: Experiment = field(default_factory=Experiment)
     reconstruction_training_debug: HyperParameters = HyperParameters(
@@ -58,7 +59,6 @@ class Config(SerializationMixin):
     debug: bool = False
     debug_batch_limit: int = 1
     quiet_prediction: bool = True
-    run_analysis: bool = False
 
     device: int = 1
     precision: int = 64

@@ -14,8 +14,11 @@ def evaluate(reconstruction: Module, pipeline: Pipeline) -> Evaluation:
         return evaluator.get_evaluation()
 
     analysis_modules = (analysis.weights,)
-    for analysis_module in analysis_modules:
-        apply(analysis_module)
+    from revnets.context import context
+
+    if context.config.run_analysis:
+        for analysis_module in analysis_modules:
+            apply(analysis_module)
 
     # attack_evaluation = apply(attack)
 

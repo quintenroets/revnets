@@ -4,6 +4,7 @@ from types import ModuleType
 import cli
 import numpy as np
 import torch
+from torch import nn
 
 from revnets import pipelines
 from revnets.models import Experiment as Config
@@ -30,21 +31,16 @@ class Experiment:
         self.run_experiment()
 
     def run_experiment(self) -> None:
-        reconstruction = self.reconstructor.create_reconstruction()
-        evaluation = evaluations.evaluate(reconstruction, self.pipeline)
+        pipeline: Pipeline = extract_module(pipelines, self.config.pipeline).Pipeline()
+        reconstruction = self.create_reconstruction(pipeline)
+        evaluation = evaluations.evaluate(reconstruction, pipeline)
         evaluation.show()
         context.results_path.yaml = evaluation.dict()
 
-    @property
-    def pipeline(self) -> Pipeline:
-        pipeline: Pipeline = extract_module(pipelines, self.config.pipeline).Pipeline()
-        return pipeline
-
-    @property
-    def reconstructor(self) -> Reconstructor:
+    def create_reconstruction(self, pipeline: Pipeline) -> nn.Module:
         module = extract_module(reconstructions, self.config.reconstruction_technique)
-        reconstructor: Reconstructor = module.Reconstructor(self.pipeline)
-        return reconstructor
+        reconstructor: Reconstructor = module.Reconstructor(pipeline)
+        return reconstructor.create_reconstruction()
 
 
 def set_seed() -> None:
