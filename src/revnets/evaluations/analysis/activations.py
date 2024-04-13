@@ -9,8 +9,8 @@ from torch import nn
 from torch.nn import Module
 from torch.utils.data import TensorDataset
 
-from revnets.reconstructions.queries.data import QueryDataSet
 from revnets.reconstructions.queries.random import Reconstructor
+from revnets.utils.data import compute_targets
 
 from .. import base
 
@@ -48,7 +48,7 @@ class Evaluator(base.Evaluator):
 
     def visualize_model_outputs(self, model: Module, name: str) -> None:
         inputs = Reconstructor(self.pipeline).create_queries(self.n_inputs)
-        outputs = QueryDataSet(model).compute_targets(inputs)
+        outputs = compute_targets(inputs, model)
         if self.activation:
             outputs = F.relu(outputs)  # pragma: nocover
         ActivationsVisualizer(outputs, name).run()

@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import torch
 from torch import nn
@@ -11,10 +11,12 @@ from ..context import context
 from ..utils import NamedClass
 
 
-@dataclass(frozen=True)
+@dataclass
 class NetworkFactory(NamedClass):
     output_size: int = 10
-    activation: Activation = context.config.target_network_training.activation
+    activation: Activation = field(
+        default_factory=lambda: context.config.target_network_training.activation
+    )
 
     def create_activation_layer(self) -> Module:
         activation_layer: Module

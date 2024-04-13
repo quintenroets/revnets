@@ -8,4 +8,6 @@ from . import mininet
 
 @dataclass
 class Pipeline(mininet.Pipeline):
-    network_factory: NetworkFactory = networks.mininet.NetworkFactory(hidden_size=100)
+    @classmethod
+    def create_network_factory(cls) -> NetworkFactory:
+        return networks.mininet.NetworkFactory(hidden_size=100)

@@ -4,9 +4,10 @@ from typing import cast
 
 import torch
 
+from revnets.standardization import Standardizer, align
+
 from ...context import context
 from .. import base
-from .standardize import Standardizer, align
 
 
 @dataclass

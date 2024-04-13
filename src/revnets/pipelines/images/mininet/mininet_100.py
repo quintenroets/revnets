@@ -5,6 +5,6 @@ from . import mininet_small
 
 
 class Pipeline(mininet_small.Pipeline):
-    network_factory: NetworkFactory = networks.images.mininet.NetworkFactory(
-        hidden_size=100
-    )
+    @classmethod
+    def create_network_factory(cls) -> NetworkFactory:
+        return networks.images.mininet.NetworkFactory(hidden_size=100)

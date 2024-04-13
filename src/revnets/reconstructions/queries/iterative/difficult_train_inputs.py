@@ -4,12 +4,10 @@ from typing import cast
 import numpy as np
 import torch
 from kneed import KneeLocator
-from torch import nn
 from torch.utils.data import DataLoader
 
-from revnets.context import context
+from revnets.utils.data import compute_targets
 
-from ..data import QueryDataSet
 from . import base
 
 
@@ -36,19 +34,11 @@ class Reconstructor(base.Reconstructor):
         batch_size = len(data.train)  # type: ignore[arg-type]
         dataloader = DataLoader(data.train, batch_size=batch_size, shuffle=False)
         inputs = next(iter(dataloader))[0]
-        outputs = self.calculate_outputs(inputs, self.reconstruction)
-        targets = self.calculate_outputs(inputs, self.pipeline.target)
+        outputs = compute_targets(inputs, self.reconstruction)
+        targets = compute_targets(inputs, self.pipeline.target)
         high_loss_indices = self.extract_high_loss_indices(outputs, targets)
         difficult_inputs = inputs[high_loss_indices]
         return cast(torch.Tensor, difficult_inputs)
-
-    @classmethod
-    def calculate_outputs(
-        cls, inputs: torch.Tensor, network: nn.Module
-    ) -> torch.Tensor:
-        batch_size = context.config.evaluation_batch_size
-        query_dataset = QueryDataSet(target=network, evaluation_batch_size=batch_size)
-        return query_dataset.compute_targets(inputs)
 
     def extract_high_loss_indices(
         self, outputs: torch.Tensor, targets: torch.Tensor

@@ -2,8 +2,9 @@ from collections.abc import Iterator
 
 import torch
 
+from revnets.standardization import extract_layer_weights, generate_layers
+
 from . import mae
-from .standardize import extract_layer_weights, generate_layers
 
 
 class Evaluator(mae.Evaluator):

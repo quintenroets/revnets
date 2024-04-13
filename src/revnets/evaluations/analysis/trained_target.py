@@ -10,7 +10,7 @@ from .. import base
 class Evaluator(base.Evaluator):
     def evaluate(self) -> None:
         dataset = self.pipeline.load_prepared_data()
-        network = Network(self.pipeline.target, learning_rate=0)
+        network = Network(self.pipeline.target)
         dataloaders = (
             dataset.train_dataloader(),
             dataset.val_dataloader(),

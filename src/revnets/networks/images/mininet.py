@@ -6,7 +6,7 @@ from torch import nn
 from .. import mininet
 
 
-@dataclass(frozen=True)
+@dataclass
 class NetworkFactory(mininet.NetworkFactory):
     input_size: int = 784
     hidden_size: int = 40

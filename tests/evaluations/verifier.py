@@ -6,10 +6,10 @@ from types import ModuleType
 from typing import cast
 
 import torch
+from revnets import standardization
 from revnets.context import context
-from revnets.evaluations.weights import standardize
-from revnets.evaluations.weights.standardize import Standardizer
 from revnets.models import Activation, InternalNeurons
+from revnets.standardization import Standardizer, align, generate_internal_neurons
 from torch.nn import Module, Sequential
 
 
@@ -49,7 +49,7 @@ class Verifier:
             case Standardization.standardize:
                 Standardizer(self.network).run()
             case Standardization.align:
-                standardize.align(self.network, self.target)
+                align(self.network, self.target)
 
     def test_functional_preservation(self) -> None:
         inputs = self.create_network_inputs()
@@ -62,7 +62,7 @@ class Verifier:
         assert torch.all(outputs_are_closes)
 
     def verify_standardized_form(self) -> None:
-        neuron_layers = standardize.generate_internal_neurons(self.network)
+        neuron_layers = generate_internal_neurons(self.network)
         for neurons in neuron_layers:
             if neurons.has_scale_isomorphism:
                 verify_scale_standardized(neurons)
@@ -70,8 +70,8 @@ class Verifier:
                 verify_order_standardized(neurons)
 
     def verify_aligned_form(self) -> None:
-        neuron_layers = standardize.generate_internal_neurons(self.network)
-        target_neuron_layers = standardize.generate_internal_neurons(self.target)
+        neuron_layers = generate_internal_neurons(self.network)
+        target_neuron_layers = generate_internal_neurons(self.target)
         for neurons, target_neurons in zip(neuron_layers, target_neuron_layers):
             if neurons.has_scale_isomorphism:
                 verify_scale_standardized(neurons)
@@ -112,7 +112,7 @@ class Verifier:
 
 
 def verify_scale_standardized(neurons: InternalNeurons) -> None:
-    neurons_standardizer = standardize.scale.Standardizer(neurons)
+    neurons_standardizer = standardization.scale.Standardizer(neurons)
     scales = neurons_standardizer.calculate_scale_factors(neurons.incoming)
     ones = torch.ones_like(scales)
     close_to_one = torch.isclose(scales, ones)
@@ -120,7 +120,7 @@ def verify_scale_standardized(neurons: InternalNeurons) -> None:
 
 
 def verify_order_standardized(neurons: InternalNeurons) -> None:
-    weights = standardize.extract_linear_layer_weights(neurons.incoming)
+    weights = standardization.extract_linear_layer_weights(neurons.incoming)
     incoming_weights = weights.norm(dim=1, p=1)
     sorted_indices = incoming_weights[:-1] <= incoming_weights[1:]
     is_sorted = torch.all(sorted_indices)
@@ -128,7 +128,7 @@ def verify_order_standardized(neurons: InternalNeurons) -> None:
 
 
 def verify_aligned(neurons: InternalNeurons, target_neurons: InternalNeurons) -> None:
-    order = standardize.calculate_optimal_order(
+    order = standardization.calculate_optimal_order(
         neurons.incoming, target_neurons.incoming
     )
     is_ordered = order == torch.arange(len(order))

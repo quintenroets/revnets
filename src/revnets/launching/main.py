@@ -19,6 +19,13 @@ def main() -> None:
 def launch(experiment: Experiment) -> None:
     config_dict = cast(dict[str, Any], context.options.config_path.yaml)
     experiment.prepare_config(config_dict)
-    print(experiment.config_path)
-    cli.run("ls")
-    # cli.run("revnets", "--config-path", experiment.config_path)
+    command = "revnets", "--config-path", str(experiment.config_path)
+    title = "_".join(experiment.names)
+    launch_command(command, title)
+
+
+def launch_command(command: tuple[str, ...], title: str) -> None:
+    command_str = " ".join(command)
+    shell_command = f"{command_str}; fish"
+    launch_command = ("tmux", "new-session", "-s", title, "-d", shell_command)
+    cli.run(launch_command)

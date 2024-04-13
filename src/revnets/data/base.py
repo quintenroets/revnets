@@ -13,9 +13,13 @@ T = TypeVar("T")
 
 @dataclass
 class DataModule(LightningDataModule):
-    batch_size: int = context.config.target_network_training.batch_size
+    batch_size: int = field(
+        default_factory=lambda: context.config.target_network_training.batch_size
+    )
     evaluation_batch_size: int = 1000
-    validation_ratio = context.config.validation_ratio
+    validation_ratio: float = field(
+        default_factory=lambda: context.config.validation_ratio
+    )
     train: data.Dataset[Any] = field(init=False)
     validation: data.Dataset[Any] = field(init=False)
     train_validation: data.Dataset[Any] = field(init=False)

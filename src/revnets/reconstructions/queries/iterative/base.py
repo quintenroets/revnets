@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import cli
 import torch
@@ -12,7 +12,7 @@ from ..data import DataModule
 
 @dataclass
 class Reconstructor(correlated_features.Reconstructor):
-    n_rounds: int = context.config.n_rounds
+    n_rounds: int = field(default_factory=lambda: context.config.n_rounds)
     visualize: bool = False
     round: int = 0
 

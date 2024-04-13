@@ -43,7 +43,7 @@ class Experiment(SerializationMixin):
 
     @property
     def path(self) -> Path:
-        path = Path.results
+        path = Path.config
         for name in self.names:
             path /= name
         return cast(Path, path)

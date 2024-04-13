@@ -18,10 +18,15 @@ from . import base
 
 @dataclass
 class Pipeline(base.Pipeline, ABC):
-    network_factory: NetworkFactory
-
     def create_initialized_network(self) -> Sequential:
         return self.network_factory.create_network(seed=context.config.experiment.seed)
+
+    @cached_property
+    def network_factory(self) -> NetworkFactory:
+        return self.create_network_factory()
+
+    def create_network_factory(self) -> NetworkFactory:
+        raise NotImplementedError  # pragma: nocover
 
     @cached_property
     def target(self) -> Sequential:

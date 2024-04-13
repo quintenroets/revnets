@@ -7,7 +7,7 @@ from torch import nn
 from . import base
 
 
-@dataclass(frozen=True)
+@dataclass
 class NetworkFactory(base.NetworkFactory):
     input_size: int = 40
     hidden_size: int = 20

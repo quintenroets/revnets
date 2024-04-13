@@ -34,10 +34,10 @@ class Evaluation:
 class Config(SerializationMixin):
     sampling_data_size: int = 20000
     reconstruction_training: HyperParameters = HyperParameters(
-        epochs=300, learning_rate=3e-2, batch_size=256
+        epochs=300, learning_rate=1e-1, batch_size=256
     )
-    reconstruct_from_checkpoint: bool = True
-    always_train: bool = False
+    reconstruct_from_checkpoint: bool = False
+    always_train: bool = True
     n_rounds: int = 2
     experiment: Experiment = field(default_factory=Experiment)
 

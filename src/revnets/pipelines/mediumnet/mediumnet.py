@@ -5,4 +5,6 @@ from ..mininet import mininet
 
 
 class Pipeline(mininet.Pipeline):
-    network_factory: NetworkFactory = networks.mediumnet.NetworkFactory()
+    @classmethod
+    def create_network_factory(cls) -> NetworkFactory:
+        return networks.mediumnet.NetworkFactory()
