@@ -3,13 +3,31 @@ from types import ModuleType
 
 import pytest
 from revnets import evaluations, pipelines, reconstructions
+from revnets.evaluations import analysis, attack, outputs, weights
+from revnets.pipelines import Pipeline
 
-pipeline_modules = (pipelines.mininet,)
+evaluation_modules = (
+    weights.mse,
+    weights.mae,
+    weights.max_ae,
+    weights.layers_mae,
+    weights.named_layers_mae,
+    attack.attack,
+    outputs.train,
+    outputs.val,
+    outputs.test,
+    analysis.weights,
+    analysis.activations,
+    analysis.trained_target,
+)
 
 
-@pytest.mark.parametrize("pipeline_module", pipeline_modules)
-def test_cheat_evaluations(pipeline_module: ModuleType) -> None:
-    pipeline = pipeline_module.Pipeline()
+@pytest.fixture
+def pipeline() -> Pipeline:
+    return pipelines.mininet.Pipeline()
+
+
+def test_cheat_evaluations(pipeline: Pipeline) -> None:
     reconstructor = reconstructions.cheat.Reconstructor(pipeline)
     reconstruction = reconstructor.create_reconstruction()
 
@@ -24,3 +42,12 @@ def test_cheat_evaluations(pipeline_module: ModuleType) -> None:
     for value in perfect_metrics:
         if value is not None and value != "/":
             assert math.isclose(float(value), 0, abs_tol=1e-5)
+
+
+@pytest.mark.parametrize("evaluation_module", evaluation_modules)
+def test_evaluations(
+    evaluation_module: ModuleType, pipeline: Pipeline, test_context: None
+) -> None:
+    reconstructor = reconstructions.empty.Reconstructor(pipeline)
+    reconstruction = reconstructor.create_reconstruction()
+    evaluation_module.Evaluator(reconstruction, pipeline).evaluate()

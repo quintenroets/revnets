@@ -115,7 +115,6 @@ class AttackNetwork(pl.LightningModule):
         self.model_under_attack = PyTorchClassifier(
             model=self.reconstruction,
             loss=torch.nn.CrossEntropyLoss(),
-            optimizer=self.reconstruction.configure_optimizers(),
             input_shape=inputs.shape[1:],
             nb_classes=outputs.shape[-1],
             device_type="gpu",
