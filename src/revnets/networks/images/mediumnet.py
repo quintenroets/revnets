@@ -6,7 +6,7 @@ from torch import nn
 from .. import mediumnet
 
 
-@dataclass(frozen=True)
+@dataclass
 class NetworkFactory(mediumnet.NetworkFactory):
     input_size: int = 784
     hidden_size1: int = 512

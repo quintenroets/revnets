@@ -34,10 +34,10 @@ class Evaluation:
 class Config(SerializationMixin):
     sampling_data_size: int = 20000
     reconstruction_training: HyperParameters = HyperParameters(
-        epochs=300, learning_rate=3e-2, batch_size=256
+        epochs=300, learning_rate=1e-1, batch_size=256
     )
-    reconstruct_from_checkpoint: bool = True
-    always_train: bool = False
+    reconstruct_from_checkpoint: bool = False
+    always_train: bool = True
     n_rounds: int = 2
     experiment: Experiment = field(default_factory=Experiment)
 
@@ -70,14 +70,14 @@ class Config(SerializationMixin):
     console_metrics_refresh_interval: float = 0.5
     max_difficult_inputs_epochs: int = 100
 
+    limit_batches: int | None = None
+
     @property
     def number_of_validation_sanity_steps(self) -> int | None:
         return 0 if self.debug else 0
 
-    @property
-    def limit_batches(self) -> int | None:
-        return self.debug_batch_limit if self.debug else None
-
     def __post_init__(self) -> None:
         if self.evaluation.run_analysis:
             self.always_train = False
+        if self.debug:
+            self.limit_batches = self.debug_batch_limit  # pragma: nocover

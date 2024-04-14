@@ -7,10 +7,10 @@ import torch
 from torch.nn import Module
 
 from revnets.context import context
+from revnets.standardization import extract_layer_weights, generate_layers
 
 from ...utils.colors import get_colors
 from ..weights import layers_mae
-from ..weights.standardize import extract_layer_weights, generate_layers
 
 cpu = torch.device("cpu")
 

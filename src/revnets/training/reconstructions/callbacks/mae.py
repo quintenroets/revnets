@@ -6,8 +6,8 @@ from torch import nn
 
 from revnets.evaluations import weights
 from revnets.evaluations.weights import Evaluator
-from revnets.evaluations.weights.standardize.network import Standardizer
 from revnets.pipelines import Pipeline
+from revnets.standardization.network import Standardizer
 
 
 @dataclass

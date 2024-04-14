@@ -16,9 +16,8 @@ def evaluate(reconstruction: Module, pipeline: Pipeline) -> Evaluation:
         evaluator: Evaluator = evaluation_module.Evaluator(reconstruction, pipeline)
         return evaluator.get_evaluation()
 
-    analysis_modules = (analysis.weights,)
-
     if context.config.evaluation.run_analysis:
+        analysis_modules = (analysis.weights,)
         for analysis_module in analysis_modules:
             apply(analysis_module)
 

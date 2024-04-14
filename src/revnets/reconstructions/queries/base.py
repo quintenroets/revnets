@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cached_property
 from typing import cast
 
@@ -22,7 +22,7 @@ from .data import DataModule
 
 @dataclass
 class Reconstructor(base.Reconstructor):
-    num_samples: int = context.config.sampling_data_size
+    num_samples: int = field(default_factory=lambda: context.config.sampling_data_size)
 
     @cached_property
     def trained_weights_path(self) -> Path:

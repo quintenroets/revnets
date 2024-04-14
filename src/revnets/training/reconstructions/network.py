@@ -10,11 +10,8 @@ from .metrics import Metrics
 
 
 class Network(network.Network[Metrics]):
-    def __init__(
-        self,
-        model: torch.nn.Module,
-        learning_rate: float = context.config.reconstruction_training.learning_rate,
-    ) -> None:
+    def __init__(self, model: torch.nn.Module) -> None:
+        learning_rate = context.config.reconstruction_training.learning_rate
         super().__init__(model, learning_rate=learning_rate)
 
     def calculate_metrics(

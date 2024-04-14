@@ -8,9 +8,9 @@ from ... import train
 
 @dataclass
 class Pipeline(train.Pipeline):
-    network_factory: NetworkFactory = networks.images.mininet.NetworkFactory(
-        hidden_size=40
-    )
+    @classmethod
+    def create_network_factory(cls) -> NetworkFactory:
+        return networks.images.mininet.NetworkFactory(hidden_size=40)
 
     @classmethod
     def load_data(cls) -> data.mnist.DataModule:

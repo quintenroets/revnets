@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 import torch
 from torch.nn import Sequential
 
-from revnets.evaluations.weights.standardize import generate_layers
 from revnets.pipelines import Pipeline
+from revnets.standardization import generate_layers
 
 from ..context import context
 from ..utils import NamedClass
@@ -13,7 +13,9 @@ from ..utils import NamedClass
 @dataclass
 class Reconstructor(NamedClass):
     pipeline: Pipeline
-    downscale_factor: float | None = context.config.weight_variance_downscale_factor
+    downscale_factor: float | None = field(
+        default_factory=lambda: context.config.weight_variance_downscale_factor
+    )
     reconstruction: Sequential = field(init=False)
 
     def __post_init__(self) -> None:

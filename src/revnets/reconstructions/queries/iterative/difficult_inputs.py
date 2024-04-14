@@ -1,5 +1,5 @@
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import torch
@@ -79,7 +79,7 @@ class EmptyDataset(Dataset[torch.Tensor]):
 
 @dataclass
 class Reconstructor(base.Reconstructor):
-    n_networks: int = context.config.n_networks
+    n_networks: int = field(default_factory=lambda: context.config.n_networks)
 
     def __post_init__(self) -> None:
         super().__post_init__()

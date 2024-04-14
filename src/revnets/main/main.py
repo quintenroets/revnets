@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from types import ModuleType
+from typing import Any
 
 import cli
 import numpy as np
@@ -28,15 +29,15 @@ class Experiment:
     def run(self) -> None:
         set_seed()
         cli.console.rule(self.config.title)
-        self.run_experiment()
+        results = self.run_experiment()
+        context.results_path.yaml = results
 
-    def run_experiment(self) -> None:
+    def run_experiment(self) -> dict[str, Any]:
         pipeline: Pipeline = extract_module(pipelines, self.config.pipeline).Pipeline()
         reconstruction = self.create_reconstruction(pipeline)
         evaluation = evaluations.evaluate(reconstruction, pipeline)
         evaluation.show()
-        results = {"metrics": evaluation.dict(), "config": context.config.dict()}
-        context.results_path.yaml = results
+        return {"metrics": evaluation.dict(), "config": context.config.dict()}
 
     def create_reconstruction(self, pipeline: Pipeline) -> nn.Module:
         module = extract_module(reconstructions, self.config.reconstruction_technique)

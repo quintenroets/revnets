@@ -5,7 +5,7 @@ from revnets.cli import entry_point, launch
 
 
 @no_cli_args
-@patch("revnets.main.main.Experiment.run_experiment")
+@patch("revnets.main.main.Experiment.run_experiment", return_value={})
 def test_main(run: MagicMock) -> None:
     entry_point.entry_point()
     run.assert_called_once()
