@@ -34,6 +34,7 @@ def test_context(context: Context, mocked_assets_path: None) -> Iterator[Context
         reconstruction_training=hyperparameters,
         max_difficult_inputs_epochs=1,
         evaluation=evaluation,
+        limit_batches=5,
     )
     mock = patch("matplotlib.pyplot.show")
     with mock:

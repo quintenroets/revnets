@@ -15,10 +15,11 @@ all_pipeline_modules = (
     *pipeline_modules,
     pipelines.mininet.mininet_40,
     pipelines.mininet.mininet_100,
+    pipelines.mediumnet.mediumnet_40,
     pipelines.images.mininet_100,
     pipelines.images.mininet_128,
     pipelines.images.mininet_200,
-    pipelines.mediumnet.mediumnet_40,
+    pipelines.images.mediumnet,
 )
 
 
