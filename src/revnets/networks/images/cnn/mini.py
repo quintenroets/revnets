@@ -8,6 +8,8 @@ from .. import mediumnet
 
 @dataclass
 class NetworkFactory(mediumnet.NetworkFactory):
+    input_shape: tuple[int, ...] = 1, 28, 28
+
     def create_layers(self) -> Iterable[nn.Module]:
         yield from (
             # 28 x 28 x 1

@@ -39,11 +39,23 @@ class Standardizer:
 
 def rescale_incoming_weights(layer: Module, scales: torch.Tensor) -> None:
     parameters = extract_parameters(layer)
-    parameters.weight.data *= scales.reshape(-1, 1)
+    parameters.weight.data *= broadcast(scales, parameters.weight.data)
     if parameters.bias is not None:
         parameters.bias.data *= scales
 
 
+def broadcast(
+    values: torch.Tensor, target: torch.Tensor, dimension: int = 0
+) -> torch.Tensor:
+    shape = [1] * target.dim()
+    shape[dimension] = -1
+    return values.view(*shape)
+
+
 def rescale_outgoing_weights(layer: Module, scales: torch.Tensor) -> None:
     parameters = extract_parameters(layer)
-    parameters.weight.data *= scales
+    # take into account that flatten layers cause outgoing weights with altered shapes
+    shape = parameters.weight.data.shape[0], scales.shape[0], -1
+    data = parameters.weight.data.view(shape)
+    data *= broadcast(scales, data, dimension=1)
+    parameters.weight.data = data.reshape(parameters.weight.shape)

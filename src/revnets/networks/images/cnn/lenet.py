@@ -3,11 +3,11 @@ from dataclasses import dataclass
 
 from torch import nn
 
-from .. import mediumnet
+from . import mini
 
 
 @dataclass
-class NetworkFactory(mediumnet.NetworkFactory):
+class NetworkFactory(mini.NetworkFactory):
     hidden_size1: int = 120
     hidden_size2: int = 84
 

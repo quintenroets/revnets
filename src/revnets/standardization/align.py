@@ -21,8 +21,8 @@ def align(model: Module, target: Module) -> None:
 
 def align_internal_neurons(neurons: InternalNeurons, target: InternalNeurons) -> None:
     sort_indices = calculate_optimal_order(neurons.incoming, target.incoming)
-    order.permute_output_weights(neurons.incoming, sort_indices)
-    order.permute_input_weights(neurons.outgoing, sort_indices)
+    order.permute_incoming_weights(neurons.incoming, sort_indices)
+    order.permute_outgoing_weights(neurons.outgoing, sort_indices)
 
 
 def calculate_optimal_order(layer: Module, target: Module) -> torch.Tensor:

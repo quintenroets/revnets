@@ -14,8 +14,8 @@ class Standardizer:
 
     def run(self) -> None:
         sort_indices = calculate_sort_order(self.neurons.incoming)
-        permute_output_weights(self.neurons.incoming, sort_indices)
-        permute_input_weights(self.neurons.outgoing, sort_indices)
+        permute_incoming_weights(self.neurons.incoming, sort_indices)
+        permute_outgoing_weights(self.neurons.outgoing, sort_indices)
 
 
 def calculate_sort_order(layer: nn.Module) -> torch.Tensor:
@@ -25,16 +25,17 @@ def calculate_sort_order(layer: nn.Module) -> torch.Tensor:
     return torch.sort(sort_values)[1]
 
 
-def permute_input_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
+def permute_incoming_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
     parameters = extract_parameters(layer)
-    number_of_outputs = len(parameters.weight)
-    flat_connections = parameters.weight.data.reshape(number_of_outputs, -1)
-    permuted_connections = flat_connections[:, sort_indices]
-    parameters.weight.data = permuted_connections.reshape(parameters.weight.shape)
-
-
-def permute_output_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
-    parameters = extract_parameters(layer)
-    parameters.weight.data = parameters.weight.data[sort_indices, :]
+    parameters.weight.data = parameters.weight.data[sort_indices]
     if parameters.bias is not None:
         parameters.bias.data = parameters.bias.data[sort_indices]
+
+
+def permute_outgoing_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
+    parameters = extract_parameters(layer)
+    # take into account that flatten layers cause outgoing weights with altered shapes
+    shape = parameters.weight.data.shape[0], sort_indices.shape[0], -1
+    data = parameters.weight.data.view(shape)
+    data = torch.index_select(data, 1, sort_indices)
+    parameters.weight.data = data.reshape(parameters.weight.shape)

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import TypeVar, cast
 
-from torch.nn import Flatten, Module
+from torch import nn
 
 from revnets.models import InternalNeurons
 
@@ -15,7 +15,7 @@ T = TypeVar("T")
 
 @dataclass
 class Standardizer:
-    model: Module
+    model: nn.Module
     optimize_mae: bool = False
 
     def run(self) -> None:
@@ -54,7 +54,7 @@ class Standardizer:
         return list(neurons)
 
 
-def generate_internal_neurons(model: Module) -> Iterator[InternalNeurons]:
+def generate_internal_neurons(model: nn.Module) -> Iterator[InternalNeurons]:
     layers = generate_layers(model)
     layers_list = list(layers)
     for triplet in generate_triplets(layers_list):
@@ -65,7 +65,11 @@ def generate_triplets(items: list[T]) -> Iterator[tuple[T, T, T]]:
     yield from zip(items[::2], items[1::2], items[2::2])
 
 
-def generate_layers(model: Module) -> Iterator[Module]:
+# TODO: MaxPool destroys sign isomorphism for tanh
+skip_layer_types = nn.Flatten, nn.MaxPool1d, nn.MaxPool2d, nn.AvgPool1d, nn.AvgPool2d
+
+
+def generate_layers(model: nn.Module) -> Iterator[nn.Module]:
     """
     :return: all root layers (the deepest level) in order of feature propagation
     """
@@ -74,5 +78,5 @@ def generate_layers(model: Module) -> Iterator[Module]:
         for child in children:
             yield from generate_layers(child)
     else:
-        if not isinstance(model, Flatten):
+        if not isinstance(model, skip_layer_types):
             yield model

@@ -11,7 +11,7 @@ class Parameters:
 
     @property
     def number_of_outputs(self) -> int:
-        return len(self.weight)
+        return self.weight.shape[0]
 
 
 def extract_parameters(layer: Module) -> Parameters:
