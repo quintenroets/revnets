@@ -9,6 +9,7 @@ pipeline_modules = (
     pipelines.mediumnet.mediumnet,
     pipelines.images.mininet_small,
     pipelines.images.mediumnet_small,
+    pipelines.images.cnn,
 )
 
 all_pipeline_modules = (

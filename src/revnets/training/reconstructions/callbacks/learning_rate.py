@@ -35,7 +35,9 @@ class LearningRateScheduler(Callback):
     losses: list[float] = field(default_factory=list)
 
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
-        pl_module.log("learning rate", pl_module.learning_rate, prog_bar=True)
+        pl_module.log(
+            "learning rate", pl_module.learning_rate, prog_bar=True, on_step=False
+        )
         loss = trainer.callback_metrics["train l1 loss"].item()
         self.losses.append(loss)
         self.check_learning_rate(pl_module, loss)

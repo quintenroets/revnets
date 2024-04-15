@@ -19,8 +19,7 @@ class Reconstructor(base.Reconstructor):
     @property
     def input_shape(self) -> tuple[int, ...]:
         dataset = self.pipeline.load_prepared_data()
-        shape = dataset.train_validation[0][0].shape
-        return cast(tuple[int, ...], shape)
+        return dataset.input_shape
 
     def create_random_inputs(self, shape: Sequence[int]) -> torch.Tensor:
         train_inputs = self.extract_train_inputs()

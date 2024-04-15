@@ -8,7 +8,7 @@ from torch.nn import Flatten, Module
 from revnets.models import InternalNeurons
 
 from . import order, scale
-from .utils import extract_linear_layer_weights
+from .utils import extract_weights
 
 T = TypeVar("T")
 
@@ -41,7 +41,7 @@ class Standardizer:
                 scale.Standardizer(neurons).run()
 
     def calculate_average_scale_per_layer(self) -> float:
-        weights = extract_linear_layer_weights(self.internal_neurons[-1].outgoing)
+        weights = extract_weights(self.internal_neurons[-1].outgoing)
         last_neuron_scales = weights.norm(dim=1, p=2)
         last_neuron_scale = sum(last_neuron_scales) / len(last_neuron_scales)
         num_internal_layers = len(self.internal_neurons)

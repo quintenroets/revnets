@@ -62,6 +62,7 @@ module = [
     "kneed.*",
     "scipy.*",
     "sklearn.*",
+    "torchsummary.*",
     "torchvision.*",
 ]
 ignore_missing_imports = true

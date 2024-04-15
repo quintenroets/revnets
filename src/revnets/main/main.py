@@ -6,6 +6,7 @@ import cli
 import numpy as np
 import torch
 from torch import nn
+from torchsummary import summary
 
 from revnets import pipelines
 from revnets.models import Experiment as Config
@@ -34,10 +35,17 @@ class Experiment:
 
     def run_experiment(self) -> dict[str, Any]:
         pipeline: Pipeline = extract_module(pipelines, self.config.pipeline).Pipeline()
+        self.log_number_of_parameters(pipeline)
         reconstruction = self.create_reconstruction(pipeline)
         evaluation = evaluations.evaluate(reconstruction, pipeline)
         evaluation.show()
         return {"metrics": evaluation.dict(), "config": context.config.dict()}
+
+    def log_number_of_parameters(self, pipeline: Pipeline) -> None:
+        network = pipeline.create_initialized_network()
+        network = network.to(dtype=torch.float32).to(context.device)
+        data = pipeline.load_prepared_data()
+        summary(network, data.input_shape)
 
     def create_reconstruction(self, pipeline: Pipeline) -> nn.Module:
         module = extract_module(reconstructions, self.config.reconstruction_technique)

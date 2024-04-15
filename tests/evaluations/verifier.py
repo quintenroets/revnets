@@ -120,7 +120,7 @@ def verify_scale_standardized(neurons: InternalNeurons) -> None:
 
 
 def verify_order_standardized(neurons: InternalNeurons) -> None:
-    weights = standardization.extract_linear_layer_weights(neurons.incoming)
+    weights = standardization.extract_weights(neurons.incoming)
     incoming_weights = weights.norm(dim=1, p=1)
     sorted_indices = incoming_weights[:-1] <= incoming_weights[1:]
     is_sorted = torch.all(sorted_indices)

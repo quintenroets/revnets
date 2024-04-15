@@ -26,8 +26,8 @@ def align_internal_neurons(neurons: InternalNeurons, target: InternalNeurons) ->
 
 
 def calculate_optimal_order(layer: Module, target: Module) -> torch.Tensor:
-    weights = order.extract_linear_layer_weights(layer)
-    target_weights = order.extract_linear_layer_weights(target)
+    weights = order.extract_weights(layer)
+    target_weights = order.extract_weights(target)
     distances = torch.cdist(target_weights, weights, p=1).numpy()
     indices = linear_sum_assignment(distances)[1]
     return torch.from_numpy(indices)

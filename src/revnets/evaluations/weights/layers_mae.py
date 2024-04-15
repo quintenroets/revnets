@@ -1,36 +1,35 @@
 from collections.abc import Iterator
 
 import torch
+from torch.nn import Module
+from torch.nn.functional import l1_loss
 
-from revnets.standardization import extract_layer_weights, generate_layers
+from revnets.standardization import extract_weights, generate_layers
 
 from . import mae
 
 
-class Evaluator(mae.Evaluator):
-    def iterate_compared_layers(
-        self, device: torch.device | None = None
-    ) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
-        original_layers = generate_layers(self.target)
-        reconstruction_layers = generate_layers(self.reconstruction)
-        for original, reconstruction in zip(original_layers, reconstruction_layers):
-            original_weights = extract_layer_weights(original, device)
-            reconstruction_weights = extract_layer_weights(reconstruction, device)
-            if original_weights is not None and reconstruction_weights is not None:
-                yield original_weights, reconstruction_weights
+def generate_layer_weights(model: Module) -> Iterator[torch.Tensor]:
+    for layer in generate_layers(model):
+        try:
+            yield extract_weights(layer)
+        except StopIteration:
+            pass
 
-    def calculate_distance(self) -> tuple[float, ...]:
-        return tuple(
-            self.calculate_weights_distance(original, reconstructed)
-            for original, reconstructed in self.iterate_compared_layers()
-        )
+
+class Evaluator(mae.Evaluator):
+    def iterate_compared_layers(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
+        networks = self.target, self.reconstruction
+        weights_pair = [generate_layer_weights(self.target) for network in networks]
+        yield from zip(*weights_pair)
+
+    def calculate_total_distance(self) -> tuple[float, ...]:
+        pairs = self.iterate_compared_layers()
+        return tuple(self.calculate_distance(*pair) for pair in pairs)
 
     @classmethod
-    def calculate_weights_distance(
-        cls, original_weights: torch.Tensor, reconstructed_weights: torch.Tensor
-    ) -> float:
-        distance = torch.nn.functional.l1_loss(original_weights, reconstructed_weights)
-        return distance.item()
+    def calculate_distance(cls, values: torch.Tensor, other: torch.Tensor) -> float:
+        return l1_loss(values, other).item()
 
     @classmethod
     def format_evaluation(cls, value: tuple[float, ...], precision: int = 3) -> str:  # type: ignore[override]

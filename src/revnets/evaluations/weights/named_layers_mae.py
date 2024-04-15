@@ -7,9 +7,9 @@ from . import layers_mae
 
 
 class Evaluator(layers_mae.Evaluator):
-    def calculate_distance(self) -> dict[str, float]:  # type: ignore[override]
+    def calculate_total_distance(self) -> dict[str, float]:  # type: ignore[override]
         return {
-            name: self.calculate_weights_distance(original, reconstructed)
+            name: self.calculate_distance(original, reconstructed)
             for name, original, reconstructed in self.iterate_named_compared_layers()
         }
 

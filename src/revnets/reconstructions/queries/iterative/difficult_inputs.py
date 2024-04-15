@@ -18,12 +18,13 @@ from . import base
 class InputNetwork(LightningModule):
     def __init__(
         self,
-        shape: tuple[int, int],
+        shape: tuple[int, ...],
         reconstructions: list[torch.nn.Sequential],
-        learning_rate: float = 0.01,
-        verbose: bool = False,
+        learning_rate: float = 0.001,
+        verbose: bool = True,
     ) -> None:
         super().__init__()
+        self.shape = shape
         self.learning_rate = learning_rate
         self.inputs_embedding = self.create_input_embeddings(shape)
         self.reconstructions = torch.nn.ModuleList(reconstructions)
@@ -34,15 +35,16 @@ class InputNetwork(LightningModule):
             print("\nAverage pairwise distances: ", end="\n\t")  # pragma: nocover
 
     @classmethod
-    def create_input_embeddings(cls, shape: tuple[int, int]) -> torch.nn.Embedding:
-        embeddings = torch.nn.Embedding(*shape)
+    def create_input_embeddings(cls, shape: tuple[int, ...]) -> torch.nn.Embedding:
+        feature_shape = math.prod(shape[1:])
+        embeddings = torch.nn.Embedding(shape[0], feature_shape)
         torch.nn.init.normal_(embeddings.weight)
         return embeddings
 
     def forward(self, _: Any) -> torch.Tensor:
         outputs = []
         for reconstruction in self.reconstructions:
-            output = reconstruction(self.inputs_embedding.weight)
+            output = reconstruction(self.inputs_embedding.weight.reshape(self.shape))
             reconstruction.zero_grad()
             outputs.append(output)
         return torch.stack(outputs)
@@ -65,7 +67,7 @@ class InputNetwork(LightningModule):
             self.inputs_embedding.parameters(), lr=self.learning_rate
         )
 
-    def get_optimized_inputs(self) -> torch.Tensor:
+    def extract_optimized_inputs(self) -> torch.Tensor:
         return self.inputs_embedding.weight.detach()
 
 
@@ -88,15 +90,14 @@ class Reconstructor(base.Reconstructor):
             for seed in range(self.n_networks)
         ]
 
-    @property
-    def feature_size(self) -> int:
-        return math.prod(self.input_shape)
+    def create_queries(self, num_samples: int) -> torch.Tensor:
+        return self.create_difficult_samples()
 
     def create_difficult_samples(self) -> torch.Tensor:
-        shape = (self.num_samples, self.feature_size)
+        shape = (self.num_samples, *self.input_shape)
         network = InputNetwork(shape, self.reconstructions)
         self.fit_inputs_network(network)
-        return network.get_optimized_inputs()
+        return network.extract_optimized_inputs()
 
     @classmethod
     def fit_inputs_network(cls, network: InputNetwork) -> None:
@@ -107,7 +108,7 @@ class Reconstructor(base.Reconstructor):
         trainer.fit(network, dataloader)
 
     def run_round(self, data: DataModule) -> None:
-        trainer = self.create_trainer()
+        trainer = self.create_trainer(max_epochs=1)
         networks = [Network(reconstruction) for reconstruction in self.reconstructions]
         for network in networks:
             trainer.fit(network, data)

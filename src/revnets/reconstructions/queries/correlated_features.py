@@ -21,7 +21,7 @@ class Reconstructor(random.Reconstructor):
         distribution = MultivariateNormal(means, covariance_matrix)  # type: ignore[no-untyped-call]
         sample_shape = torch.Size((shape[0],))
         # same mean, variance, and covariance as the training data
-        return distribution.sample(sample_shape)
+        return distribution.sample(sample_shape).reshape(shape)
 
     def infer_distribution_parameters(self) -> tuple[torch.Tensor, torch.Tensor]:
         train_inputs = self.extract_flattened_train_inputs()

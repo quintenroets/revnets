@@ -23,6 +23,9 @@ from .data import DataModule
 @dataclass
 class Reconstructor(base.Reconstructor):
     num_samples: int = field(default_factory=lambda: context.config.sampling_data_size)
+    max_epochs: int = field(
+        default_factory=lambda: context.config.reconstruction_training.epochs
+    )
 
     @cached_property
     def trained_weights_path(self) -> Path:
@@ -40,14 +43,15 @@ class Reconstructor(base.Reconstructor):
             self.save_weights()
         self.load_weights()
 
-    def create_trainer(self) -> Trainer:
+    def create_trainer(self, max_epochs: int | None = None) -> Trainer:
         patience = context.config.early_stopping_patience
         callbacks = (
             EarlyStopping("train l1 loss", patience=patience, verbose=True),
             MAECalculator(self.reconstruction, self.pipeline),
             LearningRateScheduler(),
         )
-        max_epochs = context.config.reconstruction_training.epochs
+        if max_epochs is None:
+            max_epochs = self.max_epochs
         return Trainer(callbacks=callbacks, max_epochs=max_epochs)  # type: ignore[arg-type]
 
     def create_train_network(self) -> Network:

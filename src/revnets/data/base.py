@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 import torch
 from pytorch_lightning import LightningDataModule
@@ -49,3 +49,8 @@ class DataModule(LightningDataModule):
         return DataLoader(
             self.test, batch_size=self.evaluation_batch_size, shuffle=False
         )
+
+    @property
+    def input_shape(self) -> tuple[int, ...]:
+        inputs, target = self.train_validation[0]
+        return cast(tuple[int, ...], inputs.shape)

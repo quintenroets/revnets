@@ -32,9 +32,9 @@ class Evaluation:
 
 @dataclass
 class Config(SerializationMixin):
-    sampling_data_size: int = 20000
+    sampling_data_size: int = 102400
     reconstruction_training: HyperParameters = HyperParameters(
-        epochs=300, learning_rate=1e-1, batch_size=256
+        epochs=300, learning_rate=1e-2, batch_size=256
     )
     reconstruct_from_checkpoint: bool = False
     always_train: bool = True
@@ -51,7 +51,7 @@ class Config(SerializationMixin):
     evaluation_batch_size: int = 1000
 
     num_workers: int = 8
-    early_stopping_patience: int = 20
+    early_stopping_patience: int = 10
     n_networks: int = 2
     visualization_interval = 10
     weight_variance_downscale_factor: float | None = None
@@ -68,7 +68,7 @@ class Config(SerializationMixin):
     validation_ratio: float = 0.1
 
     console_metrics_refresh_interval: float = 0.5
-    max_difficult_inputs_epochs: int = 100
+    max_difficult_inputs_epochs: int = 1000
 
     limit_batches: int | None = None
 
