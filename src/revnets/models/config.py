@@ -47,6 +47,9 @@ class Config(SerializationMixin):
     target_network_training: HyperParameters = HyperParameters(
         epochs=100, learning_rate=1.0e-2, batch_size=32
     )
+    difficult_inputs_training: HyperParameters = HyperParameters(
+        epochs=1000, learning_rate=1.0e-3
+    )
     evaluation: Evaluation = field(default_factory=Evaluation)
     evaluation_batch_size: int = 1000
 
@@ -68,7 +71,6 @@ class Config(SerializationMixin):
     validation_ratio: float = 0.1
 
     console_metrics_refresh_interval: float = 0.5
-    max_difficult_inputs_epochs: int = 1000
 
     limit_batches: int | None = None
 

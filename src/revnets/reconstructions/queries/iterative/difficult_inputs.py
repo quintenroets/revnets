@@ -20,11 +20,13 @@ class InputNetwork(LightningModule):
         self,
         shape: tuple[int, ...],
         reconstructions: list[torch.nn.Sequential],
-        learning_rate: float = 0.001,
+        learning_rate: float | None = None,
         verbose: bool = True,
     ) -> None:
         super().__init__()
         self.shape = shape
+        if learning_rate is None:
+            learning_rate = context.config.difficult_inputs_training.learning_rate
         self.learning_rate = learning_rate
         self.inputs_embedding = self.create_input_embeddings(shape)
         self.reconstructions = torch.nn.ModuleList(reconstructions)
@@ -101,8 +103,8 @@ class Reconstructor(base.Reconstructor):
 
     @classmethod
     def fit_inputs_network(cls, network: InputNetwork) -> None:
-        max_epochs = context.config.max_difficult_inputs_epochs
-        trainer = Trainer(max_epochs=max_epochs, log_every_n_steps=1)
+        epochs = context.config.difficult_inputs_training.epochs
+        trainer = Trainer(max_epochs=epochs, log_every_n_steps=1)
         dataset = EmptyDataset()
         dataloader = DataLoader(dataset)
         trainer.fit(network, dataloader)
