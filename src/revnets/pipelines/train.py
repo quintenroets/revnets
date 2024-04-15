@@ -1,5 +1,5 @@
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cached_property
 
 import torch
@@ -18,6 +18,10 @@ from . import base
 
 @dataclass
 class Pipeline(base.Pipeline, ABC):
+    max_epochs: int = field(
+        default_factory=lambda: context.config.target_network_training.epochs
+    )
+
     def create_initialized_network(self) -> Sequential:
         return self.network_factory.create_network(seed=context.config.experiment.seed)
 
@@ -53,9 +57,8 @@ class Pipeline(base.Pipeline, ABC):
         data = self.load_data()
         self.run_training(trainable_network, data)
 
-    @classmethod
-    def run_training(cls, network: LightningModule, data: DataModule) -> None:
-        trainer = Trainer(max_epochs=context.config.target_network_training.epochs)
+    def run_training(self, network: LightningModule, data: DataModule) -> None:
+        trainer = Trainer(max_epochs=self.max_epochs)
         trainer.fit(network, data)
         trainer.test(network, data)
 

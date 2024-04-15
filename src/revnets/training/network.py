@@ -73,7 +73,7 @@ class Network(pl.LightningModule, Generic[Metrics]):
         value: float,
         sync_dist: bool = True,
         on_epoch: bool = True,
-        on_step: bool = False,
+        on_step: bool = True,
         **kwargs: Any,
     ) -> None:
         if self.do_log:

@@ -32,7 +32,7 @@ def test_context(context: Context, mocked_assets_path: None) -> Iterator[Context
     context.loaders.config.value = Config(
         target_network_training=hyperparameters,
         reconstruction_training=hyperparameters,
-        max_difficult_inputs_epochs=1,
+        difficult_inputs_training=hyperparameters,
         evaluation=evaluation,
         limit_batches=5,
     )

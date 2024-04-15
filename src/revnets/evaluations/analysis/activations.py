@@ -9,7 +9,6 @@ from torch import nn
 from torch.nn import Module
 from torch.utils.data import TensorDataset
 
-from revnets.reconstructions.queries.random import Reconstructor
 from revnets.utils.data import compute_targets
 
 from .. import base
@@ -31,7 +30,7 @@ class Evaluator(base.Evaluator):
             self.visualize_network(model, name)
 
     def visualize_random_inputs(self) -> None:
-        inputs = Reconstructor(self.pipeline).create_queries(self.n_inputs)
+        inputs = self.create_queries()
         ActivationsVisualizer(inputs, "random inputs").run()
 
     def visualize_train_inputs(self) -> None:
@@ -47,11 +46,17 @@ class Evaluator(base.Evaluator):
             self.visualize_model_outputs(model, name)
 
     def visualize_model_outputs(self, model: Module, name: str) -> None:
-        inputs = Reconstructor(self.pipeline).create_queries(self.n_inputs)
+        inputs = self.create_queries()
         outputs = compute_targets(inputs, model)
         if self.activation:
             outputs = F.relu(outputs)  # pragma: nocover
         ActivationsVisualizer(outputs, name).run()
+
+    def create_queries(self) -> torch.Tensor:
+        # Circular import: reconstructions should import evaluations
+        from revnets.reconstructions.queries.random import Reconstructor
+
+        return Reconstructor(self.pipeline).create_queries(self.n_inputs)
 
 
 @dataclass

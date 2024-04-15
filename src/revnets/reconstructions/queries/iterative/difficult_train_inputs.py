@@ -22,12 +22,23 @@ class Reconstructor(base.Reconstructor):
         return recombined_inputs + self.noise_factor * noise
 
     def recombine(self, inputs: torch.Tensor) -> torch.Tensor:
-        new_samples_shape = self.num_samples, inputs.shape[-1]
-        n_inputs = len(inputs)
-        new_samples = np.random.choice(range(n_inputs), size=new_samples_shape)
+        feature_dimensions = inputs.shape[1:]
+        untyped_feature_dimension = np.prod(feature_dimensions)
+        feature_dimension = cast(int, untyped_feature_dimension)
+        flat_inputs = inputs.reshape((-1, feature_dimension))
+        recombined_flat_inputs = self.recombine_flat(flat_inputs)
+        shape = -1, *feature_dimensions
+        return recombined_flat_inputs.reshape(shape)
+
+    def recombine_flat(self, inputs: torch.Tensor) -> torch.Tensor:
+        number_of_features = inputs.shape[-1]
+        new_samples_shape = self.num_samples, number_of_features
+        number_of_inpus = len(inputs)
+        choices = range(number_of_inpus)
+        new_samples = np.random.choice(choices, size=new_samples_shape)
         # each feature value in a new sample corresponds with a feature value
         # in the corresponding feature of one of the inputs
-        return inputs[new_samples, np.arange(new_samples.shape[1])]
+        return inputs[new_samples, np.arange(number_of_features)]
 
     def extract_difficult_inputs(self) -> torch.Tensor:
         data = self.pipeline.load_prepared_data()

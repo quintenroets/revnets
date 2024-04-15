@@ -23,7 +23,7 @@ class Network(network.Network[Metrics]):
         try:
             optimizer = self.optimizers()
             # if training is no longer running, optimizer is an empty list
-            if optimizer:
+            if optimizer:  # pragma: nocover
                 typed_optimizer = cast(LightningOptimizer, optimizer)
                 self.update_optimizer(typed_optimizer, learning_rate)
         except RuntimeError:  # pragma: nocover

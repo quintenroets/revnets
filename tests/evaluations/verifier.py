@@ -9,6 +9,7 @@ import torch
 from revnets import standardization
 from revnets.context import context
 from revnets.models import Activation, InternalNeurons
+from revnets.networks import NetworkFactory
 from revnets.standardization import Standardizer, align, generate_internal_neurons
 from torch.nn import Module, Sequential
 
@@ -31,6 +32,12 @@ class Verifier:
     @cached_property
     def target(self) -> Sequential:
         return self.create_network()
+
+    @property
+    def network_factory(self) -> NetworkFactory:
+        Factory = self.network_module.NetworkFactory
+        factory = Factory(activation=self.activation)
+        return cast(NetworkFactory, factory)
 
     def test_standardized_form(self) -> None:
         self.apply_transformation()
@@ -79,19 +86,21 @@ class Verifier:
                 verify_aligned(neurons, target_neurons)
 
     def create_network(self) -> Sequential:
-        Factory = self.network_module.NetworkFactory
-        factory = Factory(activation=self.activation)
-        network = factory.create_network()
-        return cast(Sequential, network)
+        return self.network_factory.create_network()
 
     def create_network_inputs(self) -> torch.Tensor:
-        size = 1, self.extract_input_size()
+        feature_shape = (
+            self.extract_feature_shape()
+            if self.network_factory.input_shape is None
+            else self.network_factory.input_shape
+        )
+        size = 1, *feature_shape
         return torch.rand(size, dtype=context.dtype) * 20 - 10
 
-    def extract_input_size(self) -> int:
+    def extract_feature_shape(self) -> tuple[int, ...]:
         input_layer = next(self.extract_layers())
-        size = input_layer.weight.shape[1]
-        return cast(int, size)
+        shape = input_layer.weight.shape[1:]
+        return cast(tuple[int, ...], shape)
 
     def extract_layers(self) -> Iterator[Module]:
         for layer in self.network.children():
@@ -120,7 +129,7 @@ def verify_scale_standardized(neurons: InternalNeurons) -> None:
 
 
 def verify_order_standardized(neurons: InternalNeurons) -> None:
-    weights = standardization.extract_linear_layer_weights(neurons.incoming)
+    weights = standardization.extract_weights(neurons.incoming)
     incoming_weights = weights.norm(dim=1, p=1)
     sorted_indices = incoming_weights[:-1] <= incoming_weights[1:]
     is_sorted = torch.all(sorted_indices)

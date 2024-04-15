@@ -16,6 +16,8 @@ network_modules = (
     networks.mediumnet,
     networks.images.mininet,
     networks.images.mediumnet,
+    networks.images.cnn.mini,
+    networks.images.cnn.lenet,
 )
 activations = (
     Activation.leaky_relu,
@@ -76,6 +78,5 @@ def test_second_standardize_no_effect(
 @pytest.mark.parametrize("network_module", network_modules)
 @pytest.mark.parametrize("activation", activations)
 def test_optimize_mae(network_module: ModuleType, activation: Activation) -> None:
-    standardization_type = Standardization.standardize
-    tester = Verifier(network_module, activation, standardization_type)
+    tester = Verifier(network_module, activation, Standardization.standardize)
     tester.test_optimize_mae()

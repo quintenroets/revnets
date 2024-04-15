@@ -21,6 +21,7 @@ dependencies = [
     "simple-classproperty >=4.0.2, <5",
     "superpathlib >=2.0.2, <3",
     "torch >=2.2.2, <3",
+    "torchsummary >=1.5.1, <2",
     "torchvision >=0.17.2, <1",
     "torchtoolbox >=0.1.8.2, <1",
     "torchtext >=0.17.2, <1",
@@ -62,6 +63,7 @@ module = [
     "kneed.*",
     "scipy.*",
     "sklearn.*",
+    "torchsummary.*",
     "torchvision.*",
 ]
 ignore_missing_imports = true

@@ -1,4 +1,3 @@
-from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
 
@@ -7,7 +6,6 @@ import torch
 from torch.nn import Module
 
 from revnets.context import context
-from revnets.standardization import extract_layer_weights, generate_layers
 
 from ...utils.colors import get_colors
 from ..weights import layers_mae
@@ -27,23 +25,16 @@ class Evaluator(layers_mae.Evaluator):
             self.visualize_network_differences()
 
     def visualize_network_weights(self, network: Module, name: str) -> None:
-        layer_weights = self.generate_layer_weights(network)
+        layer_weights = layers_mae.generate_layer_weights(network)
         for i, weights in enumerate(layer_weights):
             title = f"{name} layer {i + 1} weights".capitalize()
             self.visualize_layer_weights(weights, title)
-
-    def generate_layer_weights(self, network: Module) -> Iterator[torch.Tensor]:
-        layers = generate_layers(network)
-        for layer in layers:
-            weights = self.extract_layer_weights(layer)
-            if weights is not None:
-                yield weights
 
     @classmethod
     def visualize_layer_weights(
         cls, weights: torch.Tensor, title: str, n_show: int | None = None
     ) -> None:
-        weights = weights[:n_show]
+        weights = weights[:n_show].cpu()
 
         # weights = torch.transpose(weights, 0, 1)
 
@@ -84,12 +75,3 @@ class Evaluator(layers_mae.Evaluator):
     def show(cls) -> None:
         plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
         plt.show()
-
-    def iterate_compared_layers(
-        self, device: torch.device | None = cpu
-    ) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
-        return super().iterate_compared_layers(device=device)
-
-    @classmethod
-    def extract_layer_weights(cls, layer: Module) -> torch.Tensor | None:
-        return extract_layer_weights(layer, device=cpu)

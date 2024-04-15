@@ -17,6 +17,7 @@ class NetworkFactory(NamedClass):
     activation: Activation = field(
         default_factory=lambda: context.config.target_network_training.activation
     )
+    input_shape: tuple[int, ...] | None = None
 
     def create_activation_layer(self) -> Module:
         activation_layer: Module
