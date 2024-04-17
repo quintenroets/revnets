@@ -5,6 +5,8 @@ from typing import TypeVar, cast
 
 from torch import nn
 
+from revnets.networks.rnn import CreateRNNInput
+
 from . import order, scale
 from .internal_connection import InternalConnection
 
@@ -70,7 +72,14 @@ def generate_triplets(items: Iterable[T]) -> Iterator[tuple[T, T, T]]:
 
 
 # TODO: MaxPool destroys sign isomorphism for tanh
-skip_layer_types = nn.Flatten, nn.MaxPool1d, nn.MaxPool2d, nn.AvgPool1d, nn.AvgPool2d
+skip_layer_types = (
+    nn.Flatten,
+    nn.MaxPool1d,
+    nn.MaxPool2d,
+    nn.AvgPool1d,
+    nn.AvgPool2d,
+    CreateRNNInput,
+)
 
 
 def generate_layers(model: nn.Module) -> Iterator[nn.Module]:

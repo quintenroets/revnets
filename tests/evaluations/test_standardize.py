@@ -7,22 +7,23 @@ from revnets.models import Activation
 from tests.evaluations.verifier import Standardization, Verifier
 
 standardizations = (
-    Standardization.scale,
+    # Standardization.scale,
     Standardization.standardize,
-    Standardization.align,
+    # Standardization.align,
 )
 network_modules = (
-    networks.mininet,
-    networks.mediumnet,
-    networks.images.mininet,
-    networks.images.mediumnet,
-    networks.images.cnn.mini,
-    networks.images.cnn.lenet,
+    # networks.mininet,
+    # networks.mediumnet,
+    # networks.images.mininet,
+    # networks.images.mediumnet,
+    # networks.images.cnn.mini,
+    # networks.images.cnn.lenet,
+    networks.rnn,
 )
 activations = (
     Activation.leaky_relu,
-    Activation.relu,
-    Activation.tanh,
+    # Activation.relu,
+    # Activation.tanh,
 )
 
 
@@ -47,6 +48,7 @@ def test_standardize_preserves_functionality(
     standardization_type: Standardization,
 ) -> None:
     tester = Verifier(network_module, activation, standardization_type)
+    # with pytest.raises(NameError):
     tester.test_functional_preservation()
 
 

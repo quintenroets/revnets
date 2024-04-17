@@ -35,7 +35,7 @@ class Experiment:
 
     def run_experiment(self) -> dict[str, Any]:
         pipeline: Pipeline = extract_module(pipelines, self.config.pipeline).Pipeline()
-        self.log_number_of_parameters(pipeline)
+        # self.log_number_of_parameters(pipeline)
         reconstruction = self.create_reconstruction(pipeline)
         evaluation = evaluations.evaluate(reconstruction, pipeline)
         evaluation.show()

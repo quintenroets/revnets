@@ -4,7 +4,7 @@ import torch
 from torch.nn import Module
 from torch.nn.functional import l1_loss
 
-from revnets.standardization import extract_weights, generate_layers
+from revnets.standardization import extract_parameters, extract_weights, generate_layers
 
 from . import mae
 
@@ -12,9 +12,11 @@ from . import mae
 def generate_layer_weights(model: Module) -> Iterator[torch.Tensor]:
     for layer in generate_layers(model):
         try:
-            yield extract_weights(layer)
+            parameters = extract_parameters(layer)
         except StopIteration:
             pass
+        else:
+            yield extract_weights(parameters)
 
 
 class Evaluator(mae.Evaluator):

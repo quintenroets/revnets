@@ -11,7 +11,7 @@ from .utils import Parameters, extract_parameters, extract_weights
 class InternalConnection(models.InternalConnection):
     @property
     def input_weights(self) -> torch.Tensor:
-        return extract_weights(self.input)
+        return extract_weights(self.input_parameters)
 
     @property
     def input_parameters(self) -> Parameters:
@@ -19,7 +19,7 @@ class InternalConnection(models.InternalConnection):
 
     @property
     def output_weights(self) -> torch.Tensor:
-        return extract_weights(self.output)
+        return extract_weights(self.output_parameters)
 
     @property
     def output_parameters(self) -> Parameters:
