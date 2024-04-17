@@ -47,10 +47,8 @@ class Standardizer:
     def calculate_average_scale_per_layer(self) -> float:
         connection = self.internal_connections[-1]
         standardizer = scale.Standardizer(connection)
-        output_scales = standardizer.calculate_outgoing_scales(
-            connection.output_weights
-        )
-        output_scale = sum(output_scales) / len(output_scales)
+        scales = standardizer.calculate_outgoing_scales(connection.output_weights)
+        output_scale = sum(scales) / len(scales)
         num_internal_connections = len(self.internal_connections)
         average_scale = output_scale ** (1 / num_internal_connections)
         return cast(float, average_scale)
