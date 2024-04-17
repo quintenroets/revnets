@@ -1,39 +1,33 @@
 from dataclasses import dataclass
 
 import torch
-from torch import nn
 
-from revnets.models import InternalNeurons
-
-from .utils import extract_parameters, extract_weights
+from .internal_connection import InternalConnection, Parameters
 
 
 @dataclass
 class Standardizer:
-    neurons: InternalNeurons
+    connection: InternalConnection
 
     def run(self) -> None:
-        sort_indices = calculate_sort_order(self.neurons.incoming)
-        permute_incoming_weights(self.neurons.incoming, sort_indices)
-        permute_outgoing_weights(self.neurons.outgoing, sort_indices)
+        sort_indices = calculate_outgoing_sort_order(self.connection.input_weights)
+        permute_outgoing(self.connection.input_parameters, sort_indices)
+        permute_incoming(self.connection.output_parameters, sort_indices)
 
 
-def calculate_sort_order(layer: nn.Module) -> torch.Tensor:
-    weights = extract_weights(layer)
+def calculate_outgoing_sort_order(weights: torch.Tensor) -> torch.Tensor:
     p = 1  # use l1-norm because l2-norm is already standardized
     sort_values = weights.norm(dim=1, p=p)
     return torch.sort(sort_values)[1]
 
 
-def permute_incoming_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
-    parameters = extract_parameters(layer)
+def permute_outgoing(parameters: Parameters, sort_indices: torch.Tensor) -> None:
     parameters.weight.data = parameters.weight.data[sort_indices]
     if parameters.bias is not None:
         parameters.bias.data = parameters.bias.data[sort_indices]
 
 
-def permute_outgoing_weights(layer: nn.Module, sort_indices: torch.Tensor) -> None:
-    parameters = extract_parameters(layer)
+def permute_incoming(parameters: Parameters, sort_indices: torch.Tensor) -> None:
     # take into account that flatten layers cause outgoing weights with altered shapes
     shape = parameters.weight.data.shape[0], sort_indices.shape[0], -1
     data = parameters.weight.data.view(shape)

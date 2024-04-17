@@ -2,10 +2,9 @@ import torch
 from scipy.optimize import linear_sum_assignment
 from torch.nn import Module
 
-from revnets.models import InternalNeurons
-
 from . import order
-from .network import Standardizer, generate_internal_neurons
+from .internal_connection import InternalConnection
+from .network import Standardizer, generate_internal_connections
 
 
 def align(model: Module, target: Module) -> None:
@@ -13,21 +12,25 @@ def align(model: Module, target: Module) -> None:
     Standardizer(target).standardize_scale()
     # align internal neurons of model to internal neurons of target
     # to achieve a minimal weight difference
-    neurons = generate_internal_neurons(model)
-    target_neurons = generate_internal_neurons(target)
-    for internal_neurons_pair in zip(neurons, target_neurons):
-        align_internal_neurons(*internal_neurons_pair)
+    connections = generate_internal_connections(model)
+    target_connections = generate_internal_connections(target)
+    for connection_pair in zip(connections, target_connections):
+        align_internal_connections(*connection_pair)
 
 
-def align_internal_neurons(neurons: InternalNeurons, target: InternalNeurons) -> None:
-    sort_indices = calculate_optimal_order(neurons.incoming, target.incoming)
-    order.permute_incoming_weights(neurons.incoming, sort_indices)
-    order.permute_outgoing_weights(neurons.outgoing, sort_indices)
+def align_internal_connections(
+    connection: InternalConnection, target: InternalConnection
+) -> None:
+    sort_indices = calculate_optimal_order_mapping(
+        connection.input_weights, target.input_weights
+    )
+    order.permute_outgoing(connection.input_parameters, sort_indices)
+    order.permute_incoming(connection.output_parameters, sort_indices)
 
 
-def calculate_optimal_order(layer: Module, target: Module) -> torch.Tensor:
-    weights = order.extract_weights(layer)
-    target_weights = order.extract_weights(target)
+def calculate_optimal_order_mapping(
+    weights: torch.Tensor, target_weights: torch.Tensor
+) -> torch.Tensor:
     distances = torch.cdist(target_weights, weights, p=1).numpy()
     indices = linear_sum_assignment(distances)[1]
     return torch.from_numpy(indices)

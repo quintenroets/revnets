@@ -1,14 +1,12 @@
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import cached_property
 from typing import TypeVar, cast
 
 from torch import nn
 
-from revnets.models import InternalNeurons
-
 from . import order, scale
-from .utils import extract_weights
+from .internal_connection import InternalConnection
 
 T = TypeVar("T")
 
@@ -23,46 +21,54 @@ class Standardizer:
         Convert network to the standard form of its isomorphism group.
         """
         self.standardize_scale()
-        for neurons in self.internal_neurons:
-            order.Standardizer(neurons).run()
+        for connection in self.internal_connections:
+            order.Standardizer(connection).run()
         if self.optimize_mae:
             self.apply_optimize_mae()
 
     def standardize_scale(self) -> None:
-        for neurons in self.internal_neurons:
-            scale.Standardizer(neurons).run()
+        for connection in self.internal_connections:
+            scale.Standardizer(connection).run()
 
     def apply_optimize_mae(self) -> None:
         # optimize mae by distributing last layer scale factor over all layers
-        if all(neuron.has_norm_isomorphism for neuron in self.internal_neurons):
-            desired_scale = self.calculate_average_scale_per_layer()
-            for neurons in self.internal_neurons:
-                neurons.standardized_scale = desired_scale
-                scale.Standardizer(neurons).run()
+        can_optimize_mae = all(
+            connection.has_norm_isomorphism for connection in self.internal_connections
+        )
+        if can_optimize_mae:
+            self._apply_optimize_mae()
+
+    def _apply_optimize_mae(self) -> None:
+        desired_scale = self.calculate_average_scale_per_layer()
+        for connection in self.internal_connections:
+            connection.standardized_scale = desired_scale
+            scale.Standardizer(connection).run()
 
     def calculate_average_scale_per_layer(self) -> float:
-        weights = extract_weights(self.internal_neurons[-1].outgoing)
-        last_neuron_scales = weights.norm(dim=1, p=2)
-        last_neuron_scale = sum(last_neuron_scales) / len(last_neuron_scales)
-        num_internal_layers = len(self.internal_neurons)
-        average_scale = last_neuron_scale ** (1 / num_internal_layers)
+        connection = self.internal_connections[-1]
+        standardizer = scale.Standardizer(connection)
+        output_scales = standardizer.calculate_outgoing_scales(
+            connection.output_weights
+        )
+        output_scale = sum(output_scales) / len(output_scales)
+        num_internal_connections = len(self.internal_connections)
+        average_scale = output_scale ** (1 / num_internal_connections)
         return cast(float, average_scale)
 
     @cached_property
-    def internal_neurons(self) -> list[InternalNeurons]:
-        neurons = generate_internal_neurons(self.model)
-        return list(neurons)
+    def internal_connections(self) -> list[InternalConnection]:
+        return list(generate_internal_connections(self.model))
 
 
-def generate_internal_neurons(model: nn.Module) -> Iterator[InternalNeurons]:
+def generate_internal_connections(model: nn.Module) -> Iterator[InternalConnection]:
     layers = generate_layers(model)
-    layers_list = list(layers)
-    for triplet in generate_triplets(layers_list):
-        yield InternalNeurons(*triplet)
+    for triplet in generate_triplets(layers):
+        yield InternalConnection(*triplet)
 
 
-def generate_triplets(items: list[T]) -> Iterator[tuple[T, T, T]]:
-    yield from zip(items[::2], items[1::2], items[2::2])
+def generate_triplets(items: Iterable[T]) -> Iterator[tuple[T, T, T]]:
+    items_list = list(items)
+    yield from zip(items_list[::2], items_list[1::2], items_list[2::2])
 
 
 # TODO: MaxPool destroys sign isomorphism for tanh
