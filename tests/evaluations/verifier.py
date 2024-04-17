@@ -8,9 +8,14 @@ from typing import cast
 import torch
 from revnets import standardization
 from revnets.context import context
-from revnets.models import Activation, InternalNeurons
+from revnets.models import Activation
 from revnets.networks import NetworkFactory
-from revnets.standardization import Standardizer, align, generate_internal_neurons
+from revnets.standardization import (
+    InternalConnection,
+    Standardizer,
+    align,
+    generate_internal_connections,
+)
 from torch.nn import Module, Sequential
 
 
@@ -69,21 +74,21 @@ class Verifier:
         assert torch.all(outputs_are_closes)
 
     def verify_standardized_form(self) -> None:
-        neuron_layers = generate_internal_neurons(self.network)
-        for neurons in neuron_layers:
-            if neurons.has_scale_isomorphism:
-                verify_scale_standardized(neurons)
+        connections = generate_internal_connections(self.network)
+        for connection in connections:
+            if connection.has_scale_isomorphism:
+                verify_scale_standardized(connection)
             if self.standardization_type == Standardization.standardize:
-                verify_order_standardized(neurons)
+                verify_order_standardized(connection)
 
     def verify_aligned_form(self) -> None:
-        neuron_layers = generate_internal_neurons(self.network)
-        target_neuron_layers = generate_internal_neurons(self.target)
-        for neurons, target_neurons in zip(neuron_layers, target_neuron_layers):
-            if neurons.has_scale_isomorphism:
-                verify_scale_standardized(neurons)
-                verify_scale_standardized(target_neurons)
-                verify_aligned(neurons, target_neurons)
+        connections = generate_internal_connections(self.network)
+        target_connections = generate_internal_connections(self.target)
+        for connection, target_connection in zip(connections, target_connections):
+            if connection.has_scale_isomorphism:
+                verify_scale_standardized(connection)
+                verify_scale_standardized(target_connection)
+                verify_aligned(connection, target_connection)
 
     def create_network(self) -> Sequential:
         return self.network_factory.create_network()
@@ -120,25 +125,24 @@ class Verifier:
         Standardizer(self.network, optimize_mae=True).run()
 
 
-def verify_scale_standardized(neurons: InternalNeurons) -> None:
-    neurons_standardizer = standardization.scale.Standardizer(neurons)
-    scales = neurons_standardizer.calculate_scale_factors(neurons.incoming)
+def verify_scale_standardized(connection: InternalConnection) -> None:
+    scale_standardizer = standardization.scale.Standardizer(connection)
+    scales = scale_standardizer.calculate_outgoing_scales(connection.input_weights)
     ones = torch.ones_like(scales)
     close_to_one = torch.isclose(scales, ones)
     assert torch.all(close_to_one)
 
 
-def verify_order_standardized(neurons: InternalNeurons) -> None:
-    weights = standardization.extract_weights(neurons.incoming)
-    incoming_weights = weights.norm(dim=1, p=1)
-    sorted_indices = incoming_weights[:-1] <= incoming_weights[1:]
+def verify_order_standardized(connection: InternalConnection) -> None:
+    outgoing_weights = connection.input_weights.norm(dim=1, p=1)
+    sorted_indices = outgoing_weights[:-1] <= outgoing_weights[1:]
     is_sorted = torch.all(sorted_indices)
     assert is_sorted
 
 
-def verify_aligned(neurons: InternalNeurons, target_neurons: InternalNeurons) -> None:
-    order = standardization.calculate_optimal_order(
-        neurons.incoming, target_neurons.incoming
+def verify_aligned(connection: InternalConnection, target: InternalConnection) -> None:
+    order = standardization.calculate_optimal_order_mapping(
+        connection.input_weights, target.input_weights
     )
     is_ordered = order == torch.arange(len(order))
     assert torch.all(is_ordered)

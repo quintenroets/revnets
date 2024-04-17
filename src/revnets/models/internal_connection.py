@@ -5,10 +5,10 @@ from torch.nn import LeakyReLU, ReLU, Tanh
 
 
 @dataclass
-class InternalNeurons:
-    incoming: torch.nn.Module
+class InternalConnection:
+    input: torch.nn.Module
     activation: torch.nn.Module
-    outgoing: torch.nn.Module
+    output: torch.nn.Module
     standardized_scale: float = 1
 
     @property
