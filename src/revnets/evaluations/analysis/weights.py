@@ -32,7 +32,7 @@ class Evaluator(layers_mae.Evaluator):
 
     @classmethod
     def visualize_layer_weights(
-        cls, weights: torch.Tensor, title: str, n_show: int | None = None
+        cls, weights: torch.Tensor, title: str, n_show: int | None = 10
     ) -> None:
         weights = weights[:n_show].cpu()
 

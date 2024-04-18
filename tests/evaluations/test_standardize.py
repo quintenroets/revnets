@@ -7,23 +7,24 @@ from revnets.models import Activation
 from tests.evaluations.verifier import Standardization, Verifier
 
 standardizations = (
-    # Standardization.scale,
+    Standardization.scale,
     Standardization.standardize,
-    # Standardization.align,
+    Standardization.align,
 )
 network_modules = (
-    # networks.mininet,
-    # networks.mediumnet,
-    # networks.images.mininet,
-    # networks.images.mediumnet,
-    # networks.images.cnn.mini,
-    # networks.images.cnn.lenet,
-    networks.rnn,
+    networks.mininet,
+    networks.mediumnet,
+    networks.images.mininet,
+    networks.images.mediumnet,
+    networks.images.cnn.mini,
+    networks.images.cnn.lenet,
+    networks.images.rnn,
+    networks.images.rnn_double,
 )
 activations = (
     Activation.leaky_relu,
-    # Activation.relu,
-    # Activation.tanh,
+    Activation.relu,
+    Activation.tanh,
 )
 
 

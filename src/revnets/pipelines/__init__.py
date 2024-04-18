@@ -1,2 +1,2 @@
-from . import images, mediumnet, mininet, rnn
+from . import images, mediumnet, mininet
 from .train import Pipeline

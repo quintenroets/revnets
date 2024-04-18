@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,7 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from torch.nn import Module
-from torch.utils.data import TensorDataset
+from torch.utils.data import DataLoader
 
 from revnets.utils.data import compute_targets
 
@@ -35,7 +34,9 @@ class Evaluator(base.Evaluator):
 
     def visualize_train_inputs(self) -> None:
         data = self.pipeline.load_prepared_data()
-        inputs = cast(TensorDataset, data.train_validation).tensors[0]
+        batch_size = len(data.train)  # type: ignore[arg-type]
+        dataloader = DataLoader(data.train, batch_size, shuffle=False)
+        inputs, _ = next(iter(dataloader))
         ActivationsVisualizer(inputs, "train inputs").run()
 
     def visualize_network(self, network: nn.Module, name: str) -> None:
@@ -63,6 +64,11 @@ class Evaluator(base.Evaluator):
 class ActivationsVisualizer:
     values: torch.Tensor
     name: str = ""
+    max_show: int = 100
+
+    def __post_init__(self) -> None:
+        self.values = self.values.reshape(self.values.shape[0], -1)
+        self.values = self.values[: self.max_show]
 
     def run(self) -> None:
         for value in self.values:

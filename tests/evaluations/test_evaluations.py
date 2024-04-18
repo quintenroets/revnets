@@ -34,6 +34,11 @@ evaluation_modules = (
     analysis.trained_target,
 )
 
+pipeline_modules = (
+    pipelines.mininet,
+    pipelines.images.rnn,
+)
+
 
 @pytest.fixture
 def pipeline() -> Pipeline:
@@ -58,9 +63,11 @@ def test_cheat_evaluations(pipeline: Pipeline) -> None:
 
 
 @pytest.mark.parametrize("evaluation_module", evaluation_modules)
+@pytest.mark.parametrize("pipeline_module", pipeline_modules)
 def test_evaluations(
-    evaluation_module: ModuleType, pipeline: Pipeline, test_context: None
+    evaluation_module: ModuleType, pipeline_module: ModuleType, test_context: None
 ) -> None:
+    pipeline = cast(Pipeline, pipeline_module.Pipeline())
     reconstructor = reconstructions.empty.Reconstructor(pipeline)
     reconstruction = reconstructor.create_reconstruction()
     evaluation_module.Evaluator(reconstruction, pipeline).get_evaluation()

@@ -10,4 +10,4 @@ from . import mininet
 class Pipeline(mininet.Pipeline):
     @classmethod
     def create_network_factory(cls) -> NetworkFactory:
-        return networks.rnn.NetworkFactory()
+        return networks.images.rnn.NetworkFactory()

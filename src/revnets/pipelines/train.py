@@ -5,7 +5,9 @@ from functools import cached_property
 import torch
 from pytorch_lightning import LightningModule
 from torch.nn import Sequential
+from torchsummary import summary
 
+from revnets import networks
 from revnets.data import DataModule
 from revnets.networks import NetworkFactory
 from revnets.training import Trainer
@@ -96,3 +98,10 @@ class Pipeline(base.Pipeline, ABC):
     @property
     def weights_path_str(self) -> str:
         return str(self.weights_path)
+
+    def log_network_summary(self) -> None:
+        if not isinstance(self.network_factory, networks.images.rnn.NetworkFactory):
+            network = self.create_initialized_network()
+            network = network.to(dtype=torch.float32).to(context.device)
+            data = self.load_prepared_data()
+            summary(network, data.input_shape)

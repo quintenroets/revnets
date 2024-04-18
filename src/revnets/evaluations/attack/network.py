@@ -7,6 +7,7 @@ import torch
 import torchmetrics
 from art.attacks.evasion import FastGradientMethod
 from art.estimators.classification import PyTorchClassifier
+from numpy.typing import NDArray
 from torch import nn
 from torch.nn import Module
 
@@ -78,16 +79,24 @@ class AttackNetwork(pl.LightningModule):
     def show_comparison(
         cls, inputs: torch.Tensor, adversarial_inputs: torch.Tensor
     ) -> None:
-        length = len(inputs[0])
+        inputs_numpy = cls.extract_visualization_values(inputs)
+        adversarial_inputs_numpy = cls.extract_visualization_values(adversarial_inputs)
+        length = inputs_numpy.shape[1]
         indices = np.flip(np.arange(length))
-        inputs_numpy = inputs.cpu().numpy()[:10]
-        adversarial_inputs_numpy = adversarial_inputs.cpu().numpy()
 
         for image, adversarial in zip(inputs_numpy, adversarial_inputs_numpy):
             plt.plot(image, indices, color="green", label="original")
             plt.plot(adversarial, indices, color="red", label="adversarial")
             plt.legend()
             plt.show()
+
+    @classmethod
+    def extract_visualization_values(
+        cls, values: torch.Tensor, max_elements: int = 10
+    ) -> NDArray[np.float64]:
+        values_numpy = values.detach().cpu().numpy()[:max_elements]
+        values_numpy = values_numpy.reshape(values_numpy.shape[0], -1)
+        return cast(NDArray[np.float64], values_numpy)
 
     def get_adversarial_inputs(self, inputs: torch.Tensor) -> torch.Tensor:
         if self.model_under_attack is None:
