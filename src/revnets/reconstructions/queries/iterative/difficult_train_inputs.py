@@ -4,7 +4,6 @@ from typing import cast
 import numpy as np
 import torch
 from kneed import KneeLocator
-from torch.utils.data import DataLoader
 
 from revnets.utils.data import compute_targets
 
@@ -41,15 +40,11 @@ class Reconstructor(base.Reconstructor):
         return inputs[new_samples, np.arange(number_of_features)]
 
     def extract_difficult_inputs(self) -> torch.Tensor:
-        data = self.pipeline.load_prepared_data()
-        batch_size = len(data.train)  # type: ignore[arg-type]
-        dataloader = DataLoader(data.train, batch_size=batch_size, shuffle=False)
-        inputs = next(iter(dataloader))[0]
+        inputs = self.pipeline.load_all_train_inputs()
         outputs = compute_targets(inputs, self.reconstruction)
         targets = compute_targets(inputs, self.pipeline.target)
         high_loss_indices = self.extract_high_loss_indices(outputs, targets)
-        difficult_inputs = inputs[high_loss_indices]
-        return cast(torch.Tensor, difficult_inputs)
+        return inputs[high_loss_indices]
 
     def extract_high_loss_indices(
         self, outputs: torch.Tensor, targets: torch.Tensor

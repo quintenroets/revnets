@@ -1,10 +1,12 @@
 from abc import ABC
 from dataclasses import dataclass, field
 from functools import cached_property
+from typing import cast
 
 import torch
 from pytorch_lightning import LightningModule
 from torch.nn import Sequential
+from torch.utils.data import DataLoader
 from torchsummary import summary
 
 from revnets import networks
@@ -74,6 +76,14 @@ class Pipeline(base.Pipeline, ABC):
         data.prepare_data()
         data.setup("train")
         return data
+
+    @classmethod
+    def load_all_train_inputs(cls) -> torch.Tensor:
+        data = cls.load_prepared_data()
+        batch_size = len(data.train)  # type: ignore[arg-type]
+        dataloader = DataLoader(data.train, batch_size, shuffle=False)
+        inputs, _ = next(iter(dataloader))
+        return cast(torch.Tensor, inputs)
 
     def load_weights(self, model: torch.nn.Module) -> None:
         state = torch.load(self.weights_path_str)

@@ -6,7 +6,6 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from torch.nn import Module
-from torch.utils.data import DataLoader
 
 from revnets.utils.data import compute_targets
 
@@ -33,10 +32,7 @@ class Evaluator(base.Evaluator):
         ActivationsVisualizer(inputs, "random inputs").run()
 
     def visualize_train_inputs(self) -> None:
-        data = self.pipeline.load_prepared_data()
-        batch_size = len(data.train)  # type: ignore[arg-type]
-        dataloader = DataLoader(data.train, batch_size, shuffle=False)
-        inputs, _ = next(iter(dataloader))
+        inputs = self.pipeline.load_all_train_inputs()
         ActivationsVisualizer(inputs, "train inputs").run()
 
     def visualize_network(self, network: nn.Module, name: str) -> None:

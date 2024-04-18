@@ -10,7 +10,7 @@ from revnets.standardization.weights import feedforward, rnn
 from . import mae
 
 
-def generate_layer_weights(model: Module) -> Iterator[torch.Tensor]:
+def extract_weights(model: Module) -> Iterator[torch.Tensor]:
     for layer in extract_layers(model):
         if isinstance(layer.weights, feedforward.Weights):
             yield layer.weights.weights
@@ -24,7 +24,7 @@ def generate_layer_weights(model: Module) -> Iterator[torch.Tensor]:
 class Evaluator(mae.Evaluator):
     def iterate_compared_layers(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
         networks = self.target, self.reconstruction
-        weights_pair = [generate_layer_weights(self.target) for network in networks]
+        weights_pair = [extract_weights(self.target) for network in networks]
         yield from zip(*weights_pair)
 
     def calculate_total_distance(self) -> tuple[float, ...]:

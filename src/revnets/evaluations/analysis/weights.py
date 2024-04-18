@@ -25,7 +25,7 @@ class Evaluator(layers_mae.Evaluator):
             self.visualize_network_differences()
 
     def visualize_network_weights(self, network: Module, name: str) -> None:
-        layer_weights = layers_mae.generate_layer_weights(network)
+        layer_weights = layers_mae.extract_weights(network)
         for i, weights in enumerate(layer_weights):
             title = f"{name} layer {i + 1} weights".capitalize()
             self.visualize_layer_weights(weights, title)
