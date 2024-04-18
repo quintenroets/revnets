@@ -143,9 +143,9 @@ def verify_order_standardized(layer: InternalLayer) -> None:
     assert is_sorted
 
 
-def verify_aligned(connection: InternalLayer, target: InternalLayer) -> None:
+def verify_aligned(layer: InternalLayer, target: InternalLayer) -> None:
     order = standardization.calculate_optimal_order_mapping(
-        connection.weights.weights, target.weights.weights
+        layer.weights.weights, target.weights.weights
     )
     is_ordered = order == torch.arange(len(order))
     assert torch.all(is_ordered)

@@ -10,15 +10,17 @@ from .utils import extract_internal_layers
 def align(model: Module, target: Module) -> None:
     Standardizer(model).standardize_scale()
     Standardizer(target).standardize_scale()
-    # align internal layers of model to internal layers of target
-    # to achieve a minimal weight difference
     layers = extract_internal_layers(model)
     target_layers = extract_internal_layers(target)
     for layer_pair in zip(layers, target_layers):
-        align_layers(*layer_pair)
+        align_hidden_neurons(*layer_pair)
 
 
-def align_layers(layer: InternalLayer, target: InternalLayer) -> None:
+def align_hidden_neurons(layer: InternalLayer, target: InternalLayer) -> None:
+    """
+    Align hidden neurons of layer to hidden neurons of target layer to achieve a minimal
+    weight difference.
+    """
     sort_indices = calculate_optimal_order_mapping(
         layer.weights.weights, target.weights.weights
     )
