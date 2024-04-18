@@ -4,23 +4,27 @@ import torch
 from torch.nn import Module
 from torch.nn.functional import l1_loss
 
-from revnets.standardization import extract_weights, generate_layers
+from revnets.standardization import extract_layers
+from revnets.standardization.weights import feedforward, rnn
 
 from . import mae
 
 
-def generate_layer_weights(model: Module) -> Iterator[torch.Tensor]:
-    for layer in generate_layers(model):
-        try:
-            yield extract_weights(layer)
-        except StopIteration:
-            pass
+def extract_weights(model: Module) -> Iterator[torch.Tensor]:
+    for layer in extract_layers(model):
+        if isinstance(layer.weights, feedforward.Weights):
+            yield layer.weights.weights
+        elif isinstance(layer.weights, rnn.Weights):
+            yield layer.weights.input_to_hidden.weights
+            yield layer.weights.hidden_to_hidden.weights
+        else:
+            raise ValueError("Unexpected weights type")  # pragma: nocover
 
 
 class Evaluator(mae.Evaluator):
     def iterate_compared_layers(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
         networks = self.target, self.reconstruction
-        weights_pair = [generate_layer_weights(self.target) for network in networks]
+        weights_pair = [extract_weights(self.target) for network in networks]
         yield from zip(*weights_pair)
 
     def calculate_total_distance(self) -> tuple[float, ...]:

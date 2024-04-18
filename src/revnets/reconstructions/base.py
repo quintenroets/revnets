@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
+from typing import cast
 
-import torch
 from torch.nn import Sequential
 
 from revnets.pipelines import Pipeline
-from revnets.standardization import generate_layers
+from revnets.standardization import extract_layers
 
 from ..context import context
 from ..utils import NamedClass
@@ -25,20 +25,20 @@ class Reconstructor(NamedClass):
         if self.downscale_factor is not None:
             self.scale_weights()  # pragma: nocover
         if context.config.start_reconstruction_with_zero_biases:
-            self.set_biases()  # pragma: nocover
+            self.set_biases_to_zero()  # pragma: nocover
         self.reconstruct_weights()
         return self.reconstruction
 
     def scale_weights(self) -> None:  # pragma: nocover
-        layers = generate_layers(self.reconstruction)
+        layers = extract_layers(self.reconstruction)
         for layer in layers:
-            layer.weight.data /= self.downscale_factor
+            downscale_factor = cast(float, self.downscale_factor)
+            layer.weights.scale_down(downscale_factor)
 
-    def set_biases(self) -> None:  # pragma: nocover
-        layers = generate_layers(self.reconstruction)
+    def set_biases_to_zero(self) -> None:  # pragma: nocover
+        layers = extract_layers(self.reconstruction)
         for layer in layers:
-            bias = torch.zeros_like(layer.bias, dtype=layer.bias.dtype)
-            layer.bias = torch.nn.Parameter(bias)
+            layer.weights.set_biases_to_zero()
 
     def reconstruct_weights(self) -> None:
         raise NotImplementedError  # pragma: nocover

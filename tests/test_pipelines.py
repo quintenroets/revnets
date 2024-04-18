@@ -21,6 +21,7 @@ all_pipeline_modules = (
     pipelines.images.mininet_128,
     pipelines.images.mininet_200,
     pipelines.images.mediumnet,
+    pipelines.images.rnn,
 )
 
 

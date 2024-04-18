@@ -11,11 +11,13 @@ from revnets.context import context
 from revnets.models import Activation
 from revnets.networks import NetworkFactory
 from revnets.standardization import (
-    InternalConnection,
+    InternalLayer,
+    ScaleIsomorphism,
     Standardizer,
     align,
-    generate_internal_connections,
+    extract_internal_layers,
 )
+from revnets.standardization.weights import feedforward
 from torch.nn import Module, Sequential
 
 
@@ -74,21 +76,21 @@ class Verifier:
         assert torch.all(outputs_are_closes)
 
     def verify_standardized_form(self) -> None:
-        connections = generate_internal_connections(self.network)
-        for connection in connections:
-            if connection.has_scale_isomorphism:
-                verify_scale_standardized(connection)
+        layers = extract_internal_layers(self.network)
+        for layer in layers:
+            if layer.scale_isomorphism is not None:
+                verify_scale_standardized(layer)
             if self.standardization_type == Standardization.standardize:
-                verify_order_standardized(connection)
+                verify_order_standardized(layer)
 
     def verify_aligned_form(self) -> None:
-        connections = generate_internal_connections(self.network)
-        target_connections = generate_internal_connections(self.target)
-        for connection, target_connection in zip(connections, target_connections):
-            if connection.has_scale_isomorphism:
-                verify_scale_standardized(connection)
-                verify_scale_standardized(target_connection)
-                verify_aligned(connection, target_connection)
+        layers = extract_internal_layers(self.network)
+        target_layers = extract_internal_layers(self.target)
+        for layer, target_layer in zip(layers, target_layers):
+            if layer.scale_isomorphism is not None:
+                verify_scale_standardized(layer)
+                verify_scale_standardized(target_layer)
+            verify_aligned(layer, target_layer)
 
     def create_network(self) -> Sequential:
         return self.network_factory.create_network()
@@ -125,24 +127,25 @@ class Verifier:
         Standardizer(self.network, optimize_mae=True).run()
 
 
-def verify_scale_standardized(connection: InternalConnection) -> None:
-    scale_standardizer = standardization.scale.Standardizer(connection)
-    scales = scale_standardizer.calculate_outgoing_scales(connection.input_weights)
+def verify_scale_standardized(layer: InternalLayer) -> None:
+    weights = cast(feedforward.Weights, layer.weights)
+    scale_isomorphism = cast(ScaleIsomorphism, layer.scale_isomorphism)
+    scales = weights.calculate_outgoing_scales(scale_isomorphism)
     ones = torch.ones_like(scales)
     close_to_one = torch.isclose(scales, ones)
     assert torch.all(close_to_one)
 
 
-def verify_order_standardized(connection: InternalConnection) -> None:
-    outgoing_weights = connection.input_weights.norm(dim=1, p=1)
+def verify_order_standardized(layer: InternalLayer) -> None:
+    outgoing_weights = layer.weights.weights.norm(dim=1, p=1)
     sorted_indices = outgoing_weights[:-1] <= outgoing_weights[1:]
     is_sorted = torch.all(sorted_indices)
     assert is_sorted
 
 
-def verify_aligned(connection: InternalConnection, target: InternalConnection) -> None:
+def verify_aligned(layer: InternalLayer, target: InternalLayer) -> None:
     order = standardization.calculate_optimal_order_mapping(
-        connection.input_weights, target.input_weights
+        layer.weights.weights, target.weights.weights
     )
     is_ordered = order == torch.arange(len(order))
     assert torch.all(is_ordered)

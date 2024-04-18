@@ -1,1 +1,1 @@
-from . import cnn, mediumnet, mininet
+from . import cnn, mediumnet, mininet, rnn, rnn_double

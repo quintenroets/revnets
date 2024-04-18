@@ -2,30 +2,30 @@ import torch
 from scipy.optimize import linear_sum_assignment
 from torch.nn import Module
 
-from . import order
-from .internal_connection import InternalConnection
-from .network import Standardizer, generate_internal_connections
+from .layer import InternalLayer
+from .network import Standardizer
+from .utils import extract_internal_layers
 
 
 def align(model: Module, target: Module) -> None:
     Standardizer(model).standardize_scale()
     Standardizer(target).standardize_scale()
-    # align internal neurons of model to internal neurons of target
-    # to achieve a minimal weight difference
-    connections = generate_internal_connections(model)
-    target_connections = generate_internal_connections(target)
-    for connection_pair in zip(connections, target_connections):
-        align_internal_connections(*connection_pair)
+    layers = extract_internal_layers(model)
+    target_layers = extract_internal_layers(target)
+    for layer_pair in zip(layers, target_layers):
+        align_hidden_neurons(*layer_pair)
 
 
-def align_internal_connections(
-    connection: InternalConnection, target: InternalConnection
-) -> None:
+def align_hidden_neurons(layer: InternalLayer, target: InternalLayer) -> None:
+    """
+    Align hidden neurons of layer to hidden neurons of target layer to achieve a minimal
+    weight difference.
+    """
     sort_indices = calculate_optimal_order_mapping(
-        connection.input_weights, target.input_weights
+        layer.weights.weights, target.weights.weights
     )
-    order.permute_outgoing(connection.input_parameters, sort_indices)
-    order.permute_incoming(connection.output_parameters, sort_indices)
+    layer.weights.permute_outgoing(sort_indices)
+    layer.next.permute_incoming(sort_indices)
 
 
 def calculate_optimal_order_mapping(

@@ -18,6 +18,8 @@ network_modules = (
     networks.images.mediumnet,
     networks.images.cnn.mini,
     networks.images.cnn.lenet,
+    networks.images.rnn,
+    networks.images.rnn_double,
 )
 activations = (
     Activation.leaky_relu,
@@ -47,6 +49,7 @@ def test_standardize_preserves_functionality(
     standardization_type: Standardization,
 ) -> None:
     tester = Verifier(network_module, activation, standardization_type)
+    # with pytest.raises(NameError):
     tester.test_functional_preservation()
 
 
