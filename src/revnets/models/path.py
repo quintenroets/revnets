@@ -21,5 +21,23 @@ class Path(superpathlib.Path):
     @classmethod
     @classproperty
     def config(cls: type[T]) -> T:
-        path = cls.assets / "config" / "config.yaml"
+        path = cls.assets / "config"
+        return cast(T, path)
+
+    @classmethod
+    @classproperty
+    def data(cls: type[T]) -> T:
+        path = cls.assets / "data"
+        return cast(T, path)
+
+    @classmethod
+    @classproperty
+    def weights(cls: type[T]) -> T:
+        path = cls.assets / "weights"
+        return cast(T, path)
+
+    @classmethod
+    @classproperty
+    def results(cls: type[T]) -> T:
+        path = cls.assets / "results"
         return cast(T, path)
