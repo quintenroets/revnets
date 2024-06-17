@@ -1,7 +1,4 @@
-from __future__ import annotations
-
-import typing
-from typing import TypeVar
+from typing import TypeVar, cast
 
 import superpathlib
 from simple_classproperty import classproperty
@@ -19,28 +16,28 @@ class Path(superpathlib.Path):
     @classproperty
     def assets(cls: type[T]) -> T:
         path = cls.script_assets / cls.source_root.name
-        return typing.cast(T, path)
+        return cast(T, path)
 
     @classmethod
     @classproperty
     def config(cls: type[T]) -> T:
         path = cls.assets / "config"
-        return typing.cast(T, path)
+        return cast(T, path)
 
     @classmethod
     @classproperty
     def data(cls: type[T]) -> T:
         path = cls.assets / "data"
-        return typing.cast(T, path)
+        return cast(T, path)
 
     @classmethod
     @classproperty
     def weights(cls: type[T]) -> T:
         path = cls.assets / "weights"
-        return typing.cast(T, path)
+        return cast(T, path)
 
     @classmethod
     @classproperty
     def results(cls: type[T]) -> T:
         path = cls.assets / "results"
-        return typing.cast(T, path)
+        return cast(T, path)
