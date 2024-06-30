@@ -14,11 +14,11 @@ T = TypeVar("T")
 @dataclass
 class DataModule(LightningDataModule):
     batch_size: int = field(
-        default_factory=lambda: context.config.target_network_training.batch_size
+        default_factory=lambda: context.config.target_network_training.batch_size,
     )
     evaluation_batch_size: int = 1000
     validation_ratio: float = field(
-        default_factory=lambda: context.config.validation_ratio
+        default_factory=lambda: context.config.validation_ratio,
     )
     train: data.Dataset[Any] = field(init=False)
     validation: data.Dataset[Any] = field(init=False)
@@ -42,12 +42,16 @@ class DataModule(LightningDataModule):
 
     def val_dataloader(self, shuffle: bool = False) -> DataLoader[Any]:
         return DataLoader(
-            self.validation, batch_size=self.evaluation_batch_size, shuffle=False
+            self.validation,
+            batch_size=self.evaluation_batch_size,
+            shuffle=False,
         )
 
     def test_dataloader(self) -> DataLoader[Any]:
         return DataLoader(
-            self.test, batch_size=self.evaluation_batch_size, shuffle=False
+            self.test,
+            batch_size=self.evaluation_batch_size,
+            shuffle=False,
         )
 
     @property

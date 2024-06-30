@@ -89,7 +89,9 @@ class Weights(base.Weights):
 
 
 def broadcast(
-    values: torch.Tensor, target: torch.Tensor, dimension: int = 0
+    values: torch.Tensor,
+    target: torch.Tensor,
+    dimension: int = 0,
 ) -> torch.Tensor:
     shape = [1] * target.dim()
     shape[dimension] = -1

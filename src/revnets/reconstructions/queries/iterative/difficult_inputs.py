@@ -66,7 +66,8 @@ class InputNetwork(LightningModule):
 
     def configure_optimizers(self) -> Optimizer:
         return torch.optim.Adam(
-            self.inputs_embedding.parameters(), lr=self.learning_rate
+            self.inputs_embedding.parameters(),
+            lr=self.learning_rate,
         )
 
     def extract_optimized_inputs(self) -> torch.Tensor:

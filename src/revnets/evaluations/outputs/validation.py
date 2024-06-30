@@ -55,7 +55,7 @@ class Evaluator(base.Evaluator):
         model = CompareModel(self.target, self.reconstruction)
         data = self.pipeline.load_prepared_data()
         dataloader = self.extract_dataloader(data)
-        Trainer().test(model, dataloaders=dataloader)  # noqa
+        Trainer().test(model, dataloaders=dataloader)
         return cast(Metrics, model.metrics)
 
     @classmethod

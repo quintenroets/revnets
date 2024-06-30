@@ -32,7 +32,10 @@ class Evaluator(layers_mae.Evaluator):
 
     @classmethod
     def visualize_layer_weights(
-        cls, weights: torch.Tensor, title: str, n_show: int | None = 10
+        cls,
+        weights: torch.Tensor,
+        title: str,
+        n_show: int | None = 10,
     ) -> None:
         weights = weights[:n_show].cpu()
 
@@ -42,7 +45,7 @@ class Evaluator(layers_mae.Evaluator):
         colors = get_colors(number_of_colors=n_neurons)
         ax = cls.create_figure()
 
-        for i, (neuron, color) in enumerate(zip(weights, colors)):
+        for i, (neuron, color) in enumerate(zip(weights, colors, strict=False)):
             label = f"Neuron {i + 1}"
             ax.plot(neuron, color=color, label=label)
 

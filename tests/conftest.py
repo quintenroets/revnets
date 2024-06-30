@@ -22,12 +22,14 @@ def mocked_assets_path() -> Iterator[None]:
         yield
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_context(context: Context, mocked_assets_path: None) -> Iterator[Context]:
     config = context.config
     hyperparameters = HyperParameters(epochs=1, learning_rate=1.0e-2, batch_size=32)
     evaluation = Evaluation(
-        visualize_attack=True, run_analysis=True, only_visualize_differences=False
+        visualize_attack=True,
+        run_analysis=True,
+        only_visualize_differences=False,
     )
     context.loaders.config.value = Config(
         target_network_training=hyperparameters,

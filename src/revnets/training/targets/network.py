@@ -23,6 +23,9 @@ class Network(network.Network[Metrics]):
     def calculate_accuracy(cls, outputs: torch.Tensor, labels: torch.Tensor) -> float:
         _, predictions = outputs.max(1)
         accuracy = torchmetrics.functional.accuracy(
-            predictions, labels, task="multiclass", num_classes=10
+            predictions,
+            labels,
+            task="multiclass",
+            num_classes=10,
         )
         return accuracy.item()

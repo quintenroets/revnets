@@ -14,7 +14,7 @@ from ..utils import NamedClass
 class Reconstructor(NamedClass):
     pipeline: Pipeline
     downscale_factor: float | None = field(
-        default_factory=lambda: context.config.weight_variance_downscale_factor
+        default_factory=lambda: context.config.weight_variance_downscale_factor,
     )
     reconstruction: Sequential = field(init=False)
 

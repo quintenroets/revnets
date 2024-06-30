@@ -34,7 +34,9 @@ class Evaluation:
 class Config(SerializationMixin):
     sampling_data_size: int = 102400
     reconstruction_training: HyperParameters = HyperParameters(
-        epochs=300, learning_rate=1e-2, batch_size=256
+        epochs=300,
+        learning_rate=1e-2,
+        batch_size=256,
     )
     reconstruct_from_checkpoint: bool = False
     always_train: bool = True
@@ -42,13 +44,18 @@ class Config(SerializationMixin):
     experiment: Experiment = field(default_factory=Experiment)
 
     reconstruction_training_debug: HyperParameters = HyperParameters(
-        epochs=3, learning_rate=0.1, batch_size=16
+        epochs=3,
+        learning_rate=0.1,
+        batch_size=16,
     )
     target_network_training: HyperParameters = HyperParameters(
-        epochs=100, learning_rate=1.0e-2, batch_size=32
+        epochs=100,
+        learning_rate=1.0e-2,
+        batch_size=32,
     )
     difficult_inputs_training: HyperParameters = HyperParameters(
-        epochs=1000, learning_rate=1.0e-3
+        epochs=1000,
+        learning_rate=1.0e-3,
     )
     evaluation: Evaluation = field(default_factory=Evaluation)
     evaluation_batch_size: int = 1000

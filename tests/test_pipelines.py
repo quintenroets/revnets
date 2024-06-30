@@ -27,7 +27,8 @@ all_pipeline_modules = (
 
 @pytest.mark.parametrize("pipeline_module", pipeline_modules)
 def test_target_network_training(
-    pipeline_module: ModuleType, test_context: None
+    pipeline_module: ModuleType,
+    test_context: None,
 ) -> None:
     pipeline: Pipeline = pipeline_module.Pipeline()
     pipeline.create_target_network()

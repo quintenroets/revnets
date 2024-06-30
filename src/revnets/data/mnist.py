@@ -10,7 +10,7 @@ from . import base
 class DataModule(base.DataModule):
     path: str = str(Path.data / "mnist")
     transformation: transforms.Compose = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+        [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))],
     )
 
     def prepare_data(self) -> None:
@@ -24,5 +24,8 @@ class DataModule(base.DataModule):
 
     def load_dataset(self, train: bool) -> datasets.MNIST:
         return datasets.MNIST(
-            self.path, train=train, download=True, transform=self.transformation
+            self.path,
+            train=train,
+            download=True,
+            transform=self.transformation,
         )

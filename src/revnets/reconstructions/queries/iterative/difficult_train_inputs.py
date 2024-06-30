@@ -47,7 +47,9 @@ class Reconstructor(base.Reconstructor):
         return inputs[high_loss_indices]
 
     def extract_high_loss_indices(
-        self, outputs: torch.Tensor, targets: torch.Tensor
+        self,
+        outputs: torch.Tensor,
+        targets: torch.Tensor,
     ) -> torch.Tensor:
         sorted_losses, original_indices = self.calculate_sorted_losses(outputs, targets)
         elbow = self.calculate_elbow(sorted_losses)
@@ -55,7 +57,9 @@ class Reconstructor(base.Reconstructor):
 
     @classmethod
     def calculate_sorted_losses(
-        cls, outputs: torch.Tensor, targets: torch.Tensor
+        cls,
+        outputs: torch.Tensor,
+        targets: torch.Tensor,
     ) -> torch.return_types.sort:
         losses = torch.nn.functional.l1_loss(outputs, targets, reduction="none")
         losses = losses.mean(dim=1)
@@ -65,6 +69,9 @@ class Reconstructor(base.Reconstructor):
     def calculate_elbow(cls, values: torch.Tensor) -> int:
         elbow_range = range(len(values))
         elbow_result = KneeLocator(
-            elbow_range, values, curve="convex", direction="decreasing"
+            elbow_range,
+            values,
+            curve="convex",
+            direction="decreasing",
         )
         return cast(int, elbow_result.elbow)
