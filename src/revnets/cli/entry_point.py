@@ -1,9 +1,6 @@
 from package_utils.context.entry_point import create_entry_point
 
-from revnets.main.main import Experiment
+from revnets import main
+from revnets.context import context
 
-from ..context import context
-
-experiment = Experiment()
-
-entry_point = create_entry_point(experiment.run, context)
+entry_point = create_entry_point(main, context)

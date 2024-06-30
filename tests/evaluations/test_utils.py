@@ -26,10 +26,14 @@ def test_linear_extract_weights(in_features: int, out_features: int) -> None:
     kernel_size=strategies.integers(min_value=1, max_value=10),
 )
 def test_convolutional_extract_weights(
-    in_channels: int, out_channels: int, kernel_size: int
+    in_channels: int,
+    out_channels: int,
+    kernel_size: int,
 ) -> None:
     layer = nn.Conv2d(
-        in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size
+        in_channels=in_channels,
+        out_channels=out_channels,
+        kernel_size=kernel_size,
     )
     weights = extract_layer(layer).weights.weights
     assert weights.shape == (out_channels, in_channels * kernel_size**2 + 1)
@@ -41,10 +45,15 @@ def test_convolutional_extract_weights(
     number_of_layers=strategies.integers(min_value=1, max_value=10),
 )
 def test_rnn_extract_weights(
-    input_size: int, hidden_size: int, number_of_layers: int
+    input_size: int,
+    hidden_size: int,
+    number_of_layers: int,
 ) -> None:
     layer = nn.RNN(
-        input_size, hidden_size, num_layers=number_of_layers, batch_first=True
+        input_size,
+        hidden_size,
+        num_layers=number_of_layers,
+        batch_first=True,
     )
     untyped_layers = [layer.weights for layer in extract_rnn_layers(layer)]
     layers = cast(list[rnn.Weights], untyped_layers)

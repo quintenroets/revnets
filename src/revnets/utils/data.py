@@ -20,7 +20,9 @@ class PredictNetwork(LightningModule):
 
 
 def compute_targets(
-    inputs: torch.Tensor, network: nn.Module, batch_size: int | None = None
+    inputs: torch.Tensor,
+    network: nn.Module,
+    batch_size: int | None = None,
 ) -> torch.Tensor:
     if batch_size is None:
         batch_size = context.config.evaluation_batch_size

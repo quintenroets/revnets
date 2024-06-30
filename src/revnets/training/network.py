@@ -13,7 +13,10 @@ Metrics = TypeVar("Metrics", bound=BaseMetrics)
 
 class Network(pl.LightningModule, Generic[Metrics]):
     def __init__(
-        self, model: nn.Module, learning_rate: float, do_log: bool = True
+        self,
+        model: nn.Module,
+        learning_rate: float,
+        do_log: bool = True,
     ) -> None:
         super().__init__()
         self._learning_rate = learning_rate

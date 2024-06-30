@@ -41,7 +41,9 @@ class Trainer(pl.Trainer):
 
     @classmethod
     def generate_callbacks(
-        cls, callbacks: list[Callback] | None, barebones: bool
+        cls,
+        callbacks: list[Callback] | None,
+        barebones: bool,
     ) -> Iterator[Callback]:
         if callbacks is not None:
             yield from callbacks
@@ -49,6 +51,7 @@ class Trainer(pl.Trainer):
         if extra_callbacks:
             yield RichModelSummary()
             theme = RichProgressBarTheme(
-                metrics_format=".3e", metrics_text_delimiter="\n"
+                metrics_format=".3e",
+                metrics_text_delimiter="\n",
             )
             yield RichProgressBar(theme=theme)

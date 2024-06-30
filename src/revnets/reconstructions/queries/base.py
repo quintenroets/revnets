@@ -24,7 +24,7 @@ from .data import DataModule
 class Reconstructor(base.Reconstructor):
     num_samples: int = field(default_factory=lambda: context.config.sampling_data_size)
     max_epochs: int = field(
-        default_factory=lambda: context.config.reconstruction_training.epochs
+        default_factory=lambda: context.config.reconstruction_training.epochs,
     )
 
     @cached_property
