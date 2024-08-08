@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from torch import nn
 
-from .. import mininet
+from revnets.networks import mininet
 
 
 @dataclass

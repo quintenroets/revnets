@@ -1,7 +1,6 @@
 from revnets import networks
 from revnets.networks import NetworkFactory
-
-from .. import mininet
+from revnets.pipelines.images import mininet
 
 
 class Pipeline(mininet.Pipeline):

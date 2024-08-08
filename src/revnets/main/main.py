@@ -1,19 +1,18 @@
 from dataclasses import dataclass
 from types import ModuleType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import cli
-import numpy as np
 import torch
 from torch import nn
 
-from revnets import pipelines
+from revnets import evaluations, pipelines, reconstructions
+from revnets.context import context
 from revnets.models import Experiment as Config
 from revnets.pipelines import Pipeline
 
-from .. import evaluations, reconstructions
-from ..context import context
-from ..reconstructions import Reconstructor
+if TYPE_CHECKING:
+    from revnets.reconstructions import Reconstructor  # pragma: nocover
 
 
 @dataclass
@@ -48,7 +47,6 @@ class Experiment:
 
 def set_seed() -> None:
     torch.manual_seed(context.config.experiment.seed)
-    np.random.seed(context.config.experiment.seed)
 
 
 def extract_module(module: ModuleType, names: list[str]) -> ModuleType:

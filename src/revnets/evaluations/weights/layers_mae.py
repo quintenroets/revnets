@@ -17,15 +17,16 @@ def extract_weights(model: Module) -> Iterator[torch.Tensor]:
         elif isinstance(layer.weights, rnn.Weights):
             yield layer.weights.input_to_hidden.weights
             yield layer.weights.hidden_to_hidden.weights
-        else:
-            raise ValueError("Unexpected weights type")  # pragma: nocover
+        else:  # pragma: nocover
+            message = "Unexpected weights type"
+            raise TypeError(message)
 
 
 class Evaluator(mae.Evaluator):
     def iterate_compared_layers(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
         networks = self.target, self.reconstruction
         weights_pair = [extract_weights(self.target) for network in networks]
-        yield from zip(*weights_pair)
+        yield from zip(*weights_pair, strict=False)
 
     def calculate_total_distance(self) -> tuple[float, ...]:
         pairs = self.iterate_compared_layers()
@@ -39,7 +40,10 @@ class Evaluator(mae.Evaluator):
     def format_evaluation(cls, value: tuple[float, ...], precision: int = 3) -> str:  # type: ignore[override]
         if value:
             values = (
-                super(Evaluator, cls).format_evaluation(layer_value)
+                super(Evaluator, cls).format_evaluation(
+                    layer_value,
+                    precision=precision,
+                )
                 for layer_value in value
             )
             formatted_value = ", ".join(values)

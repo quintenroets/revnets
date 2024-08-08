@@ -44,8 +44,8 @@ class Standardizer:
                 layer.standardize_scale()
 
     def calculate_average_scale_per_layer(self) -> float:
-        next = cast(feedforward.Weights, self.internal_layers[-1].next)
-        scales = next.calculate_outgoing_norms()
+        next_ = cast(feedforward.Weights, self.internal_layers[-1].next)
+        scales = next_.calculate_outgoing_norms()
         scale = sum(scales) / len(scales)
         num_internal_layers = len(self.layers_with_norm_isomorphism)
         average_scale = scale ** (1 / num_internal_layers)

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .. import metrics
+from revnets.training import metrics
 
 
 @dataclass

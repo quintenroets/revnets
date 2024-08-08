@@ -8,9 +8,8 @@ from torch.nn import Module
 from torch.utils.data import DataLoader
 
 from revnets.data import DataModule
+from revnets.evaluations import base
 from revnets.training import Trainer
-
-from .. import base
 
 
 @dataclass
@@ -34,7 +33,7 @@ class CompareModel(pl.LightningModule):
         self.mse_metric = torchmetrics.MeanSquaredError()
         self.metrics: Metrics | None = None
 
-    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
+    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:  # noqa: ARG002
         inputs, labels = batch
         models = (self.model1, self.model2)
         outputs = [model(inputs) for model in models]
@@ -55,7 +54,7 @@ class Evaluator(base.Evaluator):
         model = CompareModel(self.target, self.reconstruction)
         data = self.pipeline.load_prepared_data()
         dataloader = self.extract_dataloader(data)
-        Trainer().test(model, dataloaders=dataloader)  # noqa
+        Trainer().test(model, dataloaders=dataloader)
         return cast(Metrics, model.metrics)
 
     @classmethod

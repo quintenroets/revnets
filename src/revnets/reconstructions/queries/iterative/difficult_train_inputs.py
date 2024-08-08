@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from kneed import KneeLocator
 
+from revnets.context import context
 from revnets.utils.data import compute_targets
 
 from . import base
@@ -32,9 +33,10 @@ class Reconstructor(base.Reconstructor):
     def recombine_flat(self, inputs: torch.Tensor) -> torch.Tensor:
         number_of_features = inputs.shape[-1]
         new_samples_shape = self.num_samples, number_of_features
-        number_of_inpus = len(inputs)
-        choices = range(number_of_inpus)
-        new_samples = np.random.choice(choices, size=new_samples_shape)
+        number_of_inputs = len(inputs)
+        choices = range(number_of_inputs)
+        generator = np.random.default_rng(seed=context.config.experiment.seed)
+        new_samples = generator.choice(choices, size=new_samples_shape)
         # each feature value in a new sample corresponds with a feature value
         # in the corresponding feature of one of the inputs
         return inputs[new_samples, np.arange(number_of_features)]
@@ -47,7 +49,9 @@ class Reconstructor(base.Reconstructor):
         return inputs[high_loss_indices]
 
     def extract_high_loss_indices(
-        self, outputs: torch.Tensor, targets: torch.Tensor
+        self,
+        outputs: torch.Tensor,
+        targets: torch.Tensor,
     ) -> torch.Tensor:
         sorted_losses, original_indices = self.calculate_sorted_losses(outputs, targets)
         elbow = self.calculate_elbow(sorted_losses)
@@ -55,7 +59,9 @@ class Reconstructor(base.Reconstructor):
 
     @classmethod
     def calculate_sorted_losses(
-        cls, outputs: torch.Tensor, targets: torch.Tensor
+        cls,
+        outputs: torch.Tensor,
+        targets: torch.Tensor,
     ) -> torch.return_types.sort:
         losses = torch.nn.functional.l1_loss(outputs, targets, reduction="none")
         losses = losses.mean(dim=1)
@@ -65,6 +71,9 @@ class Reconstructor(base.Reconstructor):
     def calculate_elbow(cls, values: torch.Tensor) -> int:
         elbow_range = range(len(values))
         elbow_result = KneeLocator(
-            elbow_range, values, curve="convex", direction="decreasing"
+            elbow_range,
+            values,
+            curve="convex",
+            direction="decreasing",
         )
         return cast(int, elbow_result.elbow)

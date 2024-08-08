@@ -2,19 +2,22 @@ from __future__ import annotations
 
 import pickle
 from dataclasses import dataclass
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-import numpy as np
 import requests
 import torch
-from numpy.typing import NDArray
 from package_utils.dataclasses import SerializationMixin
 from simple_classproperty import classproperty
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import TensorDataset
 
-from ..models import Path
+from revnets.models import Path
+
 from . import base
+
+if TYPE_CHECKING:  # pragma: nocover
+    import numpy as np
+    from numpy.typing import NDArray
 
 
 @dataclass
@@ -27,7 +30,7 @@ class RawData(SerializationMixin):
     @classmethod
     def from_path(cls, path: Path) -> RawData:
         with path.open("rb") as fp:
-            data = pickle.load(fp)
+            data = pickle.load(fp)  # noqa: S301
         return cls(data["x"], data["y"], data["x_test"], data["y_test"])
 
     def scale(self) -> None:
@@ -71,7 +74,7 @@ class DataModule(base.DataModule):
             self.process()
 
     def download(self) -> None:
-        response = requests.get(self.download_url, allow_redirects=True)
+        response = requests.get(self.download_url, allow_redirects=True, timeout=10)
         self.raw_path.byte_content = response.content
 
     def process(self) -> None:
@@ -81,7 +84,7 @@ class DataModule(base.DataModule):
         path = str(self.path)
         torch.save(data, path)
 
-    def setup(self, stage: str) -> None:
+    def setup(self, stage: str) -> None:  # noqa: ARG002
         path = str(self.path)
         self.train_validation, self.test = torch.load(path)
         self.split_train_validation()

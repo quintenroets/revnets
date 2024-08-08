@@ -5,10 +5,9 @@ from typing import cast
 import torch
 from torch.nn.functional import mse_loss
 
+from revnets.context import context
+from revnets.evaluations import base
 from revnets.standardization import Standardizer, align
-
-from ...context import context
-from .. import base
 
 
 @dataclass
@@ -50,4 +49,5 @@ class Evaluator(base.Evaluator):
         yield from zip(
             self.target.state_dict().values(),
             self.reconstruction.state_dict().values(),
+            strict=False,
         )

@@ -2,8 +2,7 @@ from dataclasses import dataclass
 
 from revnets import data, networks
 from revnets.networks import NetworkFactory
-
-from ... import train
+from revnets.pipelines import train
 
 
 @dataclass

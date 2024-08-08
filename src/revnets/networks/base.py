@@ -5,17 +5,16 @@ import torch
 from torch import nn
 from torch.nn import Module, Sequential
 
+from revnets.context import context
 from revnets.models import Activation
-
-from ..context import context
-from ..utils import NamedClass
+from revnets.utils import NamedClass
 
 
 @dataclass
 class NetworkFactory(NamedClass):
     output_size: int = 10
     activation: Activation = field(
-        default_factory=lambda: context.config.target_network_training.activation
+        default_factory=lambda: context.config.target_network_training.activation,
     )
     input_shape: tuple[int, ...] | None = None
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from types import ModuleType
 
-from .. import models, pipelines, reconstructions
+from revnets import models, pipelines, reconstructions
 
 
 @dataclass

@@ -1,8 +1,11 @@
 from types import ModuleType
+from typing import TYPE_CHECKING
 
 import pytest
 from revnets import pipelines
-from revnets.pipelines import Pipeline
+
+if TYPE_CHECKING:
+    from revnets.pipelines import Pipeline  # pragma: nocover
 
 pipeline_modules = (
     pipelines.mininet.mininet,
@@ -26,14 +29,14 @@ all_pipeline_modules = (
 
 
 @pytest.mark.parametrize("pipeline_module", pipeline_modules)
-def test_target_network_training(
-    pipeline_module: ModuleType, test_context: None
-) -> None:
+@pytest.mark.usefixtures("test_context")
+def test_target_network_training(pipeline_module: ModuleType) -> None:
     pipeline: Pipeline = pipeline_module.Pipeline()
     pipeline.create_target_network()
 
 
 @pytest.mark.parametrize("pipeline_module", all_pipeline_modules)
-def test_network_factory(pipeline_module: ModuleType, test_context: None) -> None:
+@pytest.mark.usefixtures("test_context")
+def test_network_factory(pipeline_module: ModuleType) -> None:
     pipeline: Pipeline = pipeline_module.Pipeline()
     pipeline.create_network_factory()

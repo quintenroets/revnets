@@ -8,10 +8,10 @@ from torch.optim import Optimizer
 from torch.utils.data import DataLoader, Dataset
 
 from revnets.context import context
+from revnets.reconstructions.queries.base import DataModule
 from revnets.training import Trainer
 from revnets.training.reconstructions import Network
 
-from ..base import DataModule
 from . import base
 
 
@@ -21,6 +21,7 @@ class InputNetwork(LightningModule):
         shape: tuple[int, ...],
         reconstructions: list[torch.nn.Sequential],
         learning_rate: float | None = None,
+        *,
         verbose: bool = True,
     ) -> None:
         super().__init__()
@@ -34,7 +35,7 @@ class InputNetwork(LightningModule):
 
     def on_train_start(self) -> None:
         if self.verbose:
-            print("\nAverage pairwise distances: ", end="\n\t")  # pragma: nocover
+            pass  # pragma: nocover
 
     @classmethod
     def create_input_embeddings(cls, shape: tuple[int, ...]) -> torch.nn.Embedding:
@@ -57,16 +58,21 @@ class InputNetwork(LightningModule):
         distance_total = pairwise_distances.mean()
         loss = -distance_total
         if self.verbose:
-            print(f"{distance_total.item():.3f}", end=" ")  # pragma: nocover
+            pass  # pragma: nocover
         return loss
 
-    def training_step(self, batch: torch.Tensor, batch_idx: int) -> torch.Tensor:
+    def training_step(
+        self,
+        batch: torch.Tensor,
+        batch_idx: int,  # noqa: ARG002
+    ) -> torch.Tensor:
         outputs = self(batch)
         return self.calculate_loss(outputs)
 
     def configure_optimizers(self) -> Optimizer:
         return torch.optim.Adam(
-            self.inputs_embedding.parameters(), lr=self.learning_rate
+            self.inputs_embedding.parameters(),
+            lr=self.learning_rate,
         )
 
     def extract_optimized_inputs(self) -> torch.Tensor:
@@ -92,7 +98,7 @@ class Reconstructor(base.Reconstructor):
             for seed in range(self.n_networks)
         ]
 
-    def create_queries(self, num_samples: int) -> torch.Tensor:
+    def create_queries(self, num_samples: int) -> torch.Tensor:  # noqa: ARG002
         return self.create_difficult_samples()
 
     def create_difficult_samples(self) -> torch.Tensor:

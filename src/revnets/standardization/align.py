@@ -12,7 +12,7 @@ def align(model: Module, target: Module) -> None:
     Standardizer(target).standardize_scale()
     layers = extract_internal_layers(model)
     target_layers = extract_internal_layers(target)
-    for layer_pair in zip(layers, target_layers):
+    for layer_pair in zip(layers, target_layers, strict=False):
         align_hidden_neurons(*layer_pair)
 
 
@@ -22,14 +22,16 @@ def align_hidden_neurons(layer: InternalLayer, target: InternalLayer) -> None:
     weight difference.
     """
     sort_indices = calculate_optimal_order_mapping(
-        layer.weights.weights, target.weights.weights
+        layer.weights.weights,
+        target.weights.weights,
     )
     layer.weights.permute_outgoing(sort_indices)
     layer.next.permute_incoming(sort_indices)
 
 
 def calculate_optimal_order_mapping(
-    weights: torch.Tensor, target_weights: torch.Tensor
+    weights: torch.Tensor,
+    target_weights: torch.Tensor,
 ) -> torch.Tensor:
     distances = torch.cdist(target_weights, weights, p=1).numpy()
     indices = linear_sum_assignment(distances)[1]

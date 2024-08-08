@@ -5,7 +5,7 @@ import torch
 
 
 @dataclass
-class Weights(ABC):
+class Weights(ABC):  # noqa: B024
     def permute_incoming(self, sort_indices: torch.Tensor) -> None:
         raise NotImplementedError  # pragma: nocover
 

@@ -13,7 +13,7 @@ def context() -> Context:
 
 
 @pytest.fixture(scope="session")
-def mocked_assets_path() -> Iterator[None]:
+def _mocked_assets_path() -> Iterator[None]:
     path = Path.tempfile(create=False)
     path.mkdir()
     mocked_path = PropertyMock(return_value=path)
@@ -22,12 +22,17 @@ def mocked_assets_path() -> Iterator[None]:
         yield
 
 
-@pytest.fixture
-def test_context(context: Context, mocked_assets_path: None) -> Iterator[Context]:
+@pytest.fixture()
+def test_context(
+    context: Context,
+    _mocked_assets_path: None,  # noqa: PT019
+) -> Iterator[Context]:
     config = context.config
     hyperparameters = HyperParameters(epochs=1, learning_rate=1.0e-2, batch_size=32)
     evaluation = Evaluation(
-        visualize_attack=True, run_analysis=True, only_visualize_differences=False
+        visualize_attack=True,
+        run_analysis=True,
+        only_visualize_differences=False,
     )
     context.loaders.config.value = Config(
         target_network_training=hyperparameters,

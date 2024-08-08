@@ -1,24 +1,25 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
 from dataclasses import asdict, dataclass, fields
 from typing import TYPE_CHECKING
 
 import cli
 
-if TYPE_CHECKING:
-    from rich.table import Table  # pragma: nocover
+if TYPE_CHECKING:  # pragma: nocover
+    from collections.abc import Iterator
+
+    from rich.table import Table
 
 
 @dataclass
 class Evaluation:
-    weights_MSE: str | None = None
-    weights_MAE: str | None = None
-    weights_max_AE: str | None = None
-    weights_MAE_layers: str | None = None
-    train_outputs_MAE: str | None = None
-    val_outputs_MAE: str | None = None
-    test_outputs_MAE: str | None = None
+    weights_MSE: str | None = None  # noqa: N815
+    weights_MAE: str | None = None  # noqa: N815
+    weights_max_AE: str | None = None  # noqa: N815
+    weights_MAE_layers: str | None = None  # noqa: N815
+    train_outputs_MAE: str | None = None  # noqa: N815
+    val_outputs_MAE: str | None = None  # noqa: N815
+    test_outputs_MAE: str | None = None  # noqa: N815
     test_acc: str | None = None
     adversarial_test_acc: str | None = None
     adversarial_transfer_test_acc: str | None = None

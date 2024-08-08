@@ -4,8 +4,7 @@ from typing import cast
 from pytorch_lightning import Callback, LightningModule, Trainer
 
 from revnets.context import context
-
-from ..network import Network
+from revnets.training.reconstructions.network import Network
 
 transitions = {
     1: 1e-1,
@@ -36,7 +35,10 @@ class LearningRateScheduler(Callback):
 
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
         pl_module.log(
-            "learning rate", pl_module.learning_rate, prog_bar=True, on_step=False
+            "learning rate",
+            pl_module.learning_rate,
+            prog_bar=True,
+            on_step=False,
         )
         loss = trainer.callback_metrics["train l1 loss"].item()
         self.losses.append(loss)

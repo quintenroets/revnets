@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
+from revnets.evaluations import base
 from revnets.training import Trainer
 from revnets.training.targets import Network
-
-from .. import base
 
 
 @dataclass

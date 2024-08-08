@@ -6,7 +6,7 @@ from pytorch_lightning import LightningDataModule
 from torch.utils import data
 from torch.utils.data import DataLoader, Subset, random_split
 
-from ..context import context
+from revnets.context import context
 
 T = TypeVar("T")
 
@@ -14,11 +14,11 @@ T = TypeVar("T")
 @dataclass
 class DataModule(LightningDataModule):
     batch_size: int = field(
-        default_factory=lambda: context.config.target_network_training.batch_size
+        default_factory=lambda: context.config.target_network_training.batch_size,
     )
     evaluation_batch_size: int = 1000
     validation_ratio: float = field(
-        default_factory=lambda: context.config.validation_ratio
+        default_factory=lambda: context.config.validation_ratio,
     )
     train: data.Dataset[Any] = field(init=False)
     validation: data.Dataset[Any] = field(init=False)
@@ -37,17 +37,21 @@ class DataModule(LightningDataModule):
         random_generator = torch.Generator().manual_seed(seed)
         return random_split(dataset, split_sizes, random_generator)
 
-    def train_dataloader(self, shuffle: bool = True) -> DataLoader[Any]:
-        return DataLoader(self.train, batch_size=self.batch_size, shuffle=True)
+    def train_dataloader(self, *, shuffle: bool = True) -> DataLoader[Any]:
+        return DataLoader(self.train, batch_size=self.batch_size, shuffle=shuffle)
 
-    def val_dataloader(self, shuffle: bool = False) -> DataLoader[Any]:
+    def val_dataloader(self, *, shuffle: bool = False) -> DataLoader[Any]:
         return DataLoader(
-            self.validation, batch_size=self.evaluation_batch_size, shuffle=False
+            self.validation,
+            batch_size=self.evaluation_batch_size,
+            shuffle=shuffle,
         )
 
     def test_dataloader(self) -> DataLoader[Any]:
         return DataLoader(
-            self.test, batch_size=self.evaluation_batch_size, shuffle=False
+            self.test,
+            batch_size=self.evaluation_batch_size,
+            shuffle=False,
         )
 
     @property

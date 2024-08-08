@@ -42,7 +42,9 @@ def extract_weights(rnn: nn.RNN, layer: int) -> Weights:
 
 
 def extract_feedforward_weights(
-    rnn: nn.RNN, layer: int, input_type: str
+    rnn: nn.RNN,
+    layer: int,
+    input_type: str,
 ) -> feedforward.Weights:
     weights = getattr(rnn, f"weight_{input_type}h_l{layer}")
     bias = getattr(rnn, f"bias_{input_type}h_l{layer}")

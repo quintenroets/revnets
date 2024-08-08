@@ -33,7 +33,7 @@ class LossMetric(torchmetrics.Metric):
 class RunningMetrics:
     def __init__(self) -> None:
         self.accuracy = torchmetrics.Accuracy("multiclass", num_classes=10).to(
-            context.device
+            context.device,
         )
         self.loss = LossMetric().to(context.device)
 
@@ -60,7 +60,7 @@ class AttackNetwork(pl.LightningModule):
         self.attack: FastGradientMethod | None = None
         self.visualize = context.config.evaluation.visualize_attack
 
-    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
+    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:  # noqa: ARG002
         inputs, labels = batch
         adversarial_inputs = self.get_adversarial_inputs(inputs)
 
@@ -69,22 +69,34 @@ class AttackNetwork(pl.LightningModule):
 
         self.evaluate_inputs(self.reconstruction, inputs, labels, self.test_metric)
         self.evaluate_inputs(
-            self.reconstruction, adversarial_inputs, labels, self.adversarial_metric
+            self.reconstruction,
+            adversarial_inputs,
+            labels,
+            self.adversarial_metric,
         )
         self.evaluate_inputs(
-            self.original, adversarial_inputs, labels, self.adversarial_transfer_metric
+            self.original,
+            adversarial_inputs,
+            labels,
+            self.adversarial_transfer_metric,
         )
 
     @classmethod
     def show_comparison(
-        cls, inputs: torch.Tensor, adversarial_inputs: torch.Tensor
+        cls,
+        inputs: torch.Tensor,
+        adversarial_inputs: torch.Tensor,
     ) -> None:
         inputs_numpy = cls.extract_visualization_values(inputs)
         adversarial_inputs_numpy = cls.extract_visualization_values(adversarial_inputs)
         length = inputs_numpy.shape[1]
         indices = np.flip(np.arange(length))
 
-        for image, adversarial in zip(inputs_numpy, adversarial_inputs_numpy):
+        for image, adversarial in zip(
+            inputs_numpy,
+            adversarial_inputs_numpy,
+            strict=False,
+        ):
             plt.plot(image, indices, color="green", label="original")
             plt.plot(adversarial, indices, color="red", label="adversarial")
             plt.legend()
@@ -92,7 +104,9 @@ class AttackNetwork(pl.LightningModule):
 
     @classmethod
     def extract_visualization_values(
-        cls, values: torch.Tensor, max_elements: int = 10
+        cls,
+        values: torch.Tensor,
+        max_elements: int = 10,
     ) -> NDArray[np.float64]:
         values_numpy = values.detach().cpu().numpy()[:max_elements]
         values_numpy = values_numpy.reshape(values_numpy.shape[0], -1)
@@ -103,9 +117,9 @@ class AttackNetwork(pl.LightningModule):
             self.configure_attack(inputs)
 
         attack_inputs = inputs.cpu().numpy()
-        assert self.attack is not None
+        attack = cast(FastGradientMethod, self.attack)
         with torch.inference_mode(mode=False):
-            adversarial_inputs = self.attack.generate(x=attack_inputs)
+            adversarial_inputs = attack.generate(x=attack_inputs)
         return torch.Tensor(adversarial_inputs).to(inputs.device)
 
     @classmethod
@@ -131,7 +145,8 @@ class AttackNetwork(pl.LightningModule):
             device_type="gpu",
         )
         self.attack = FastGradientMethod(
-            self.model_under_attack, eps=context.config.evaluation.adversarial_epsilon
+            self.model_under_attack,
+            eps=context.config.evaluation.adversarial_epsilon,
         )
 
     def on_test_epoch_end(self) -> None:

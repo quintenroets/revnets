@@ -42,7 +42,7 @@ class Verifier:
 
     @property
     def network_factory(self) -> NetworkFactory:
-        Factory = self.network_module.NetworkFactory
+        Factory = self.network_module.NetworkFactory  # noqa:N806
         factory = Factory(activation=self.activation)
         return cast(NetworkFactory, factory)
 
@@ -86,7 +86,7 @@ class Verifier:
     def verify_aligned_form(self) -> None:
         layers = extract_internal_layers(self.network)
         target_layers = extract_internal_layers(self.target)
-        for layer, target_layer in zip(layers, target_layers):
+        for layer, target_layer in zip(layers, target_layers, strict=False):
             if layer.scale_isomorphism is not None:
                 verify_scale_standardized(layer)
                 verify_scale_standardized(target_layer)
@@ -119,7 +119,11 @@ class Verifier:
         state_dict = self.network.state_dict()
         self.apply_transformation()
         second_state_dict = self.network.state_dict()
-        for value, second_value in zip(state_dict.values(), second_state_dict.values()):
+        for value, second_value in zip(
+            state_dict.values(),
+            second_state_dict.values(),
+            strict=False,
+        ):
             is_close = torch.isclose(value, second_value)
             assert torch.all(is_close)
 
@@ -145,7 +149,8 @@ def verify_order_standardized(layer: InternalLayer) -> None:
 
 def verify_aligned(layer: InternalLayer, target: InternalLayer) -> None:
     order = standardization.calculate_optimal_order_mapping(
-        layer.weights.weights, target.weights.weights
+        layer.weights.weights,
+        target.weights.weights,
     )
     is_ordered = order == torch.arange(len(order))
     assert torch.all(is_ordered)
