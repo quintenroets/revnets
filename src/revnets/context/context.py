@@ -49,8 +49,8 @@ class Context(Context_[Options, Config, None]):
             case 64:
                 dtype = torch.float64
             case _:
-                msg = f"Unsupported precision {self.config.precision}"
-                raise ValueError(msg)
+                message = f"Unsupported precision {self.config.precision}"
+                raise ValueError(message)
         return dtype
 
 

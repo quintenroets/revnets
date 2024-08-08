@@ -12,7 +12,7 @@ def align(model: Module, target: Module) -> None:
     Standardizer(target).standardize_scale()
     layers = extract_internal_layers(model)
     target_layers = extract_internal_layers(target)
-    for layer_pair in zip(layers, target_layers, strict=False):
+    for layer_pair in zip(layers, target_layers, strict=True):
         align_hidden_neurons(*layer_pair)
 
 

@@ -86,7 +86,7 @@ class Verifier:
     def verify_aligned_form(self) -> None:
         layers = extract_internal_layers(self.network)
         target_layers = extract_internal_layers(self.target)
-        for layer, target_layer in zip(layers, target_layers, strict=False):
+        for layer, target_layer in zip(layers, target_layers, strict=True):
             if layer.scale_isomorphism is not None:
                 verify_scale_standardized(layer)
                 verify_scale_standardized(target_layer)

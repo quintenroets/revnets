@@ -2,6 +2,7 @@ import math
 from dataclasses import dataclass, field
 from typing import Any
 
+import cli
 import torch
 from pytorch_lightning import LightningModule
 from torch.optim import Optimizer
@@ -35,7 +36,10 @@ class InputNetwork(LightningModule):
 
     def on_train_start(self) -> None:
         if self.verbose:
-            pass  # pragma: nocover
+            cli.console.print(
+                "\nAverage pairwise distances: ",
+                end="\n\t",
+            )  # pragma: nocover
 
     @classmethod
     def create_input_embeddings(cls, shape: tuple[int, ...]) -> torch.nn.Embedding:
@@ -58,7 +62,10 @@ class InputNetwork(LightningModule):
         distance_total = pairwise_distances.mean()
         loss = -distance_total
         if self.verbose:
-            pass  # pragma: nocover
+            cli.console.print(
+                f"{distance_total.item():.3f}",
+                end=" ",
+            )  # pragma: nocover
         return loss
 
     def training_step(

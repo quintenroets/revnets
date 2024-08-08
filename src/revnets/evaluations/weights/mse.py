@@ -49,5 +49,5 @@ class Evaluator(base.Evaluator):
         yield from zip(
             self.target.state_dict().values(),
             self.reconstruction.state_dict().values(),
-            strict=False,
+            strict=True,
         )

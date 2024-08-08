@@ -19,7 +19,7 @@ class Evaluator(layers_mae.Evaluator):
         keys = self.target.state_dict().keys()
         original_values = self.target.state_dict().values()
         reconstruction_values = self.reconstruction.state_dict().values()
-        yield from zip(keys, original_values, reconstruction_values, strict=False)
+        yield from zip(keys, original_values, reconstruction_values, strict=True)
 
     @classmethod
     def format_evaluation(cls, value: dict[str, float], precision: int = 3) -> str:  # type: ignore[override]

@@ -48,7 +48,7 @@ class Evaluator(layers_mae.Evaluator):
 
         n_features = len(weights[0])
         interval = n_features // 4
-        x_ticks = [*list(range(0, n_features, interval)), n_features - 1]
+        x_ticks = [*range(0, n_features, interval), n_features - 1]
         if n_features - 2 not in x_ticks and False:
             x_ticks.insert(-1, n_features - 2)
         x_tick_labels = [str(xtick) for xtick in x_ticks[:-1]] + ["Bias weight"]

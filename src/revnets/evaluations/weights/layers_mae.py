@@ -26,7 +26,7 @@ class Evaluator(mae.Evaluator):
     def iterate_compared_layers(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
         networks = self.target, self.reconstruction
         weights_pair = [extract_weights(self.target) for network in networks]
-        yield from zip(*weights_pair, strict=False)
+        yield from zip(*weights_pair, strict=True)
 
     def calculate_total_distance(self) -> tuple[float, ...]:
         pairs = self.iterate_compared_layers()
