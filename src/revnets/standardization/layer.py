@@ -33,8 +33,8 @@ class InternalLayer(Layer):
         weights.rescale_outgoing(1 / scale_factors)
 
         # we assume that an rnn layer is never preceded by a feedforward layer
-        next = cast(feedforward.Weights, self.next)
-        next.rescale_incoming(scale_factors)
+        next_ = cast(feedforward.Weights, self.next)
+        next_.rescale_incoming(scale_factors)
 
     def calculate_scale_factors(self) -> torch.Tensor:
         # only feedforward layers have scale isomorphism

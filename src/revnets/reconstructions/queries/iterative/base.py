@@ -5,9 +5,8 @@ import torch
 from rich.text import Text
 
 from revnets.context import context
-
-from .. import correlated_features
-from ..data import DataModule
+from revnets.reconstructions.queries import correlated_features
+from revnets.reconstructions.queries.data import DataModule
 
 
 @dataclass
@@ -22,8 +21,8 @@ class Reconstructor(correlated_features.Reconstructor):
 
     def start_training(self) -> None:
         data = self.create_training_data()
-        for round in range(self.n_rounds):
-            self.show_progress(round)
+        for round_ in range(self.n_rounds):
+            self.show_progress(round_)
             self.run_round(data)
             self.add_difficult_inputs(data)
 
@@ -32,8 +31,8 @@ class Reconstructor(correlated_features.Reconstructor):
         network = self.create_train_network()
         trainer.fit(network, data)
 
-    def show_progress(self, round: int) -> None:
-        round_title = f"Round {round+1}/{self.n_rounds}"
+    def show_progress(self, round_: int) -> None:
+        round_title = f"Round {round_+1}/{self.n_rounds}"
         title = f"Round {round_title}: {self.num_samples}/{self.total_samples} samples"
         text = Text(title, style="black")
         cli.console.rule(text)

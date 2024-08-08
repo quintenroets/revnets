@@ -22,7 +22,9 @@ class Evaluator:
 
     @classmethod
     def format_evaluation(
-        cls, value: float | tuple[float, ...] | None, precision: int = 3
+        cls,
+        value: float | tuple[float, ...] | None,
+        precision: int = 3,
     ) -> str:
         if value is None:
             result = "/"

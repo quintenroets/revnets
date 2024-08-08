@@ -40,7 +40,7 @@ pipeline_modules = (
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def pipeline() -> Pipeline:
     return pipelines.mininet.Pipeline()
 
@@ -64,8 +64,10 @@ def test_cheat_evaluations(pipeline: Pipeline) -> None:
 
 @pytest.mark.parametrize("evaluation_module", evaluation_modules)
 @pytest.mark.parametrize("pipeline_module", pipeline_modules)
+@pytest.mark.usefixtures("test_context")
 def test_evaluations(
-    evaluation_module: ModuleType, pipeline_module: ModuleType, test_context: None
+    evaluation_module: ModuleType,
+    pipeline_module: ModuleType,
 ) -> None:
     pipeline = cast(Pipeline, pipeline_module.Pipeline())
     reconstructor = reconstructions.empty.Reconstructor(pipeline)
@@ -84,7 +86,9 @@ class Verifier(verifier.Verifier):
 
 @pytest.mark.parametrize("evaluation_module", weight_evaluation_modules)
 def test_weight_evaluations(
-    evaluation_module: ModuleType, pipeline: Pipeline, test_context: Context
+    evaluation_module: ModuleType,
+    pipeline: Pipeline,
+    test_context: Context,
 ) -> None:
     reconstructor = reconstructions.empty.Reconstructor(pipeline)
     reconstruction = reconstructor.create_reconstruction()
@@ -94,7 +98,9 @@ def test_weight_evaluations(
 
 
 def verify_evaluated_networks(
-    evaluator: weights.Evaluator, pipeline: Pipeline, context: Context
+    evaluator: weights.Evaluator,
+    pipeline: Pipeline,
+    context: Context,
 ) -> None:
     use_align = context.config.evaluation.use_align
     standardization = (

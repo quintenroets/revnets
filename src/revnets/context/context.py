@@ -4,7 +4,7 @@ from typing import cast
 import torch
 from package_utils.context import Context as Context_
 
-from ..models import Config, Options, Path
+from revnets.models import Config, Options, Path
 
 
 class Context(Context_[Options, Config, None]):
@@ -49,7 +49,8 @@ class Context(Context_[Options, Config, None]):
             case 64:
                 dtype = torch.float64
             case _:
-                raise ValueError(f"Unsupported precision {self.config.precision}")
+                message = f"Unsupported precision {self.config.precision}"
+                raise ValueError(message)
         return dtype
 
 

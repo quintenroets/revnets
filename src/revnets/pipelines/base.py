@@ -1,6 +1,6 @@
 from torch.nn import Sequential
 
-from ..utils import NamedClass
+from revnets.utils import NamedClass
 
 
 class Pipeline(NamedClass):

@@ -3,13 +3,12 @@ from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torch.nn.functional as F
 from torch import nn
 from torch.nn import Module
+from torch.nn.functional import relu
 
+from revnets.evaluations import base
 from revnets.utils.data import compute_targets
-
-from .. import base
 
 
 @dataclass
@@ -46,7 +45,7 @@ class Evaluator(base.Evaluator):
         inputs = self.create_queries()
         outputs = compute_targets(inputs, model)
         if self.activation:
-            outputs = F.relu(outputs)  # pragma: nocover
+            outputs = relu(outputs)  # pragma: nocover
         ActivationsVisualizer(outputs, name).run()
 
     def create_queries(self) -> torch.Tensor:

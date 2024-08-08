@@ -1,5 +1,5 @@
+import itertools
 from collections.abc import Iterator
-from itertools import tee
 
 from torch import nn
 from torch.nn.modules.pooling import _AvgPoolNd as AvgPoolND
@@ -15,9 +15,8 @@ skip_layers = nn.Flatten, AvgPoolND, CreateRNNInput, ExtractRNNOutput
 
 
 def extract_internal_layers(network: nn.Module) -> Iterator[InternalLayer]:
-    layers, next_layers = tee(extract_layers(network))
-    next(next_layers, None)
-    for layer, next_layer in zip(layers, next_layers):
+    layers = extract_layers(network)
+    for layer, next_layer in itertools.pairwise(layers):
         yield InternalLayer(layer.weights, layer.scale_isomorphism, next_layer.weights)
 
 
@@ -38,9 +37,8 @@ def extract_children(network: nn.Module) -> Iterator[nn.Module]:
     if children:
         for child in children:
             yield from extract_children(child)
-    else:
-        if not isinstance(network, skip_layers):
-            yield network
+    elif not isinstance(network, skip_layers):
+        yield network
 
 
 def extract_rnn_layers(layer: nn.RNN) -> Iterator[Layer]:

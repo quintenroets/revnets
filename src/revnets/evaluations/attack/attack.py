@@ -3,10 +3,10 @@ from typing import cast
 
 import torch
 
+from revnets.evaluations import base
 from revnets.training import Trainer
 from revnets.training.targets import Metrics
 
-from .. import base
 from .network import AttackNetwork
 
 

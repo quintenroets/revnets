@@ -3,18 +3,17 @@ from typing import cast
 
 from torch.nn import Sequential
 
+from revnets.context import context
 from revnets.pipelines import Pipeline
 from revnets.standardization import extract_layers
-
-from ..context import context
-from ..utils import NamedClass
+from revnets.utils import NamedClass
 
 
 @dataclass
 class Reconstructor(NamedClass):
     pipeline: Pipeline
     downscale_factor: float | None = field(
-        default_factory=lambda: context.config.weight_variance_downscale_factor
+        default_factory=lambda: context.config.weight_variance_downscale_factor,
     )
     reconstruction: Sequential = field(init=False)
 

@@ -1,8 +1,11 @@
 from types import ModuleType
+from typing import TYPE_CHECKING
 
 import pytest
 from revnets import data
-from revnets.data import DataModule
+
+if TYPE_CHECKING:
+    from revnets.data import DataModule  # pragma: nocover
 
 dataset_modules = data.mnist, data.mnist1d
 

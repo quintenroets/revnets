@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
+from revnets.data import mnist1d
 from revnets.networks import NetworkFactory, mininet
-
-from ...data import mnist1d
-from .. import train
+from revnets.pipelines import train
 
 
 @dataclass

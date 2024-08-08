@@ -9,6 +9,7 @@ from pytorch_lightning.callbacks import EarlyStopping
 
 from revnets.context import context
 from revnets.models import Path
+from revnets.reconstructions import base
 from revnets.training import Trainer
 from revnets.training.reconstructions import Network
 from revnets.training.reconstructions.callbacks import (
@@ -16,7 +17,6 @@ from revnets.training.reconstructions.callbacks import (
     MAECalculator,
 )
 
-from .. import base
 from .data import DataModule
 
 
@@ -24,7 +24,7 @@ from .data import DataModule
 class Reconstructor(base.Reconstructor):
     num_samples: int = field(default_factory=lambda: context.config.sampling_data_size)
     max_epochs: int = field(
-        default_factory=lambda: context.config.reconstruction_training.epochs
+        default_factory=lambda: context.config.reconstruction_training.epochs,
     )
 
     @cached_property

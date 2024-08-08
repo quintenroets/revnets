@@ -12,7 +12,9 @@ from revnets.utils.data import compute_targets
 
 class QueryDataSet(TensorDataset):
     def __init__(
-        self, target: nn.Module, evaluation_batch_size: int | None = None
+        self,
+        target: nn.Module,
+        evaluation_batch_size: int | None = None,
     ) -> None:
         self.target = target
         if evaluation_batch_size is None:
@@ -35,10 +37,10 @@ class QueryDataSet(TensorDataset):
 class DataModule(base.DataModule):
     pipeline: Pipeline = field(default_factory=Pipeline)
     batch_size: int = field(
-        default_factory=lambda: context.config.reconstruction_training.batch_size
+        default_factory=lambda: context.config.reconstruction_training.batch_size,
     )
     evaluation_batch_size: int = field(
-        default_factory=lambda: context.config.evaluation_batch_size
+        default_factory=lambda: context.config.evaluation_batch_size,
     )
     train: QueryDataSet = field(init=False)
     validation: QueryDataSet = field(init=False)

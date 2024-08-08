@@ -4,7 +4,8 @@ from typing import cast
 import torch
 from torch import nn
 
-from ..scale_isomorphism import ScaleIsomorphism
+from revnets.standardization.scale_isomorphism import ScaleIsomorphism
+
 from . import base
 
 
@@ -89,7 +90,9 @@ class Weights(base.Weights):
 
 
 def broadcast(
-    values: torch.Tensor, target: torch.Tensor, dimension: int = 0
+    values: torch.Tensor,
+    target: torch.Tensor,
+    dimension: int = 0,
 ) -> torch.Tensor:
     shape = [1] * target.dim()
     shape[dimension] = -1

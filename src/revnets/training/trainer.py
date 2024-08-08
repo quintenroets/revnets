@@ -8,7 +8,7 @@ from pytorch_lightning.callbacks.progress.rich_progress import (
     RichProgressBarTheme,
 )
 
-from ..context import context
+from revnets.context import context
 
 
 class Trainer(pl.Trainer):
@@ -18,11 +18,12 @@ class Trainer(pl.Trainer):
         callbacks: list[Callback] | None = None,
         max_epochs: int | None = None,
         precision: int | None = None,
+        *,
         barebones: bool = False,
         **kwargs: Any,
     ) -> None:
         config = context.config
-        callbacks = list(self.generate_callbacks(callbacks, barebones))
+        callbacks = list(self.generate_callbacks(callbacks, barebones=barebones))
         super().__init__(
             accelerator=accelerator,
             barebones=barebones,
@@ -35,13 +36,16 @@ class Trainer(pl.Trainer):
             default_root_dir=context.log_path_str,
             precision=precision or config.precision,
             sync_batchnorm=True,
-            # gradient_clip_val=config.gradient_clip_val,
+            gradient_clip_val=context.config.gradient_clip_val,
             **kwargs,
         )
 
     @classmethod
     def generate_callbacks(
-        cls, callbacks: list[Callback] | None, barebones: bool
+        cls,
+        callbacks: list[Callback] | None,
+        *,
+        barebones: bool,
     ) -> Iterator[Callback]:
         if callbacks is not None:
             yield from callbacks
@@ -49,6 +53,7 @@ class Trainer(pl.Trainer):
         if extra_callbacks:
             yield RichModelSummary()
             theme = RichProgressBarTheme(
-                metrics_format=".3e", metrics_text_delimiter="\n"
+                metrics_format=".3e",
+                metrics_text_delimiter="\n",
             )
             yield RichProgressBar(theme=theme)

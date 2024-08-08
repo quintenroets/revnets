@@ -6,9 +6,8 @@ import torch
 from torch.nn import Module
 
 from revnets.context import context
-
-from ...utils.colors import get_colors
-from ..weights import layers_mae
+from revnets.evaluations.weights import layers_mae
+from revnets.utils.colors import get_colors
 
 cpu = torch.device("cpu")
 
@@ -32,23 +31,24 @@ class Evaluator(layers_mae.Evaluator):
 
     @classmethod
     def visualize_layer_weights(
-        cls, weights: torch.Tensor, title: str, n_show: int | None = 10
+        cls,
+        weights: torch.Tensor,
+        title: str,
+        n_show: int | None = 10,
     ) -> None:
         weights = weights[:n_show].cpu()
-
-        # weights = torch.transpose(weights, 0, 1)
 
         n_neurons = len(weights)
         colors = get_colors(number_of_colors=n_neurons)
         ax = cls.create_figure()
 
-        for i, (neuron, color) in enumerate(zip(weights, colors)):
+        for i, (neuron, color) in enumerate(zip(weights, colors, strict=False)):
             label = f"Neuron {i + 1}"
             ax.plot(neuron, color=color, label=label)
 
         n_features = len(weights[0])
         interval = n_features // 4
-        x_ticks = list(range(0, n_features, interval)) + [n_features - 1]
+        x_ticks = [*range(0, n_features, interval), n_features - 1]
         if n_features - 2 not in x_ticks and False:
             x_ticks.insert(-1, n_features - 2)
         x_tick_labels = [str(xtick) for xtick in x_ticks[:-1]] + ["Bias weight"]

@@ -1,14 +1,16 @@
 from types import ModuleType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from torch.nn import Module
 
 from revnets.context import context
+from revnets.pipelines import Pipeline
 
-from ..pipelines import Pipeline
 from . import analysis, outputs, weights
-from .base import Evaluator
 from .evaluation import Evaluation
+
+if TYPE_CHECKING:
+    from .base import Evaluator  # pragma: nocover
 
 
 def evaluate(reconstruction: Module, pipeline: Pipeline) -> Evaluation:

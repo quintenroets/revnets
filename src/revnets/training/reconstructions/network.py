@@ -4,8 +4,8 @@ import torch
 from pytorch_lightning.core.optimizer import LightningOptimizer
 
 from revnets.context import context
+from revnets.training import network
 
-from .. import network
 from .metrics import Metrics
 
 
@@ -15,7 +15,9 @@ class Network(network.Network[Metrics]):
         super().__init__(model, learning_rate=learning_rate)
 
     def calculate_metrics(
-        self, outputs: torch.Tensor, targets: torch.Tensor
+        self,
+        outputs: torch.Tensor,
+        targets: torch.Tensor,
     ) -> Metrics:
         return Metrics.from_results(outputs, targets)
 
@@ -32,9 +34,11 @@ class Network(network.Network[Metrics]):
 
     @classmethod
     def update_optimizer(
-        cls, optimizer: LightningOptimizer, learning_rate: float
+        cls,
+        optimizer: LightningOptimizer,
+        learning_rate: float,
     ) -> None:
-        for param_group in optimizer.param_groups:  # noqa
+        for param_group in optimizer.param_groups:
             param_group["lr"] = learning_rate
 
     @property

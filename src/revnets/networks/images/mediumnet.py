@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from torch import nn
 
-from .. import mediumnet
+from revnets.networks import mediumnet
 
 
 @dataclass

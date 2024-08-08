@@ -13,7 +13,11 @@ Metrics = TypeVar("Metrics", bound=BaseMetrics)
 
 class Network(pl.LightningModule, Generic[Metrics]):
     def __init__(
-        self, model: nn.Module, learning_rate: float, do_log: bool = True
+        self,
+        model: nn.Module,
+        learning_rate: float,
+        *,
+        do_log: bool = True,
     ) -> None:
         super().__init__()
         self._learning_rate = learning_rate
@@ -28,14 +32,22 @@ class Network(pl.LightningModule, Generic[Metrics]):
         outputs = self.model(inputs)
         return cast(torch.Tensor, outputs)
 
-    def training_step(self, batch: torch.Tensor, batch_idx: int) -> torch.Tensor:
+    def training_step(
+        self,
+        batch: torch.Tensor,
+        batch_idx: int,  # noqa: ARG002
+    ) -> torch.Tensor:
         metrics = self.obtain_metrics(batch, Phase.TRAIN)
         return metrics.loss
 
-    def validation_step(self, batch: torch.Tensor, batch_idx: int) -> None:
+    def validation_step(
+        self,
+        batch: torch.Tensor,
+        batch_idx: int,  # noqa: ARG002
+    ) -> None:
         self.obtain_metrics(batch, Phase.VAL)
 
-    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:
+    def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:  # noqa: ARG002
         self.obtain_metrics(batch, Phase.TEST)
 
     def obtain_metrics(self, batch: torch.Tensor, phase: Phase) -> Metrics:
@@ -71,13 +83,14 @@ class Network(pl.LightningModule, Generic[Metrics]):
         self,
         name: str,
         value: float,
+        *,
         sync_dist: bool = True,
         on_epoch: bool = True,
         on_step: bool = True,
         **kwargs: Any,
     ) -> None:
         if self.do_log:
-            return super().log(
+            super().log(
                 name,
                 value,
                 sync_dist=sync_dist,

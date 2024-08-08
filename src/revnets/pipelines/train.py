@@ -10,20 +10,20 @@ from torch.utils.data import DataLoader
 from torchsummary import summary
 
 from revnets import networks
+from revnets.context import context
 from revnets.data import DataModule
+from revnets.models import Path
 from revnets.networks import NetworkFactory
 from revnets.training import Trainer
 from revnets.training.targets import Network
 
-from ..context import context
-from ..models import Path
 from . import base
 
 
 @dataclass
 class Pipeline(base.Pipeline, ABC):
     max_epochs: int = field(
-        default_factory=lambda: context.config.target_network_training.epochs
+        default_factory=lambda: context.config.target_network_training.epochs,
     )
 
     def create_initialized_network(self) -> Sequential:

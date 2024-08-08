@@ -23,7 +23,8 @@ reconstruction_modules = (
 
 
 @pytest.mark.parametrize("reconstruction_module", reconstruction_modules)
-def test_reconstructions(reconstruction_module: ModuleType, test_context: None) -> None:
+@pytest.mark.usefixtures("test_context")
+def test_reconstructions(reconstruction_module: ModuleType) -> None:
     pipeline = Pipeline()
     reconstructor: Reconstructor = reconstruction_module.Reconstructor(pipeline)
     reconstructor.create_reconstruction()

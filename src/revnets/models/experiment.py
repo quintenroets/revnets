@@ -15,7 +15,9 @@ class Experiment(SerializationMixin):
     target_network_seed: int = 900
 
     def __post_init__(self) -> None:
-        assert self.seed != self.target_network_seed
+        if self.seed == self.target_network_seed:  # pragma: nocover
+            message = "Initialization seed cannot be the same as the target network"
+            raise ValueError(message)
 
     @property
     def names(self) -> tuple[str, ...]:
