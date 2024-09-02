@@ -1,5 +1,6 @@
 import pytest
 import torch
+
 from revnets.main.main import Experiment
 
 gpu_available = torch.cuda.is_available()

@@ -2,12 +2,13 @@ from types import ModuleType
 
 import pytest
 from pytorch_lightning.core.optimizer import LightningOptimizer
+from torch import nn
+
 from revnets import reconstructions
 from revnets.pipelines.mininet import Pipeline
 from revnets.reconstructions import Reconstructor, queries
 from revnets.training.reconstructions import Network
 from revnets.training.reconstructions.callbacks import LearningRateScheduler
-from torch import nn
 
 reconstruction_modules = (
     reconstructions.empty,

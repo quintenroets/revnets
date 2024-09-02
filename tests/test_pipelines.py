@@ -2,6 +2,7 @@ from types import ModuleType
 from typing import TYPE_CHECKING
 
 import pytest
+
 from revnets import pipelines
 
 if TYPE_CHECKING:
