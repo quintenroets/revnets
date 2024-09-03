@@ -6,6 +6,8 @@ from types import ModuleType
 from typing import cast
 
 import torch
+from torch.nn import Module, Sequential
+
 from revnets import standardization
 from revnets.context import context
 from revnets.models import Activation
@@ -18,7 +20,6 @@ from revnets.standardization import (
     extract_internal_layers,
 )
 from revnets.standardization.weights import feedforward
-from torch.nn import Module, Sequential
 
 
 class Standardization(Enum):

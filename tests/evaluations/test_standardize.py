@@ -1,9 +1,9 @@
 from types import ModuleType
 
 import pytest
+
 from revnets import networks
 from revnets.models import Activation
-
 from tests.evaluations.verifier import Standardization, Verifier
 
 standardizations = (

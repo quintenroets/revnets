@@ -4,14 +4,14 @@ from types import ModuleType
 from typing import cast
 
 import pytest
+from torch.nn import Sequential
+
 from revnets import evaluations, pipelines, reconstructions
 from revnets.context import Context
 from revnets.evaluations import analysis, attack, outputs, weights
 from revnets.evaluations.evaluate import format_percentage
 from revnets.networks import mininet
 from revnets.pipelines import Pipeline
-from torch.nn import Sequential
-
 from tests.evaluations import verifier
 from tests.evaluations.verifier import Standardization
 
@@ -40,7 +40,7 @@ pipeline_modules = (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def pipeline() -> Pipeline:
     return pipelines.mininet.Pipeline()
 

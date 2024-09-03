@@ -2,6 +2,7 @@ from collections.abc import Iterator
 from unittest.mock import PropertyMock, patch
 
 import pytest
+
 from revnets.context import context as context_
 from revnets.context.context import Context
 from revnets.models import Config, Evaluation, HyperParameters, Path
@@ -22,7 +23,7 @@ def _mocked_assets_path() -> Iterator[None]:
         yield
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_context(
     context: Context,
     _mocked_assets_path: None,  # noqa: PT019

@@ -1,13 +1,14 @@
 from typing import cast
 
 from hypothesis import given, strategies
+from torch import nn
+
 from revnets.standardization.utils import (
     extract_layer,
     extract_rnn_layers,
     extract_scale_isomorphism_after_max_pool,
 )
 from revnets.standardization.weights import rnn
-from torch import nn
 
 
 @given(

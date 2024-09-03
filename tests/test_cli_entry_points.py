@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from package_dev_utils.tests.args import no_cli_args
+
 from revnets.cli import entry_point, launch
 
 
