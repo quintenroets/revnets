@@ -1,4 +1,9 @@
 # Revnets
+<<<<<<< HEAD
+=======
+[![PyPI version](https://badge.fury.io/py/revnets.svg)](https://badge.fury.io/py/revnets)
+![PyPI downloads](https://img.shields.io/pypi/dm/revnets)
+>>>>>>> template
 ![Python version](https://img.shields.io/badge/python-3.10+-brightgreen)
 ![Operating system](https://img.shields.io/badge/os-linux-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
