@@ -34,7 +34,7 @@ class Trainer(pl.Trainer):
             limit_val_batches=config.limit_batches,
             limit_test_batches=config.limit_batches,
             default_root_dir=context.log_path_str,
-            precision=precision or config.precision,
+            precision=precision or config.precision,  # type: ignore[arg-type]
             sync_batchnorm=True,
             gradient_clip_val=context.config.gradient_clip_val,
             **kwargs,
