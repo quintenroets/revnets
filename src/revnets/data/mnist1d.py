@@ -86,5 +86,5 @@ class DataModule(base.DataModule):
 
     def setup(self, stage: str) -> None:  # noqa: ARG002
         path = str(self.path)
-        self.train_validation, self.test = torch.load(path)
+        self.train_validation, self.test = torch.load(path, weights_only=False)
         self.split_train_validation()
