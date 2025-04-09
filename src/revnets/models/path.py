@@ -21,10 +21,9 @@ class Path(superpathlib.Path):
 
     @classmethod
     @classproperty
-<<<<<<< HEAD
-    def config(cls: type[T]) -> T:
-        path = cls.assets / "config"
-        return cast(T, path)
+    def config(cls) -> Self:
+        path = cls.assets / "config" / "config.yaml"
+        return cast("Self", path)
 
     @classmethod
     @classproperty
@@ -43,8 +42,3 @@ class Path(superpathlib.Path):
     def results(cls: type[T]) -> T:
         path = cls.assets / "results"
         return cast(T, path)
-=======
-    def config(cls) -> Self:
-        path = cls.assets / "config" / "config.yaml"
-        return cast("Self", path)
->>>>>>> template
