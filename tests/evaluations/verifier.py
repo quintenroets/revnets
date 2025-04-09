@@ -109,7 +109,7 @@ class Verifier:
 
     def extract_feature_shape(self) -> tuple[int, ...]:
         input_layer = next(self.extract_layers())
-        shape = input_layer.weight.shape[1:]
+        shape = input_layer.weight.shape[1:]  # type: ignore[index]
         return cast("tuple[int, ...]", shape)
 
     def extract_layers(self) -> Iterator[Module]:
