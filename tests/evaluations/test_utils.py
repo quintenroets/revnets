@@ -1,4 +1,4 @@
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from hypothesis import given, strategies
 from torch import nn
@@ -8,7 +8,9 @@ from revnets.standardization.utils import (
     extract_rnn_layers,
     extract_scale_isomorphism_after_max_pool,
 )
-from revnets.standardization.weights import rnn
+
+if TYPE_CHECKING:
+    from revnets.standardization.weights import rnn
 
 
 @given(

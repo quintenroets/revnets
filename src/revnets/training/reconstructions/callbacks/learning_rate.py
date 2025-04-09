@@ -1,10 +1,12 @@
 from dataclasses import dataclass, field
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from pytorch_lightning import Callback, LightningModule, Trainer
 
 from revnets.context import context
-from revnets.training.reconstructions.network import Network
+
+if TYPE_CHECKING:
+    from revnets.training.reconstructions.network import Network
 
 transitions = {
     1: 1e-1,

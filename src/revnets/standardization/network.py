@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 
 from torch import nn
 
 from .layer import InternalLayer
 from .scale_isomorphism import ScaleIsomorphism
 from .utils import extract_internal_layers
-from .weights import feedforward
+
+if TYPE_CHECKING:
+    from .weights import feedforward
 
 T = TypeVar("T")
 

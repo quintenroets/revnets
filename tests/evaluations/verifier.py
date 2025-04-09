@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
 from types import ModuleType
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import torch
 from torch.nn import Module, Sequential
@@ -19,7 +19,9 @@ from revnets.standardization import (
     align,
     extract_internal_layers,
 )
-from revnets.standardization.weights import feedforward
+
+if TYPE_CHECKING:
+    from revnets.standardization.weights import feedforward
 
 
 class Standardization(Enum):
