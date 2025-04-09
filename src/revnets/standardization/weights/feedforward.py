@@ -41,7 +41,7 @@ class Weights(base.Weights):
 
     def calculate_outgoing_norms(self) -> torch.Tensor:
         norms = self.weights.norm(dim=1, p=2)
-        return cast(torch.Tensor, norms)
+        return cast("torch.Tensor", norms)
 
     def rescale_incoming(self, scales: torch.Tensor) -> None:
         data = self.extract_weight_data(scales.shape)

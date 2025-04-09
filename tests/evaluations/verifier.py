@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
 from types import ModuleType
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import torch
 from torch.nn import Module, Sequential
@@ -19,7 +19,9 @@ from revnets.standardization import (
     align,
     extract_internal_layers,
 )
-from revnets.standardization.weights import feedforward
+
+if TYPE_CHECKING:
+    from revnets.standardization.weights import feedforward
 
 
 class Standardization(Enum):
@@ -45,7 +47,7 @@ class Verifier:
     def network_factory(self) -> NetworkFactory:
         Factory = self.network_module.NetworkFactory  # noqa:N806
         factory = Factory(activation=self.activation)
-        return cast(NetworkFactory, factory)
+        return cast("NetworkFactory", factory)
 
     def test_standardized_form(self) -> None:
         self.apply_transformation()
@@ -107,8 +109,8 @@ class Verifier:
 
     def extract_feature_shape(self) -> tuple[int, ...]:
         input_layer = next(self.extract_layers())
-        shape = input_layer.weight.shape[1:]
-        return cast(tuple[int, ...], shape)
+        shape = input_layer.weight.shape[1:]  # type: ignore[index]
+        return cast("tuple[int, ...]", shape)
 
     def extract_layers(self) -> Iterator[Module]:
         for layer in self.network.children():
@@ -133,8 +135,8 @@ class Verifier:
 
 
 def verify_scale_standardized(layer: InternalLayer) -> None:
-    weights = cast(feedforward.Weights, layer.weights)
-    scale_isomorphism = cast(ScaleIsomorphism, layer.scale_isomorphism)
+    weights = cast("feedforward.Weights", layer.weights)
+    scale_isomorphism = cast("ScaleIsomorphism", layer.scale_isomorphism)
     scales = weights.calculate_outgoing_scales(scale_isomorphism)
     ones = torch.ones_like(scales)
     close_to_one = torch.isclose(scales, ones)

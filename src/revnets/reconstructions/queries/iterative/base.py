@@ -32,7 +32,7 @@ class Reconstructor(correlated_features.Reconstructor):
         trainer.fit(network, data)
 
     def show_progress(self, round_: int) -> None:
-        round_title = f"Round {round_+1}/{self.n_rounds}"
+        round_title = f"Round {round_ + 1}/{self.n_rounds}"
         title = f"Round {round_title}: {self.num_samples}/{self.total_samples} samples"
         text = Text(title, style="black")
         cli.console.rule(text)

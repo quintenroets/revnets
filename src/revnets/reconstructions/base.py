@@ -31,7 +31,7 @@ class Reconstructor(NamedClass):
     def scale_weights(self) -> None:  # pragma: nocover
         layers = extract_layers(self.reconstruction)
         for layer in layers:
-            downscale_factor = cast(float, self.downscale_factor)
+            downscale_factor = cast("float", self.downscale_factor)
             layer.weights.scale_down(downscale_factor)
 
     def set_biases_to_zero(self) -> None:  # pragma: nocover

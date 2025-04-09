@@ -1,4 +1,4 @@
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from hypothesis import given, strategies
 from torch import nn
@@ -8,7 +8,9 @@ from revnets.standardization.utils import (
     extract_rnn_layers,
     extract_scale_isomorphism_after_max_pool,
 )
-from revnets.standardization.weights import rnn
+
+if TYPE_CHECKING:
+    from revnets.standardization.weights import rnn
 
 
 @given(
@@ -57,7 +59,7 @@ def test_rnn_extract_weights(
         batch_first=True,
     )
     untyped_layers = [layer.weights for layer in extract_rnn_layers(layer)]
-    layers = cast(list[rnn.Weights], untyped_layers)
+    layers = cast("list[rnn.Weights]", untyped_layers)
     assert len(layers) == number_of_layers
     assert layers[0].input_to_hidden.weights.shape == (hidden_size, input_size + 1)
 

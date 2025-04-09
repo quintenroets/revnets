@@ -69,7 +69,7 @@ def test_evaluations(
     evaluation_module: ModuleType,
     pipeline_module: ModuleType,
 ) -> None:
-    pipeline = cast(Pipeline, pipeline_module.Pipeline())
+    pipeline = cast("Pipeline", pipeline_module.Pipeline())
     reconstructor = reconstructions.empty.Reconstructor(pipeline)
     reconstruction = reconstructor.create_reconstruction()
     evaluation_module.Evaluator(reconstruction, pipeline).get_evaluation()
@@ -111,7 +111,7 @@ def verify_evaluated_networks(
             network_module=mininet,
             standardization_type=standardization,
             activation=pipeline.network_factory.activation,
-            network=cast(Sequential, network),
+            network=cast("Sequential", network),
             target=pipeline.target,
         )
         network_verifier.verify_form()

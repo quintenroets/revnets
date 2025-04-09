@@ -26,7 +26,7 @@ class Context(Context_[Options, Config, None]):
         relative_path = self.output_path.relative_to(Path.config)
         path = Path.results / relative_path / "results.yaml"
         path = path.with_nonexistent_name()
-        return cast(Path, path)
+        return cast("Path", path)
 
     @property
     def log_path(self) -> Path:

@@ -55,7 +55,7 @@ class Evaluator(base.Evaluator):
         data = self.pipeline.load_prepared_data()
         dataloader = self.extract_dataloader(data)
         Trainer().test(model, dataloaders=dataloader)
-        return cast(Metrics, model.metrics)
+        return cast("Metrics", model.metrics)
 
     @classmethod
     def extract_dataloader(cls, data: DataModule) -> DataLoader[Any]:

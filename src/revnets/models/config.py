@@ -91,7 +91,7 @@ class Config(SerializationMixin):
 
     @property
     def number_of_validation_sanity_steps(self) -> int | None:
-        return 0 if self.debug else 0
+        return 0 if self.debug else 1
 
     def __post_init__(self) -> None:
         if self.evaluation.run_analysis:

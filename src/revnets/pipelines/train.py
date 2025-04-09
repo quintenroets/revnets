@@ -83,7 +83,7 @@ class Pipeline(base.Pipeline, ABC):
         batch_size = len(data.train)  # type: ignore[arg-type]
         dataloader = DataLoader(data.train, batch_size, shuffle=False)
         inputs, _ = next(iter(dataloader))
-        return cast(torch.Tensor, inputs)
+        return cast("torch.Tensor", inputs)
 
     def load_weights(self, model: torch.nn.Module) -> None:
         state = torch.load(self.weights_path_str)

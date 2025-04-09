@@ -55,13 +55,13 @@ class DataModule(base.DataModule):
     @classproperty
     def path(cls) -> Path:
         path = Path.data / "mnist_1D"
-        return cast(Path, path)
+        return cast("Path", path)
 
     @classmethod
     @classproperty
     def raw_path(cls) -> Path:
         path = Path.data / "mnist_1D.pkl"
-        return cast(Path, path)
+        return cast("Path", path)
 
     download_url: str = (
         "https://github.com/greydanus/mnist1d/raw/master/mnist1d_data.pkl"
@@ -86,5 +86,5 @@ class DataModule(base.DataModule):
 
     def setup(self, stage: str) -> None:  # noqa: ARG002
         path = str(self.path)
-        self.train_validation, self.test = torch.load(path)
+        self.train_validation, self.test = torch.load(path, weights_only=False)
         self.split_train_validation()

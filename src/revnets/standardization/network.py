@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 
 from torch import nn
 
 from .layer import InternalLayer
 from .scale_isomorphism import ScaleIsomorphism
 from .utils import extract_internal_layers
-from .weights import feedforward
+
+if TYPE_CHECKING:
+    from .weights import feedforward
 
 T = TypeVar("T")
 
@@ -44,12 +46,12 @@ class Standardizer:
                 layer.standardize_scale()
 
     def calculate_average_scale_per_layer(self) -> float:
-        next_ = cast(feedforward.Weights, self.internal_layers[-1].next)
+        next_ = cast("feedforward.Weights", self.internal_layers[-1].next)
         scales = next_.calculate_outgoing_norms()
         scale = sum(scales) / len(scales)
         num_internal_layers = len(self.layers_with_norm_isomorphism)
         average_scale = scale ** (1 / num_internal_layers)
-        return cast(float, average_scale)
+        return cast("float", average_scale)
 
     @cached_property
     def internal_layers(self) -> list[InternalLayer]:

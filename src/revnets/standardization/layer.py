@@ -29,17 +29,17 @@ class InternalLayer(Layer):
     def _standardize_scale(self) -> None:
         scale_factors = self.calculate_scale_factors()
         # only feedforward layers have scale isomorphism
-        weights = cast(feedforward.Weights, self.weights)
+        weights = cast("feedforward.Weights", self.weights)
         weights.rescale_outgoing(1 / scale_factors)
 
         # we assume that an rnn layer is never preceded by a feedforward layer
-        next_ = cast(feedforward.Weights, self.next)
+        next_ = cast("feedforward.Weights", self.next)
         next_.rescale_incoming(scale_factors)
 
     def calculate_scale_factors(self) -> torch.Tensor:
         # only feedforward layers have scale isomorphism
-        weights = cast(feedforward.Weights, self.weights)
-        isomorphism = cast(ScaleIsomorphism, self.scale_isomorphism)
+        weights = cast("feedforward.Weights", self.weights)
+        isomorphism = cast("ScaleIsomorphism", self.scale_isomorphism)
         return weights.calculate_outgoing_scales(isomorphism) / self.standardized_scale
 
     def standardize_order(self) -> None:

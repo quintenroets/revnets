@@ -32,7 +32,7 @@ class Reconstructor(base.Reconstructor):
         seed = str(context.config.experiment.seed)
         path = Path.weights / "reconstructions" / self.name / self.pipeline.name / seed
         path.create_parent()
-        return cast(Path, path)
+        return cast("Path", path)
 
     def reconstruct_weights(self) -> None:
         weights_saved = self.trained_weights_path.exists()
