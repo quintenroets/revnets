@@ -27,18 +27,18 @@ class Path(superpathlib.Path):
 
     @classmethod
     @classproperty
-    def data(cls: type[T]) -> T:
+    def data(cls) -> Self:
         path = cls.assets / "data"
-        return cast(T, path)
+        return cast("Self", path)
 
     @classmethod
     @classproperty
-    def weights(cls: type[T]) -> T:
+    def weights(cls) -> Self:
         path = cls.assets / "weights"
-        return cast(T, path)
+        return cast("Self", path)
 
     @classmethod
     @classproperty
-    def results(cls: type[T]) -> T:
+    def results(cls) -> Self:
         path = cls.assets / "results"
-        return cast(T, path)
+        return cast("Self", path)
