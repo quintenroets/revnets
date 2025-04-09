@@ -31,7 +31,7 @@ class Evaluator:
         elif isinstance(value, float):
             result = f"{value:.{precision}e}"
         else:
-            result = cast(str, value)
+            result = cast("str", value)
         return result
 
     def evaluate(self) -> Any:

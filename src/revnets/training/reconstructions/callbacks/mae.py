@@ -32,4 +32,4 @@ class MAECalculator(Callback):
         Standardizer(self.reconstruction).run()
         mae = self.evaluator.calculate_total_distance()
         self.reconstruction.load_state_dict(state_dict)
-        return cast(float, mae)
+        return cast("float", mae)

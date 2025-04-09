@@ -31,5 +31,5 @@ class Evaluator(base.Evaluator):
             network.to(dtype)
         Trainer(precision=precision).test(model, dataloaders=dataloader)
         untyped_metrics = model.test, model.adversarial, model.adversarial_transfer
-        metrics = cast(tuple[Metrics, ...], untyped_metrics)
+        metrics = cast("tuple[Metrics, ...]", untyped_metrics)
         return Evaluation(*metrics)

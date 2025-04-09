@@ -27,7 +27,7 @@ class LossMetric(torchmetrics.Metric):
 
     def compute(self) -> torch.Tensor:
         value = self.loss_sum / self.num_examples
-        return cast(torch.Tensor, value)
+        return cast("torch.Tensor", value)
 
 
 class RunningMetrics:
@@ -110,14 +110,14 @@ class AttackNetwork(pl.LightningModule):
     ) -> NDArray[np.float64]:
         values_numpy = values.detach().cpu().numpy()[:max_elements]
         values_numpy = values_numpy.reshape(values_numpy.shape[0], -1)
-        return cast(NDArray[np.float64], values_numpy)
+        return cast("NDArray[np.float64]", values_numpy)
 
     def get_adversarial_inputs(self, inputs: torch.Tensor) -> torch.Tensor:
         if self.model_under_attack is None:
             self.configure_attack(inputs)
 
         attack_inputs = inputs.cpu().numpy()
-        attack = cast(FastGradientMethod, self.attack)
+        attack = cast("FastGradientMethod", self.attack)
         with torch.inference_mode(mode=False):
             adversarial_inputs = attack.generate(x=attack_inputs)
         return torch.Tensor(adversarial_inputs).to(inputs.device)

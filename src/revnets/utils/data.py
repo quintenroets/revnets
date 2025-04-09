@@ -16,7 +16,7 @@ class PredictNetwork(LightningModule):
 
     def forward(self, batch: torch.Tensor) -> torch.Tensor:
         outputs = self.network(batch[0])
-        return cast(torch.Tensor, outputs)
+        return cast("torch.Tensor", outputs)
 
 
 def compute_targets(
@@ -31,5 +31,5 @@ def compute_targets(
     trainer = Trainer(barebones=True)
     network = PredictNetwork(network)
     untyped_batch_outputs = trainer.predict(network, dataloader)
-    batch_outputs = cast(list[torch.Tensor], untyped_batch_outputs)
+    batch_outputs = cast("list[torch.Tensor]", untyped_batch_outputs)
     return torch.cat(batch_outputs)

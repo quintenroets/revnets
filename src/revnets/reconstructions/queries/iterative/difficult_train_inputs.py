@@ -24,7 +24,7 @@ class Reconstructor(base.Reconstructor):
     def recombine(self, inputs: torch.Tensor) -> torch.Tensor:
         feature_dimensions = inputs.shape[1:]
         untyped_feature_dimension = np.prod(feature_dimensions)
-        feature_dimension = cast(int, untyped_feature_dimension)
+        feature_dimension = cast("int", untyped_feature_dimension)
         flat_inputs = inputs.reshape((-1, feature_dimension))
         recombined_flat_inputs = self.recombine_flat(flat_inputs)
         shape = -1, *feature_dimensions
@@ -76,4 +76,4 @@ class Reconstructor(base.Reconstructor):
             curve="convex",
             direction="decreasing",
         )
-        return cast(int, elbow_result.elbow)
+        return cast("int", elbow_result.elbow)

@@ -18,7 +18,7 @@ def main() -> None:
 
 
 def launch(experiment: Experiment) -> None:
-    config_dict = cast(dict[str, Any], context.options.config_path.yaml)
+    config_dict = cast("dict[str, Any]", context.options.config_path.yaml)
     experiment.prepare_config(config_dict)
     command = "revnets", "--config-path", str(experiment.config_path)
     title = "_".join(experiment.names)

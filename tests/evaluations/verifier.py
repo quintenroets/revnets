@@ -45,7 +45,7 @@ class Verifier:
     def network_factory(self) -> NetworkFactory:
         Factory = self.network_module.NetworkFactory  # noqa:N806
         factory = Factory(activation=self.activation)
-        return cast(NetworkFactory, factory)
+        return cast("NetworkFactory", factory)
 
     def test_standardized_form(self) -> None:
         self.apply_transformation()
@@ -108,7 +108,7 @@ class Verifier:
     def extract_feature_shape(self) -> tuple[int, ...]:
         input_layer = next(self.extract_layers())
         shape = input_layer.weight.shape[1:]
-        return cast(tuple[int, ...], shape)
+        return cast("tuple[int, ...]", shape)
 
     def extract_layers(self) -> Iterator[Module]:
         for layer in self.network.children():
@@ -133,8 +133,8 @@ class Verifier:
 
 
 def verify_scale_standardized(layer: InternalLayer) -> None:
-    weights = cast(feedforward.Weights, layer.weights)
-    scale_isomorphism = cast(ScaleIsomorphism, layer.scale_isomorphism)
+    weights = cast("feedforward.Weights", layer.weights)
+    scale_isomorphism = cast("ScaleIsomorphism", layer.scale_isomorphism)
     scales = weights.calculate_outgoing_scales(scale_isomorphism)
     ones = torch.ones_like(scales)
     close_to_one = torch.isclose(scales, ones)

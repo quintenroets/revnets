@@ -30,7 +30,7 @@ class Network(pl.LightningModule, Generic[Metrics]):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         outputs = self.model(inputs)
-        return cast(torch.Tensor, outputs)
+        return cast("torch.Tensor", outputs)
 
     def training_step(
         self,

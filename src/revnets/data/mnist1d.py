@@ -55,13 +55,13 @@ class DataModule(base.DataModule):
     @classproperty
     def path(cls) -> Path:
         path = Path.data / "mnist_1D"
-        return cast(Path, path)
+        return cast("Path", path)
 
     @classmethod
     @classproperty
     def raw_path(cls) -> Path:
         path = Path.data / "mnist_1D.pkl"
-        return cast(Path, path)
+        return cast("Path", path)
 
     download_url: str = (
         "https://github.com/greydanus/mnist1d/raw/master/mnist1d_data.pkl"

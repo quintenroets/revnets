@@ -39,7 +39,7 @@ class Evaluator(base.Evaluator):
             for original, reconstruction in self.iterate_compared_layers()
         )
         distance = total_distance / total_size
-        return cast(float, distance)
+        return cast("float", distance)
 
     @classmethod
     def calculate_distance(cls, values: torch.Tensor, other: torch.Tensor) -> float:
