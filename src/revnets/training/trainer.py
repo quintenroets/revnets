@@ -24,12 +24,15 @@ class Trainer(pl.Trainer):
     ) -> None:
         config = context.config
         callbacks = list(self.generate_callbacks(callbacks, barebones=barebones))
+        number_of_validation_sanity_steps = (
+            0 if barebones else config.number_of_validation_sanity_steps
+        )
         super().__init__(
             accelerator=accelerator,
             barebones=barebones,
             callbacks=callbacks,
             max_epochs=max_epochs or context.config.reconstruction_training.epochs,
-            num_sanity_val_steps=config.number_of_validation_sanity_steps,
+            num_sanity_val_steps=number_of_validation_sanity_steps,
             limit_train_batches=config.limit_batches,
             limit_val_batches=config.limit_batches,
             limit_test_batches=config.limit_batches,
