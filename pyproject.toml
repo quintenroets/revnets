@@ -3,7 +3,7 @@ name = "revnets"
 version = "0.1.0"
 description = "Reverse engineer internal parameters of black box neural networks"
 authors = [{name = "Quinten Roets", email = "qdr2104@columbia.edu"}, {name="Judah Goldfeder", email="jag2396@columbia.edu"}]
-license = {text = "MIT"}
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
 dependencies = [
