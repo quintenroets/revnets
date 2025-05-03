@@ -1,9 +1,15 @@
 [project]
 name = "revnets"
 version = "0.1.0"
+<<<<<<< HEAD
 description = "Reverse engineer internal parameters of black box neural networks"
 authors = [{name = "Quinten Roets", email = "qdr2104@columbia.edu"}, {name="Judah Goldfeder", email="jag2396@columbia.edu"}]
 license = {text = "MIT"}
+=======
+description = "Template for Python package published on PyPI"
+authors = [{name = "Quinten Roets", email = "qdr2104@columbia.edu"}]
+license = "MIT"
+>>>>>>> template
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
 dependencies = [
