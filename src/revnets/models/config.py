@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -98,3 +99,5 @@ class Config(SerializationMixin):
             self.always_train = False
         if self.debug:
             self.limit_batches = self.debug_batch_limit  # pragma: nocover
+=======
+>>>>>>> template
