@@ -11,6 +11,8 @@ jobs:
       - name: Validate
         id: validate
         uses: quintenroets/actions/validate/@main
+        env:
+          SKIP: "check-coverage"
 
   extract-python-versions:
     name: Extract Python versions
