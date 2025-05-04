@@ -4,7 +4,10 @@ from typing import cast
 import torch
 from package_utils.context import Context as Context_
 
-from revnets.models import Config, Options, Path
+from revnets.models import Path
+
+from .config import Config
+from .options import Options
 
 
 class Context(Context_[Options, Config, None]):

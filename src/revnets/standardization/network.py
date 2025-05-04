@@ -9,7 +9,7 @@ from .scale_isomorphism import ScaleIsomorphism
 from .utils import extract_internal_layers
 
 if TYPE_CHECKING:
-    from .weights import feedforward
+    from .weights import feedforward  # pragma: nocover
 
 T = TypeVar("T")
 

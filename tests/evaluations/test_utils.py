@@ -10,7 +10,7 @@ from revnets.standardization.utils import (
 )
 
 if TYPE_CHECKING:
-    from revnets.standardization.weights import rnn
+    from revnets.standardization.weights import rnn  # pragma: nocover
 
 
 @given(

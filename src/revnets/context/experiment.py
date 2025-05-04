@@ -4,7 +4,7 @@ from typing import Any, cast
 
 from package_utils.dataclasses.mixins import SerializationMixin
 
-from .path import Path
+from revnets.models import Path
 
 
 @dataclass

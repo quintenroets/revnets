@@ -2,8 +2,7 @@ from typing import Any, cast
 
 import cli
 
-from revnets.context import context
-from revnets.models import Experiment
+from revnets.context import Experiment, context
 
 from .lauch_plan import LaunchPlan
 

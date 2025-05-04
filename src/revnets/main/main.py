@@ -7,8 +7,8 @@ import torch
 from torch import nn
 
 from revnets import evaluations, pipelines, reconstructions
+from revnets.context import Experiment as Config
 from revnets.context import context
-from revnets.models import Experiment as Config
 from revnets.pipelines import Pipeline
 
 if TYPE_CHECKING:

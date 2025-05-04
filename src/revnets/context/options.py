@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .path import Path
+from revnets.models import Path
 
 
 @dataclass

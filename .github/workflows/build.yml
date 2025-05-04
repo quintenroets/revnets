@@ -4,47 +4,15 @@ on:
   push:
 
 jobs:
-  check-pre-commit:
-    name: Check pre-commit hooks
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
     steps:
-      - name: Setup environment
-        uses: quintenroets/actions/setup/environment@main
-        with:
-          environment: dev
-          editable: true
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v4
+      - name: Validate
+        id: validate
+        uses: quintenroets/actions/validate/@main
         env:
-          KEY:
-            pre-commit
-            ${{ runner.os }}
-            ${{ steps.determine-python-version.outputs.python_version }}
-        with:
-          save-always: true
-          path: |
-            ~/.cache/pre-commit
-            .mypy_cache
-          key: ${{ env.KEY }}-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: ${{ env.KEY }}
-
-      - name: Run hooks
-        shell: bash
-        run: |
-          hooks=("docformatter" "ruff" "ruff-format" "black" "infer-missing-annotations" "mypy")
-          for hook in "${hooks[@]}"; do
-            pre-commit run --show-diff-on-failure --color=always --all-files $hook
-          done
-
-
-  verify-packaging:
-    name: Verify packaging
-    runs-on: ubuntu-latest
-    steps:
-      - name: Verify packaging
-        uses: quintenroets/actions/validate/package@main
+          SKIP: "check-coverage"
 
   extract-python-versions:
     name: Extract Python versions
@@ -74,7 +42,7 @@ jobs:
     name: Publish package
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [check-pre-commit, verify-packaging, run-tests]
+    needs: [validate, run-tests]
     environment: release
     permissions:
       id-token: write  # Needed for PyPi publishing
@@ -87,7 +55,7 @@ jobs:
     name: Trigger template sync
     runs-on: ubuntu-latest
     if: github.repository == 'quintenroets/python-package-template' && github.ref == 'refs/heads/main'
-    needs: [check-pre-commit, verify-packaging, run-tests]
+    needs: [validate, run-tests]
     steps:
       - name: Trigger template sync
         uses: quintenroets/actions/trigger-template-sync@main

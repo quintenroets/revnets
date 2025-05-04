@@ -31,7 +31,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "hypothesis >= 6.97.1",
-    "package-dev-tools >=0.5.11, <1",
+    "package-dev-tools >=0.7.1, <1",
     "package-dev-utils >=0.1.6, <1",
     "types-requests >=2.31.0.10, <3",
 ]
@@ -48,6 +48,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.coverage.run]
 command_line = "-m pytest tests"
+omit = [
+  "/tmp/*",
+]
 
 [tool.coverage.report]
 precision = 4
