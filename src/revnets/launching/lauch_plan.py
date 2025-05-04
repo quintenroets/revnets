@@ -2,7 +2,7 @@ import itertools
 from collections.abc import Iterator
 from types import ModuleType
 
-from revnets import models, pipelines, reconstructions
+from revnets import context, pipelines, reconstructions
 
 from .experiment import Experiment
 
@@ -21,7 +21,7 @@ class LaunchPlan:
         yield from range(5)
 
     @classmethod
-    def experiments_to_launch(cls) -> Iterator[models.Experiment]:
+    def experiments_to_launch(cls) -> Iterator[context.Experiment]:
         combinations = itertools.product(
             cls.reconstruction_techniques(),
             cls.pipelines(),

@@ -5,8 +5,7 @@ import torch
 from torch import nn
 from torch.nn import Module, Sequential
 
-from revnets.context import context
-from revnets.models import Activation
+from revnets.context import Activation, context
 from revnets.utils import NamedClass
 
 

@@ -6,7 +6,7 @@ from pytorch_lightning import Callback, LightningModule, Trainer
 from revnets.context import context
 
 if TYPE_CHECKING:
-    from revnets.training.reconstructions.network import Network
+    from revnets.training.reconstructions.network import Network  # pragma: nocover
 
 transitions = {
     1: 1e-1,
@@ -38,7 +38,7 @@ class LearningRateScheduler(Callback):
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
         pl_module.log(
             "learning rate",
-            pl_module.learning_rate,  # type: ignore[arg-type]
+            pl_module.learning_rate,
             prog_bar=True,
             on_step=False,
         )
@@ -54,6 +54,6 @@ class LearningRateScheduler(Callback):
                 target_scale = scale
         initial_learning_rate = context.config.target_network_training.learning_rate
         learning_rate = initial_learning_rate * target_scale
-        if learning_rate < pl_module.learning_rate:  # type: ignore[operator]
+        if learning_rate < pl_module.learning_rate:
             network = cast("Network", pl_module)
             network.learning_rate = learning_rate

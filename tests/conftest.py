@@ -3,9 +3,10 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
+from revnets.context import Config, Evaluation, HyperParameters
 from revnets.context import context as context_
 from revnets.context.context import Context
-from revnets.models import Config, Evaluation, HyperParameters, Path
+from revnets.models import Path
 
 
 @pytest.fixture(scope="session")

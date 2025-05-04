@@ -9,18 +9,17 @@ import torch
 from torch.nn import Module, Sequential
 
 from revnets import standardization
-from revnets.context import context
-from revnets.models import Activation
+from revnets.context import Activation, context
 from revnets.networks import NetworkFactory
 from revnets.standardization import (
     InternalLayer,
-    ScaleIsomorphism,
     Standardizer,
     align,
     extract_internal_layers,
 )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: nocover
+    from revnets.standardization import ScaleIsomorphism
     from revnets.standardization.weights import feedforward
 
 
@@ -109,7 +108,7 @@ class Verifier:
 
     def extract_feature_shape(self) -> tuple[int, ...]:
         input_layer = next(self.extract_layers())
-        shape = input_layer.weight.shape[1:]  # type: ignore[index]
+        shape = input_layer.weight.shape[1:]
         return cast("tuple[int, ...]", shape)
 
     def extract_layers(self) -> Iterator[Module]:

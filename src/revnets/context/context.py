@@ -1,16 +1,13 @@
 from functools import cached_property
 from typing import cast
 
-<<<<<<< HEAD
 import torch
 from package_utils.context import Context as Context_
-=======
+
+from revnets.models import Path
+
 from .config import Config
 from .options import Options
-from .secrets_ import Secrets
->>>>>>> template
-
-from revnets.models import Config, Options, Path
 
 
 class Context(Context_[Options, Config, None]):
