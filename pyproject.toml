@@ -7,6 +7,7 @@ license = "MIT"
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
 dependencies = [
+<<<<<<< HEAD
     "adversarial-robustness-toolbox >=1.17.1, <2",
     "kneed >=0.8.5, <1",
     "matplotlib >=3.8.2, <4",
@@ -25,13 +26,21 @@ dependencies = [
     "torchvision >=0.17.2, <1",
     "torchtoolbox >=0.1.8.2, <1",
     "torchtext >=0.17.2, <1",
+=======
+    "package-utils[context] >=0.8.3, <1",
+    "powercli >=0.3.7, <1",
+>>>>>>> template
 ]
 
 
 [project.optional-dependencies]
 dev = [
+<<<<<<< HEAD
     "hypothesis >= 6.97.1",
     "package-dev-tools >=0.7.1, <1",
+=======
+    "package-dev-tools >=0.8.0, <1",
+>>>>>>> template
     "package-dev-utils >=0.1.6, <1",
     "types-requests >=2.31.0.10, <3",
 ]
@@ -86,6 +95,12 @@ ignore = [
     "ANN401",   # annotated with Any
     "D",        # docstrings
     "G004",     # logging f-string
+    "D1",       # missing docstrings
+    "D200",     # one-line docstring
+    "D203",     # conflicts with D211
+    "D205",     # blank line between summary and description
+    "D212",     # conflicts with D213
+    "D401",     # imperative first line
 ]
 
 [tool.ruff.lint.per-file-ignores]
