@@ -5,7 +5,7 @@ description = "Reverse engineer internal parameters of black box neural networks
 authors = [{name = "Quinten Roets", email = "qdr2104@columbia.edu"}, {name="Judah Goldfeder", email="jag2396@columbia.edu"}]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, <3.13"
 dependencies = [
     "adversarial-robustness-toolbox >=1.20.1, <2",
     "kneed >=0.8.6, <1",
