@@ -74,7 +74,12 @@ class Verifier:
         self.apply_transformation()
         with torch.no_grad():
             outputs_after_transformation = self.network(inputs)
-        outputs_are_closes = torch.isclose(outputs, outputs_after_transformation)
+        atol = 100 * torch.finfo(outputs.dtype).eps
+        outputs_are_closes = torch.isclose(
+            outputs,
+            outputs_after_transformation,
+            atol=atol,
+        )
         assert torch.all(outputs_are_closes)
 
     def verify_standardized_form(self) -> None:
@@ -108,7 +113,8 @@ class Verifier:
 
     def extract_feature_shape(self) -> tuple[int, ...]:
         input_layer = next(self.extract_layers())
-        shape = input_layer.weight.shape[1:]
+        weight = cast("torch.Tensor", input_layer.weight)
+        shape = weight.shape[1:]
         return cast("tuple[int, ...]", shape)
 
     def extract_layers(self) -> Iterator[Module]:

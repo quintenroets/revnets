@@ -18,7 +18,7 @@ class Reconstructor(random.Reconstructor):
 
     def create_random_inputs(self, shape: Sequence[int]) -> torch.Tensor:
         means, covariance_matrix = self.infer_distribution_parameters()
-        distribution = MultivariateNormal(means, covariance_matrix)  # type: ignore[no-untyped-call]
+        distribution = MultivariateNormal(means, covariance_matrix)
         sample_shape = torch.Size((shape[0],))
         # same mean, variance, and covariance as the training data
         return distribution.sample(sample_shape).reshape(shape)

@@ -23,12 +23,15 @@ class LossMetric(torchmetrics.Metric):
         self.add_state("num_examples", default=torch.tensor(0), dist_reduce_fx="sum")
 
     def update(self, outputs: torch.Tensor, labels: torch.Tensor) -> None:
-        self.loss_sum += nn.functional.cross_entropy(outputs, labels, reduction="sum")
-        self.num_examples += len(outputs)
+        loss_sum = cast("torch.Tensor", self.loss_sum)
+        num_examples = cast("torch.Tensor", self.num_examples)
+        loss_sum += nn.functional.cross_entropy(outputs, labels, reduction="sum")
+        num_examples += len(outputs)
 
     def compute(self) -> torch.Tensor:
-        value = self.loss_sum / self.num_examples
-        return cast("torch.Tensor", value)
+        loss_sum = cast("torch.Tensor", self.loss_sum)
+        num_examples = cast("torch.Tensor", self.num_examples)
+        return loss_sum / num_examples
 
 
 class RunningMetrics:

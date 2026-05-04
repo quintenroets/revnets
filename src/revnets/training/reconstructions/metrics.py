@@ -1,10 +1,10 @@
 import math
 from dataclasses import dataclass, field
+from typing import Self
 
 import torch
 from simple_classproperty import classproperty
 from torch import nn
-from typing_extensions import Self
 
 from revnets.context import context
 from revnets.training import metrics
