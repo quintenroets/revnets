@@ -42,7 +42,7 @@ class RunningMetrics:
         self.loss = LossMetric().to(context.device)
 
     def compute(self) -> Metrics:
-        accuracy = self.accuracy.compute().item()  # type: ignore[func-returns-value]
+        accuracy = cast("torch.Tensor", self.accuracy.compute()).item()
         loss = self.loss.compute()
         return Metrics(loss, accuracy)
 
