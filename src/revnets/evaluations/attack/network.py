@@ -1,3 +1,4 @@
+import copy
 from typing import Any, cast
 
 import matplotlib.pyplot as plt
@@ -113,12 +114,11 @@ class AttackNetwork(pl.LightningModule):
         return cast("NDArray[np.float64]", values_numpy)
 
     def get_adversarial_inputs(self, inputs: torch.Tensor) -> torch.Tensor:
-        if self.model_under_attack is None:
-            self.configure_attack(inputs)
-
         attack_inputs = inputs.cpu().numpy()
-        attack = cast("FastGradientMethod", self.attack)
         with torch.inference_mode(mode=False):
+            if self.model_under_attack is None:
+                self.configure_attack(inputs.clone())
+            attack = cast("FastGradientMethod", self.attack)
             adversarial_inputs = attack.generate(x=attack_inputs)
         return torch.Tensor(adversarial_inputs).to(inputs.device)
 
@@ -136,13 +136,18 @@ class AttackNetwork(pl.LightningModule):
         metric.loss.update(outputs, labels)
 
     def configure_attack(self, inputs: torch.Tensor) -> None:
-        outputs = self.reconstruction(inputs)
+        attack_model = self.reconstruction
+        if context.device.type == "mps":
+            attack_model = copy.deepcopy(attack_model).cpu()
+            inputs = inputs.cpu()
+        outputs = attack_model(inputs)
+        device_type = "gpu" if torch.cuda.is_available() else "cpu"
         self.model_under_attack = PyTorchClassifier(
-            model=self.reconstruction,
+            model=attack_model,
             loss=torch.nn.CrossEntropyLoss(),
             input_shape=inputs.shape[1:],
             nb_classes=outputs.shape[-1],
-            device_type="gpu",
+            device_type=device_type,
         )
         self.attack = FastGradientMethod(
             self.model_under_attack,

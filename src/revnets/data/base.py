@@ -56,5 +56,5 @@ class DataModule(LightningDataModule):
 
     @property
     def input_shape(self) -> tuple[int, ...]:
-        inputs, target = self.train_validation[0]
+        inputs, _ = self.train_validation[0]
         return cast("tuple[int, ...]", inputs.shape)

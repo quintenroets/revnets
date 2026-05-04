@@ -1,5 +1,5 @@
 .pre-commit-config.yaml
-template-Makefile
+config/template-Makefile
 uv.lock
 
 # IDE config files

@@ -45,7 +45,7 @@ class Evaluation:
 
     def create_table(self) -> Table:
         # slow import
-        from rich.table import Table
+        from rich.table import Table  # noqa: PLC0415
 
         table = Table(show_lines=True)
         table.add_column("Metric", style="cyan", max_width=20, overflow="fold")

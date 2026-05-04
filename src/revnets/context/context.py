@@ -41,20 +41,29 @@ class Context(Context_[Options, Config, None]):
 
     @cached_property
     def device(self) -> torch.device:
-        name = "cuda" if torch.cuda.is_available() else "cpu"
+        name = (
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps"
+            if torch.backends.mps.is_available()
+            else "cpu"
+        )
         return torch.device(name)
 
     @property
+    def precision(self) -> int:
+        return 32 if self.device.type == "mps" else self.config.precision
+
+    @property
     def dtype(self) -> torch.dtype:
-        match self.config.precision:  # pragma: nocover
+        match self.precision:  # pragma: nocover
             case 32:
-                dtype = torch.float32
+                return torch.float32
             case 64:
-                dtype = torch.float64
+                return torch.float64
             case _:
-                message = f"Unsupported precision {self.config.precision}"
+                message = f"Unsupported precision {self.precision}"
                 raise ValueError(message)
-        return dtype
 
 
 context = Context(Options, Config, None)

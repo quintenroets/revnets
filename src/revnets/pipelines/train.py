@@ -112,6 +112,9 @@ class Pipeline(base.Pipeline, ABC):
     def log_network_summary(self) -> None:
         if not isinstance(self.network_factory, networks.images.rnn.NetworkFactory):
             network = self.create_initialized_network()
-            network = network.to(dtype=torch.float32).to(context.device)
+            summary_device = (
+                "cpu" if context.device.type == "mps" else context.device.type
+            )
+            network = network.to(dtype=torch.float32)
             data = self.load_prepared_data()
-            summary(network, data.input_shape)
+            summary(network, data.input_shape, device=summary_device)

@@ -28,13 +28,14 @@ class InternalLayer(Layer):
 
     def _standardize_scale(self) -> None:
         scale_factors = self.calculate_scale_factors()
-        # only feedforward layers have scale isomorphism
-        weights = cast("feedforward.Weights", self.weights)
-        weights.rescale_outgoing(1 / scale_factors)
+        if not torch.allclose(scale_factors, torch.ones_like(scale_factors)):
+            # only feedforward layers have scale isomorphism
+            weights = cast("feedforward.Weights", self.weights)
+            weights.rescale_outgoing(1 / scale_factors)
 
-        # we assume that an rnn layer is never preceded by a feedforward layer
-        next_ = cast("feedforward.Weights", self.next)
-        next_.rescale_incoming(scale_factors)
+            # we assume that an rnn layer is never preceded by a feedforward layer
+            next_ = cast("feedforward.Weights", self.next)
+            next_.rescale_incoming(scale_factors)
 
     def calculate_scale_factors(self) -> torch.Tensor:
         # only feedforward layers have scale isomorphism

@@ -3,7 +3,7 @@ import torch
 
 from revnets.main.main import Experiment
 
-gpu_available = torch.cuda.is_available()
+gpu_available = torch.cuda.is_available() or torch.backends.mps.is_available()
 
 
 @pytest.mark.skipif(

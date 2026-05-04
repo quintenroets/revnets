@@ -50,7 +50,9 @@ class Evaluator(base.Evaluator):
 
     def create_queries(self) -> torch.Tensor:
         # Circular import: reconstructions should import evaluations
-        from revnets.reconstructions.queries.random import Reconstructor
+        from revnets.reconstructions.queries.random import (  # noqa: PLC0415
+            Reconstructor,
+        )
 
         return Reconstructor(self.pipeline).create_queries(self.n_inputs)
 

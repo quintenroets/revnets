@@ -58,6 +58,8 @@ class InputNetwork(LightningModule):
 
     def calculate_loss(self, outputs: torch.Tensor) -> torch.Tensor:
         outputs = torch.transpose(outputs, 1, 0).contiguous()
+        if outputs.device.type == "mps":
+            outputs = outputs.cpu()
         pairwise_distances = torch.cdist(outputs, outputs)
         distance_total = pairwise_distances.mean()
         loss = -distance_total
