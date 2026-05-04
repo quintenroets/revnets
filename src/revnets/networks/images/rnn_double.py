@@ -9,7 +9,7 @@ from . import rnn
 
 class ExtractRNNOutput(rnn.ExtractRNNOutput):
     def forward(self, inputs: tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
-        outputs, hidden = inputs
+        outputs, _ = inputs
         return outputs
 
 

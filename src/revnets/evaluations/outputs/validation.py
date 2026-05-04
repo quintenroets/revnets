@@ -34,7 +34,7 @@ class CompareModel(pl.LightningModule):
         self.metrics: Metrics | None = None
 
     def test_step(self, batch: torch.Tensor, batch_idx: int) -> None:  # noqa: ARG002
-        inputs, labels = batch
+        inputs, _ = batch
         models = (self.model1, self.model2)
         outputs = [model(inputs) for model in models]
         for metric in self.mae_metric, self.mse_metric:

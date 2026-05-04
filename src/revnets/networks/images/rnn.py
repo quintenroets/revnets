@@ -15,7 +15,7 @@ class CreateRNNInput(nn.Module):
 class ExtractRNNOutput(nn.Module):
     def forward(self, inputs: tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
         number_of_dimensions_without_batch = 2
-        outputs, hidden = inputs
+        outputs, _ = inputs
         if outputs.dim() == number_of_dimensions_without_batch:
             outputs = outputs.unsqueeze(0)
         return outputs[:, -1, :]
