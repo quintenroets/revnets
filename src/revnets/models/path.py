@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 from typing import Self, TypeVar, cast
 
 import superpathlib
 from simple_classproperty import classproperty
 
 T = TypeVar("T", bound="Path")
+=======
+from typing import Self, cast
+
+import superpathlib
+from simple_classproperty import classproperty
+>>>>>>> template
 
 
 class Path(superpathlib.Path):
