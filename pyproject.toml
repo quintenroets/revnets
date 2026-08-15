@@ -48,9 +48,13 @@ build-backend = "setuptools.build_meta"
 
 [tool.coverage.run]
 command_line = "-m pytest tests"
+<<<<<<< HEAD
 omit = [
   "/tmp/*",
 ]
+=======
+relative_files = true
+>>>>>>> template
 
 [tool.coverage.report]
 precision = 4
