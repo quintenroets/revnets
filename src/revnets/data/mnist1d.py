@@ -9,6 +9,7 @@ import torch
 from package_utils.dataclasses import SerializationMixin
 from simple_classproperty import classproperty
 from sklearn.preprocessing import StandardScaler
+from superpathlib.common_folders import PropertyMeta
 from torch.utils.data import TensorDataset
 
 from revnets.models import Path
@@ -50,7 +51,7 @@ class RawData(SerializationMixin):
 
 
 @dataclass
-class DataModule(base.DataModule):
+class DataModule(base.DataModule, metaclass=PropertyMeta):
     @classmethod
     @classproperty
     def path(cls) -> Path:
