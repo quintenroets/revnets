@@ -90,9 +90,12 @@ ignore = [
     "ANN401",   # annotated with Any
     "CPY001",   # missing copyright notice
 <<<<<<< HEAD
+<<<<<<< HEAD
     "D",        # docstrings
 =======
     "G004",     # logging f-string
+>>>>>>> template
+=======
 >>>>>>> template
     "D1",       # missing docstrings
     "D200",     # one-line docstring
