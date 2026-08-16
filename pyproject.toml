@@ -48,13 +48,10 @@ build-backend = "setuptools.build_meta"
 
 [tool.coverage.run]
 command_line = "-m pytest tests"
-<<<<<<< HEAD
+relative_files = true
 omit = [
   "/tmp/*",
 ]
-=======
-relative_files = true
->>>>>>> template
 
 [tool.coverage.report]
 precision = 4
@@ -89,14 +86,6 @@ select = ["ALL"]
 ignore = [
     "ANN401",   # annotated with Any
     "CPY001",   # missing copyright notice
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "D",        # docstrings
-=======
-    "G004",     # logging f-string
->>>>>>> template
-=======
->>>>>>> template
     "D1",       # missing docstrings
     "D200",     # one-line docstring
     "D203",     # conflicts with D211
