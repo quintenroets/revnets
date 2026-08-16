@@ -2,10 +2,11 @@ from dataclasses import dataclass, fields
 
 import torch
 from simple_classproperty import classproperty
+from superpathlib.common_folders import PropertyMeta
 
 
 @dataclass
-class Metrics:
+class Metrics(metaclass=PropertyMeta):
     loss: torch.Tensor
 
     def dict(self) -> dict[str, float]:

@@ -1,7 +1,8 @@
 from simple_classproperty import classproperty
+from superpathlib.common_folders import PropertyMeta
 
 
-class NamedClass:
+class NamedClass(metaclass=PropertyMeta):
     @classmethod
     def get_base_name(cls) -> str:
         raise NotImplementedError  # pragma: nocover
