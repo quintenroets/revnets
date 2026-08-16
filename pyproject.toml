@@ -89,7 +89,11 @@ select = ["ALL"]
 ignore = [
     "ANN401",   # annotated with Any
     "CPY001",   # missing copyright notice
+<<<<<<< HEAD
     "D",        # docstrings
+=======
+    "G004",     # logging f-string
+>>>>>>> template
     "D1",       # missing docstrings
     "D200",     # one-line docstring
     "D203",     # conflicts with D211
