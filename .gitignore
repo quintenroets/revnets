@@ -1,6 +1,5 @@
 .pre-commit-config.yaml
 config/template-Makefile
-uv.lock
 .worktrees/
 
 # IDE config files
