@@ -2,7 +2,7 @@ from collections.abc import Iterator
 
 import numpy as np
 from matplotlib import cm
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import Colormap
 from numpy.typing import NDArray
 
 SMALL_NUMBER_OF_COLORS = 10
@@ -27,12 +27,12 @@ def generate_colors(number_of_colors: int) -> Iterator[NDArray[np.float64]]:
 
 def generate_color_maps(
     number_of_colors: int,
-) -> Iterator[tuple[int, tuple[ListedColormap, ...]]]:
+) -> Iterator[tuple[int, tuple[Colormap, ...]]]:
     mappers = {
-        10: (cm.tab10,),  # type: ignore[attr-defined]
-        20: (cm.tab20,),  # type: ignore[attr-defined]
-        40: (cm.tab20, cm.tab20b),  # type: ignore[attr-defined]
-        60: (cm.tab20, cm.tab20b, cm.tab20c),  # type: ignore[attr-defined]
+        10: (cm.tab10,),
+        20: (cm.tab20,),
+        40: (cm.tab20, cm.tab20b),
+        60: (cm.tab20, cm.tab20b, cm.tab20c),
     }
     for number, color_map in mappers.items():
         if number_of_colors <= number:
