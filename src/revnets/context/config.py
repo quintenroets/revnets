@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from enum import Enum
+from typing import Any
 
 from package_utils.dataclasses.mixins import SerializationMixin
 
@@ -93,8 +94,17 @@ class Config(SerializationMixin):
     def number_of_validation_sanity_steps(self) -> int | None:
         return 0 if self.debug else 1
 
+    def dict(self) -> dict[str, Any]:
+        return asdict(self, dict_factory=create_serializable_dict)
+
     def __post_init__(self) -> None:
         if self.evaluation.run_analysis:
             self.always_train = False
         if self.debug:
             self.limit_batches = self.debug_batch_limit  # pragma: nocover
+
+
+def create_serializable_dict(items: list[tuple[str, Any]]) -> dict[str, Any]:
+    return {
+        key: value.value if isinstance(value, Enum) else value for key, value in items
+    }
