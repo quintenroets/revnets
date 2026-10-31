@@ -36,7 +36,7 @@ def test_context(
         run_analysis=True,
         only_visualize_differences=False,
     )
-    context.loaders.config.value = Config(
+    context.config = Config(
         target_network_training=hyperparameters,
         reconstruction_training=hyperparameters,
         difficult_inputs_training=hyperparameters,
@@ -48,4 +48,4 @@ def test_context(
     mock = patch("matplotlib.pyplot.show")
     with mock:
         yield context
-    context.loaders.config.value = config
+    context.config = config
